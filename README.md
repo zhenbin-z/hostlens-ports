@@ -20,22 +20,22 @@ mutation features.
 ## Development
 
 ```bash
-npm install
-npm run dev
+yarn install
+yarn dev
 ```
 
 ## Validation
 
 ```bash
-npm run typecheck
-npm run build
-npm test
+yarn typecheck
+yarn build
+yarn test
 ```
 
 To create local macOS `.dmg` and `.zip` artifacts:
 
 ```bash
-npm run dist:mac
+yarn dist:mac
 ```
 
 The local packaging command intentionally skips signing. A public release

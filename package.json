@@ -4,12 +4,13 @@
   "private": true,
   "description": "A lightweight desktop viewer for listening ports and their processes.",
   "author": "Zhenbin Zhang",
+  "packageManager": "yarn@1.22.22",
   "main": "./out/main/index.js",
   "type": "module",
   "scripts": {
     "dev": "electron-vite dev",
-    "build": "npm run typecheck && electron-vite build",
-    "dist:mac": "npm run build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg zip",
+    "build": "yarn typecheck && electron-vite build",
+    "dist:mac": "yarn build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg zip",
     "preview": "electron-vite preview",
     "test": "node --test src/main/scanners/*.test.ts",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json"
