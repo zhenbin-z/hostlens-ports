@@ -391,6 +391,13 @@ export function App(): React.JSX.Element {
             <option value="ja">日本語</option>
             <option value="zh-CN">简体中文</option>
           </select>
+          <svg
+            className="language-chevron"
+            viewBox="0 0 12 8"
+            aria-hidden="true"
+          >
+            <path d="M1 1.25 6 6.25l5-5" />
+          </svg>
         </label>
         <button
           className="icon-button"
