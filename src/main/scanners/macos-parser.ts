@@ -1,5 +1,14 @@
-import type { PortExposure, PortListener } from "../../shared/ports";
-import { classifyPortType } from "./process-identity.ts";
+import { basename } from "node:path";
+import type {
+  PortExposure,
+  PortListener,
+  ProcessAncestor,
+} from "../../shared/ports";
+import {
+  classifyPortType,
+  createUnknownLaunchSource,
+  createUnresolvedIdentity,
+} from "./process-identity.ts";
 
 interface ProcessRecord {
   pid?: number;
@@ -11,6 +20,13 @@ export interface ProcessDetails {
   parentPid?: number;
   user?: string;
   command?: string;
+}
+
+export interface ProcessTableEntry {
+  pid: number;
+  parentPid: number;
+  user: string;
+  executable: string;
 }
 
 function classifyExposure(address: string): PortExposure {
@@ -101,6 +117,20 @@ export function parseLsofListeners(output: string): PortListener[] {
       user: process.userId,
       exposure: classifyExposure(endpoint.address),
       portType: classifyPortType(endpoint.port),
+      parentChain: [],
+      observationStatus: "partial",
+      unavailableFields: [
+        "parentPid",
+        "command",
+        "executable",
+        "workingDirectory",
+        "parentChain",
+      ],
+      evidence: [],
+      identity: createUnresolvedIdentity(
+        process.processName || "Unknown process",
+      ),
+      launchSource: createUnknownLaunchSource(),
     });
   }
 
@@ -124,4 +154,112 @@ export function parsePsDetails(output: string): ProcessDetails {
     user: match[2],
     command: match[3]?.trim(),
   };
+}
+
+/**
+ * Parses: ps -axo pid=,ppid=,user=,comm=
+ *
+ * The executable/comm column is last because application paths may contain
+ * spaces on macOS.
+ */
+export function parsePsProcessTable(output: string): ProcessTableEntry[] {
+  const entries: ProcessTableEntry[] = [];
+
+  for (const line of output.split(/\r?\n/)) {
+    const match = line.match(/^\s*(\d+)\s+(\d+)\s+(\S+)\s+(.+?)\s*$/);
+    if (!match) continue;
+
+    entries.push({
+      pid: Number.parseInt(match[1] ?? "", 10),
+      parentPid: Number.parseInt(match[2] ?? "", 10),
+      user: match[3] ?? "",
+      executable: match[4] ?? "",
+    });
+  }
+
+  return entries;
+}
+
+/**
+ * Parses: ps -p <pid-list> -o pid= -o command=
+ */
+export function parsePsCommands(output: string): Map<number, string> {
+  const commands = new Map<number, string>();
+
+  for (const line of output.split(/\r?\n/)) {
+    const match = line.match(/^\s*(\d+)\s+(.+?)\s*$/);
+    if (!match) continue;
+
+    commands.set(Number.parseInt(match[1] ?? "", 10), match[2] ?? "");
+  }
+
+  return commands;
+}
+
+/**
+ * Parses: lsof -a -p <pid-list> -d cwd -Fpn
+ */
+export function parseLsofWorkingDirectories(output: string): Map<number, string> {
+  const directories = new Map<number, string>();
+  let currentPid: number | undefined;
+  let currentDescriptor = "";
+
+  for (const rawLine of output.split(/\r?\n/)) {
+    if (!rawLine) continue;
+
+    const field = rawLine[0];
+    const value = rawLine.slice(1);
+
+    if (field === "p") {
+      const parsed = Number.parseInt(value, 10);
+      currentPid = Number.isInteger(parsed) ? parsed : undefined;
+      currentDescriptor = "";
+      continue;
+    }
+
+    if (field === "f") {
+      currentDescriptor = value;
+      continue;
+    }
+
+    if (field === "n" && currentPid !== undefined && currentDescriptor === "cwd") {
+      directories.set(currentPid, value);
+    }
+  }
+
+  return directories;
+}
+
+export function buildParentChain(
+  pid: number,
+  processTable: ReadonlyMap<number, ProcessTableEntry>,
+  commandsByPid: ReadonlyMap<number, string> = new Map(),
+  maxDepth = 8,
+): ProcessAncestor[] {
+  const chain: ProcessAncestor[] = [];
+  const visited = new Set<number>([pid]);
+  let parentPid = processTable.get(pid)?.parentPid;
+
+  while (
+    parentPid !== undefined &&
+    parentPid > 0 &&
+    !visited.has(parentPid) &&
+    chain.length < maxDepth
+  ) {
+    visited.add(parentPid);
+    const parent = processTable.get(parentPid);
+    if (!parent) break;
+
+    const command = commandsByPid.get(parent.pid);
+    chain.push({
+      pid: parent.pid,
+      parentPid: parent.parentPid > 0 ? parent.parentPid : undefined,
+      processName: basename(parent.executable) || parent.executable,
+      executable: parent.executable || undefined,
+      ...(command ? { command } : {}),
+    });
+    parentPid = parent.parentPid;
+  }
+
+  return chain;
 }

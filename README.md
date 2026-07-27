@@ -30,15 +30,22 @@ database, telemetry, account, or cloud service.
 
 - Live TCP listener discovery on macOS
 - Process, PID, parent PID, user, and full command inspection
-- Human-friendly names such as `Vite · project-name` and
-  `Docker Desktop Service`
+- Executable, working-directory, and parent-process-chain evidence
+- Project-aware names for Vite, Next.js, React tooling, Nuxt, webpack, and
+  other common development servers
+- Launch-source attribution for package scripts, launchd, Homebrew Services,
+  Docker, native applications, and manually started processes
+- Confidence and inspectable evidence for inferred identities
+- In-memory New, Changed, and Closed listener detection for the current session
 - Search by port, process, project, address, or command
 - Filter by port range, process owner, and bind scope
 - Sort by port, process name, owner, or scope
 - Distinguish loopback-only listeners from network-facing listeners
 - Menu bar Quick View plus a complete desktop window
 - English, Japanese, and Simplified Chinese interfaces
-- Copyable, fully visible command details
+- Friendly summaries with expandable technical details
+- Full and sanitized copy/export summaries with point-in-time disclaimers
+- Copyable, fully visible commands and explicit partial-observation states
 - Read-only operation with no administrator helper
 - Platform scanner abstraction prepared for future Linux support
 
@@ -47,6 +54,20 @@ database, telemetry, account, or cloud service.
        width="430"
        alt="HostLens Ports menu bar Quick View">
 </p>
+
+## Who it is for
+
+- **Personal users:** understand background and network-facing activity in
+  ordinary language, with technical evidence available when needed.
+- **Developers:** connect ports to projects, commands, runtimes, parent
+  processes, and launch sources.
+- **Small-business IT:** inspect important Macs and Linux hosts consistently,
+  review changes, and produce evidence-backed summaries without an enterprise
+  monitoring stack.
+
+HostLens begins with one machine. Its long-term direction includes local-first
+environment understanding across computers, servers, NAS devices, printers,
+routers, Wi-Fi, and shared services.
 
 ## Quick start
 
@@ -136,28 +157,61 @@ src/
 ## Development commands
 
 ```bash
-yarn dev        # Start Electron in development mode
-yarn typecheck  # Check main, preload, and renderer TypeScript
-yarn test       # Run scanner and process-identity tests
-yarn build      # Create a production application build
-yarn dist:mac   # Create unsigned local .dmg and .zip artifacts
+yarn dev                # Start Electron in development mode
+yarn typecheck          # Check main, preload, and renderer TypeScript
+yarn test               # Run scanner, identity, session, and privacy tests
+yarn benchmark:scanner  # Run the 20-scan macOS reference benchmark
+yarn build              # Create a production application build
+yarn dist:mac           # Create unsigned local .dmg and .zip artifacts
 ```
 
 `yarn dist:mac` intentionally disables automatic certificate discovery.
 Public macOS releases should be signed with a Developer ID certificate and
 notarized before distribution.
 
+## Why open source
+
+HostLens inspects private local system context, so users should be able to
+verify what it collects and whether data leaves the machine. Open development
+also lets the community improve compatibility across operating-system versions,
+installation methods, hardware, and local configurations.
+
+HostLens is intended to be a long-lived public infrastructure project, not a
+thin AI wrapper. Read [Why HostLens Is Open Source](docs/OPEN_SOURCE.md) for the
+full project position.
+
 ## Roadmap
 
-- UDP sockets
-- Linux scanners for Ubuntu and RHEL
-- launchd, Homebrew, Docker, and systemd source attribution
-- Port-change history and notifications
-- Optional multi-host view
-- Accessibility and additional localization improvements
+HostLens is being built in layers:
 
-HostLens will remain useful without AI. Any future diagnostic assistant should
-be optional and operate on structured, explicitly selected local information.
+```text
+See → Identify → Relate → Remember → Explain → Advise → Operate safely
+```
+
+- **0.1.0 — See:** live macOS TCP listeners and their processes.
+- **0.2.0 — Host Identity and Session Awareness:** improve scanner reliability,
+  identify projects and launch sources, attach evidence and confidence, show
+  in-memory New / Changed / Closed states, and provide friendly and technical
+  views plus a shareable current-state summary.
+- **Later:** expand the unified host model, add first-class Linux support,
+  personal and small-business IT experiences, persistent changes and alerts,
+  read-only MCP, optional Explain, environment intelligence, and only then
+  consider supervised operations.
+
+HostLens will remain useful without AI. Future AI features must operate on
+minimal, explicitly selected structured data and will not receive an
+unrestricted shell.
+
+Read the full [Roadmap](docs/ROADMAP.md).
+
+## Project documents
+
+- [Product philosophy](docs/PRODUCT.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Safety model](docs/SAFETY.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Scanner benchmark](docs/BENCHMARKS.md)
+- [Why HostLens is open source](docs/OPEN_SOURCE.md)
 
 ## Contributing
 
