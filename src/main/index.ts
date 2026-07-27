@@ -116,6 +116,12 @@ function createMainWindow(): BrowserWindow {
     window.focus();
     console.info("[HostLens] Main window shown.");
   });
+  window.on("close", (event) => {
+    if (!isQuitting && process.platform === "darwin") {
+      event.preventDefault();
+      window.hide();
+    }
+  });
   window.on("closed", () => {
     mainWindow = null;
   });
@@ -228,6 +234,11 @@ function registerIpc(): void {
 
 app.whenReady().then(() => {
   app.setName("HostLens Ports");
+
+  if (process.platform === "darwin") {
+    app.setActivationPolicy("regular");
+    void app.dock?.show();
+  }
 
   registerIpc();
   tray = new Tray(createTrayIcon());
