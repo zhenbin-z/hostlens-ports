@@ -1,6 +1,7 @@
 import {
   app,
   BrowserWindow,
+  clipboard,
   ipcMain,
   Menu,
   nativeImage,
@@ -10,8 +11,8 @@ import {
 import { join } from "node:path";
 import { createPortScanner } from "./scanners";
 
-const PANEL_WIDTH = 440;
-const PANEL_HEIGHT = 640;
+const PANEL_WIDTH = 540;
+const PANEL_HEIGHT = 720;
 
 let panelWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -167,6 +168,13 @@ function openTrayMenu(): void {
 
 function registerIpc(): void {
   ipcMain.handle("ports:list", () => scanner.scan());
+  ipcMain.handle("clipboard:write", (_event, text: unknown) => {
+    if (typeof text !== "string") {
+      throw new TypeError("Clipboard content must be text.");
+    }
+
+    clipboard.writeText(text);
+  });
 }
 
 app.whenReady().then(() => {

@@ -235,7 +235,7 @@ h1 {
   display: grid;
   width: 100%;
   grid-template-columns: 54px minmax(0, 1fr) 18px;
-  align-items: center;
+  align-items: start;
   gap: 11px;
   padding: 10px;
   border: 1px solid transparent;
@@ -295,16 +295,27 @@ h1 {
   letter-spacing: 0.06em;
 }
 
-.port-main p {
+.port-command,
+.port-meta {
   overflow: hidden;
   margin: 3px 0 0;
-  color: #718076;
-  font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.port-command {
+  color: #435048;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+}
+
+.port-meta {
+  color: #7a867d;
+  font-size: 10px;
+}
+
 .chevron {
+  align-self: center;
   width: 15px;
   fill: none;
   stroke: #98a29a;
@@ -315,10 +326,11 @@ h1 {
 
 .detail-card {
   margin: 0 12px 8px;
-  padding: 13px 14px;
+  padding: 14px;
   border: 1px solid rgb(29 107 58 / 14%);
   border-radius: 14px;
   background: #f1f7f1;
+  user-select: text;
 }
 
 .detail-heading {
@@ -350,19 +362,78 @@ h1 {
   font-size: 21px;
 }
 
-dl {
+.command-block {
+  margin-top: 12px;
+}
+
+.command-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.command-label-row > span {
+  color: #617168;
+  font-size: 9px;
+  font-weight: 760;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.copy-command-button {
+  padding: 3px 8px;
+  border: 1px solid rgb(29 107 58 / 16%);
+  border-radius: 7px;
+  background: rgb(255 255 255 / 60%);
+  color: #316443;
+  font-size: 9px;
+  font-weight: 720;
+  cursor: pointer;
+  user-select: none;
+}
+
+.copy-command-button:hover {
+  background: #fff;
+}
+
+.copy-command-button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.full-command {
+  display: block;
+  width: 100%;
+  max-height: 132px;
+  overflow: auto;
+  padding: 10px 11px;
+  border: 1px solid rgb(37 70 46 / 10%);
+  border-radius: 9px;
+  outline: none;
+  background: rgb(255 255 255 / 68%);
+  color: #1f2a22;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10.5px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.full-command:focus {
+  border-color: rgb(29 107 58 / 30%);
+  box-shadow: 0 0 0 3px rgb(29 107 58 / 8%);
+}
+
+.metadata-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 9px 15px;
-  margin: 11px 0 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 0;
 }
 
-dl div {
+.metadata-grid div {
   min-width: 0;
-}
-
-dl .wide {
-  grid-column: 1 / -1;
 }
 
 dt {
@@ -498,6 +569,13 @@ footer {
   .detail-card {
     border-color: rgb(114 189 130 / 16%);
     background: rgb(78 120 87 / 13%);
+  }
+
+  .full-command,
+  .copy-command-button {
+    border-color: rgb(255 255 255 / 9%);
+    background: rgb(255 255 255 / 5%);
+    color: #edf4ee;
   }
 
   .port-number {

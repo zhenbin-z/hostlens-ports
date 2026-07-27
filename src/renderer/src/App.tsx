@@ -27,6 +27,7 @@ export function App(): React.JSX.Element {
   const [selected, setSelected] = useState<PortListener>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>();
+  const [copiedCommandId, setCopiedCommandId] = useState<string>();
   const scanningRef = useRef(false);
 
   const refresh = useCallback(async () => {
@@ -82,6 +83,7 @@ export function App(): React.JSX.Element {
         listener.port.toString(),
         listener.processName,
         listener.address,
+        listener.command,
         listener.source,
       ]
         .filter(Boolean)
@@ -93,6 +95,18 @@ export function App(): React.JSX.Element {
     snapshot?.listeners.filter((listener) => listener.exposure === "network").length ?? 0;
   const localCount =
     snapshot?.listeners.filter((listener) => listener.exposure === "local").length ?? 0;
+
+  const copyCommand = useCallback(async (listener: PortListener) => {
+    if (!listener.command) return;
+
+    await window.hostLens.copyText(listener.command);
+    setCopiedCommandId(listener.id);
+    window.setTimeout(() => {
+      setCopiedCommandId((current) =>
+        current === listener.id ? undefined : current,
+      );
+    }, 1_500);
+  }, []);
 
   return (
     <main className="panel">
@@ -143,7 +157,7 @@ export function App(): React.JSX.Element {
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search port or process"
+          placeholder="Search port, process, or command"
           aria-label="Search ports"
         />
       </label>
@@ -182,7 +196,12 @@ export function App(): React.JSX.Element {
                     <strong>{listener.processName}</strong>
                     <span>{listener.protocol.toUpperCase()}</span>
                   </div>
-                  <p>
+                  {listener.command ? (
+                    <p className="port-command" title={listener.command}>
+                      {listener.command}
+                    </p>
+                  ) : null}
+                  <p className="port-meta">
                     {listener.address} · {exposureLabel(listener.exposure)}
                   </p>
                 </div>
@@ -211,7 +230,23 @@ export function App(): React.JSX.Element {
               ×
             </button>
           </div>
-          <dl>
+          <div className="command-block">
+            <div className="command-label-row">
+              <span>Command</span>
+              <button
+                type="button"
+                className="copy-command-button"
+                disabled={!selected.command}
+                onClick={() => void copyCommand(selected)}
+              >
+                {copiedCommandId === selected.id ? "Copied" : "Copy"}
+              </button>
+            </div>
+            <code className="full-command" tabIndex={0}>
+              {selected.command ?? "Command details are unavailable."}
+            </code>
+          </div>
+          <dl className="metadata-grid">
             <div>
               <dt>PID</dt>
               <dd>{selected.pid ?? "Unavailable"}</dd>
@@ -227,10 +262,6 @@ export function App(): React.JSX.Element {
             <div>
               <dt>Scope</dt>
               <dd>{exposureLabel(selected.exposure)}</dd>
-            </div>
-            <div className="wide">
-              <dt>Command</dt>
-              <dd>{selected.command ?? "Unavailable"}</dd>
             </div>
           </dl>
         </section>
