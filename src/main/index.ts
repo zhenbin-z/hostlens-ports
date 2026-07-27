@@ -14,6 +14,7 @@ import { createPortScanner } from "./scanners";
 const PANEL_WIDTH = 540;
 const PANEL_HEIGHT = 720;
 
+let mainWindow: BrowserWindow | null = null;
 let panelWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isQuitting = false;
@@ -81,14 +82,6 @@ function createPanelWindow(): BrowserWindow {
   }
 
   window.on("blur", () => window.hide());
-  window.once("ready-to-show", () => {
-    // In development there is no Dock icon, so reveal the panel once to make
-    // a successful launch immediately visible. Packaged builds stay tray-only.
-    if (process.env.ELECTRON_RENDERER_URL) {
-      showPanel();
-      console.info("[HostLens] Development panel shown.");
-    }
-  });
   window.on("close", (event) => {
     if (!isQuitting) {
       event.preventDefault();
@@ -96,13 +89,54 @@ function createPanelWindow(): BrowserWindow {
     }
   });
 
-  if (process.env.ELECTRON_RENDERER_URL) {
-    void window.loadURL(process.env.ELECTRON_RENDERER_URL);
-  } else {
-    void window.loadFile(join(__dirname, "../renderer/index.html"));
-  }
+  loadRenderer(window, "panel");
 
   return window;
+}
+
+function createMainWindow(): BrowserWindow {
+  const window = new BrowserWindow({
+    width: 1_120,
+    height: 760,
+    minWidth: 900,
+    minHeight: 620,
+    show: false,
+    title: "HostLens Ports",
+    backgroundColor: "#f4f7f3",
+    webPreferences: {
+      preload: join(__dirname, "../preload/index.cjs"),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+    },
+  });
+
+  window.once("ready-to-show", () => {
+    window.show();
+    window.focus();
+    console.info("[HostLens] Main window shown.");
+  });
+  window.on("closed", () => {
+    mainWindow = null;
+  });
+
+  loadRenderer(window, "app");
+  return window;
+}
+
+function loadRenderer(
+  window: BrowserWindow,
+  mode: "app" | "panel",
+): void {
+  if (process.env.ELECTRON_RENDERER_URL) {
+    const rendererUrl = new URL(process.env.ELECTRON_RENDERER_URL);
+    rendererUrl.searchParams.set("mode", mode);
+    void window.loadURL(rendererUrl.toString());
+  } else {
+    void window.loadFile(join(__dirname, "../renderer/index.html"), {
+      query: { mode },
+    });
+  }
 }
 
 function positionPanel(): void {
@@ -147,13 +181,28 @@ function togglePanel(): void {
   }
 }
 
+function showMainWindow(): void {
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    mainWindow = createMainWindow();
+    return;
+  }
+
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.show();
+  mainWindow.focus();
+}
+
 function openTrayMenu(): void {
   if (!tray) return;
 
   tray.popUpContextMenu(
     Menu.buildFromTemplate([
       {
-        label: panelWindow?.isVisible() ? "Hide HostLens Ports" : "Open HostLens Ports",
+        label: "Open HostLens Ports",
+        click: showMainWindow,
+      },
+      {
+        label: panelWindow?.isVisible() ? "Hide Quick View" : "Show Quick View",
         click: togglePanel,
       },
       { type: "separator" },
@@ -180,19 +229,18 @@ function registerIpc(): void {
 app.whenReady().then(() => {
   app.setName("HostLens Ports");
 
-  if (process.platform === "darwin") {
-    app.dock?.hide();
-  }
-
   registerIpc();
-  panelWindow = createPanelWindow();
   tray = new Tray(createTrayIcon());
   tray.setToolTip("HostLens Ports");
   tray.on("click", togglePanel);
   tray.on("right-click", openTrayMenu);
+  panelWindow = createPanelWindow();
+  mainWindow = createMainWindow();
 });
 
 app.on("window-all-closed", () => {});
+
+app.on("activate", showMainWindow);
 
 app.on("before-quit", () => {
   isQuitting = true;

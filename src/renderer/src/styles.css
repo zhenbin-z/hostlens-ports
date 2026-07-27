@@ -26,7 +26,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -214,6 +215,68 @@ h1 {
   color: #8e9991;
 }
 
+.filter-bar {
+  display: flex;
+  align-items: end;
+  gap: 9px;
+  margin: 0 20px 12px;
+  padding: 11px 12px;
+  border: 1px solid rgb(34 61 42 / 9%);
+  border-radius: 13px;
+  background: rgb(255 255 255 / 58%);
+}
+
+.filter-bar label {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-bar label > span {
+  padding-left: 2px;
+  color: #78857b;
+  font-size: 9px;
+  font-weight: 720;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.filter-bar select {
+  width: 100%;
+  min-width: 0;
+  height: 31px;
+  padding: 0 26px 0 8px;
+  border: 1px solid rgb(33 66 42 / 11%);
+  border-radius: 8px;
+  outline: none;
+  background: rgb(255 255 255 / 78%);
+  color: #2b382f;
+  font-size: 10px;
+}
+
+.filter-bar select:focus {
+  border-color: rgb(29 107 58 / 30%);
+  box-shadow: 0 0 0 3px rgb(29 107 58 / 7%);
+}
+
+.filter-bar output {
+  flex: 0 0 auto;
+  padding: 0 2px 8px 5px;
+  color: #6f7d72;
+  font-size: 10px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.workspace {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
 .content {
   min-height: 0;
   flex: 1;
@@ -256,14 +319,31 @@ h1 {
 }
 
 .port-number {
-  display: grid;
-  height: 38px;
-  place-items: center;
+  display: flex;
+  min-height: 44px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
   border-radius: 10px;
   background: #e8f2e9;
   color: #26633a;
+}
+
+.port-number strong {
   font-size: 12px;
-  font-weight: 780;
+  font-weight: 790;
+}
+
+.port-number span {
+  max-width: 48px;
+  overflow: hidden;
+  font-size: 7px;
+  font-weight: 750;
+  letter-spacing: 0.035em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .port-number.network {
@@ -293,6 +373,35 @@ h1 {
   font-size: 9px;
   font-weight: 750;
   letter-spacing: 0.06em;
+}
+
+.port-title .owner-badge {
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: #e9eeea;
+  color: #68766c;
+  font-size: 7px;
+  letter-spacing: 0.035em;
+}
+
+.port-title .owner-badge.system {
+  background: #e6edf4;
+  color: #49647a;
+}
+
+.port-title .owner-badge.service {
+  background: #e8f1e8;
+  color: #426b4c;
+}
+
+.port-title .owner-badge.application {
+  background: #eeeaf6;
+  color: #655683;
+}
+
+.port-title .owner-badge.development {
+  background: #f8eadf;
+  color: #9a562c;
 }
 
 .port-command,
@@ -353,6 +462,12 @@ h1 {
 
 .detail-heading strong {
   font-size: 13px;
+}
+
+.detail-heading small {
+  margin-top: 2px;
+  color: #78857b;
+  font-size: 9px;
 }
 
 .close-button {
@@ -427,9 +542,17 @@ h1 {
 
 .metadata-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin: 12px 0 0;
+}
+
+.detail-placeholder {
+  display: grid;
+  place-content: center;
+  color: #758278;
+  font-size: 11px;
+  text-align: center;
 }
 
 .metadata-grid div {
@@ -538,6 +661,59 @@ footer {
   }
 }
 
+.full-app {
+  border-radius: 14px;
+  box-shadow: 0 10px 32px rgb(17 31 20 / 11%);
+}
+
+.full-app .header {
+  padding: 22px 24px 16px;
+}
+
+.full-app .summary {
+  padding-right: 24px;
+  padding-left: 24px;
+}
+
+.full-app .search {
+  margin-right: 24px;
+  margin-left: 24px;
+}
+
+.full-app .filter-bar {
+  margin-right: 24px;
+  margin-left: 24px;
+}
+
+.full-app .workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(360px, 0.9fr);
+  gap: 12px;
+  padding: 0 24px 10px;
+}
+
+.full-app .content {
+  border: 1px solid rgb(35 68 44 / 8%);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 44%);
+  padding: 8px;
+}
+
+.full-app .detail-card {
+  min-height: 0;
+  margin: 0;
+  overflow-y: auto;
+}
+
+.full-app .full-command {
+  max-height: none;
+}
+
+.full-app footer {
+  padding-right: 24px;
+  padding-left: 24px;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     color: #eef4ef;
@@ -555,6 +731,8 @@ footer {
 
   .summary div,
   .search,
+  .filter-bar,
+  .filter-bar select,
   .icon-button,
   .port-row:hover,
   .port-row.selected {
@@ -563,6 +741,10 @@ footer {
   }
 
   .search input {
+    color: #eef4ef;
+  }
+
+  .filter-bar select {
     color: #eef4ef;
   }
 
