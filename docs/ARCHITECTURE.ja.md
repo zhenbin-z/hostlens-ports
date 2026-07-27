@@ -147,6 +147,11 @@ interface LaunchSource {
 実装中に正確なTypeScript型は変化できます。ただし Identity、Source、
 Confidence、Evidence は別の概念として維持します。
 
+リリース済み0.2では、各Listenerに`ProcessIdentity`と`LaunchSource`を別Field
+として保持し、成功した`PortSnapshot`を決定的なメモリ内`SessionChanges`で
+包みます。`SessionMonitor`が直前の成功SnapshotとNew / Changed / Closed Eventを
+管理します。このSession StateをDiskへ書き込みません。
+
 0.2 が対象とするのは次の概念です。
 
 - `Process`

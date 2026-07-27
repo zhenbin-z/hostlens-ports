@@ -28,14 +28,21 @@ HostLens Ports是一款轻量、开源的桌面工具，让你无需记忆`lsof`
 
 - 实时发现macOS上的TCP监听端口
 - 查看进程、PID、父进程PID、用户和完整命令
-- 显示`Vite · project-name`、`Docker Desktop Service`等易懂名称
+- 显示可执行文件、工作目录和父进程链证据
+- 识别Vite、Next.js、React Tooling、Nuxt、webpack等开发项目
+- 识别Package Script、launchd、Homebrew Services、Docker、原生应用
+  与手动启动等来源
+- 为推断出的身份提供可信度和可检查的证据
+- 在本次运行期间检测内存中的新增、变化和关闭状态
 - 按端口、进程、项目、地址或命令搜索
 - 按端口范围、进程类别和监听范围筛选
 - 按端口、进程名称、进程类别或监听范围排序
 - 区分仅本机监听和网络可访问的端口
 - 菜单栏快速视图和完整桌面窗口
 - 英文、日文和简体中文界面
-- 完整显示并可复制命令详情
+- 易懂摘要与可展开的技术详情
+- 带时间点声明的完整及脱敏复制/导出摘要
+- 完整显示并可复制命令，同时明确显示信息不完整的观测
 - 只读运行，不需要管理员辅助程序
 - 为未来Linux支持预留平台扫描器抽象
 
@@ -124,11 +131,12 @@ HostLens Ports：
 ## 开发命令
 
 ```bash
-yarn dev        # 以开发模式启动Electron
-yarn typecheck  # 检查TypeScript类型
-yarn test       # 运行扫描器和进程识别测试
-yarn build      # 创建生产构建
-yarn dist:mac   # 创建未签名的本地.dmg和.zip
+yarn dev                # 以开发模式启动Electron
+yarn typecheck          # 检查TypeScript类型
+yarn test               # 运行扫描、身份、Session和隐私测试
+yarn benchmark:scanner  # 运行20次macOS参考基准测试
+yarn build              # 创建生产构建
+yarn dist:mac           # 创建未签名的本地.dmg和.zip
 ```
 
 ## 为什么开源
@@ -167,6 +175,7 @@ HostLens 在没有 AI 时也必须保持实用。未来 AI 功能只能使用用
 - [架构](docs/ARCHITECTURE.zh-CN.md)
 - [安全模型](docs/SAFETY.zh-CN.md)
 - [Roadmap](docs/ROADMAP.zh-CN.md)
+- [扫描器基准测试](docs/BENCHMARKS.zh-CN.md)
 - [为什么HostLens选择开源](docs/OPEN_SOURCE.zh-CN.md)
 
 ## 参与贡献

@@ -30,14 +30,21 @@ TCP待受ポートを確認できる軽量なオープンソースのデスク�
 
 - macOS上のTCP待受ポートをリアルタイムに検出
 - プロセス、PID、親PID、ユーザー、完全なコマンドを表示
-- `Vite · project-name`や`Docker Desktop Service`など分かりやすい名称
+- 実行ファイル、作業ディレクトリ、親プロセスチェーンのEvidence
+- Vite、Next.js、React Tooling、Nuxt、webpackなどのProjectを考慮した名称
+- Package Script、launchd、Homebrew Services、Docker、Native App、
+  手動起動のLaunch Source識別
+- 推論したIdentityごとのConfidenceと確認可能なEvidence
+- 現在のSession内におけるNew / Changed / Closedのメモリ内検出
 - ポート、プロセス、プロジェクト、アドレス、コマンドで検索
 - ポート範囲、プロセス所有元、公開範囲で絞り込み
 - ポート、プロセス名、所有元、公開範囲で並べ替え
 - ローカル専用とネットワーク公開中のポートを区別
 - メニューバーのクイックビューと完全なデスクトップ画面
 - 英語、日本語、簡体字中国語のUI
-- 完全表示およびコピー可能なコマンド詳細
+- Friendly Summaryと展開可能なTechnical Details
+- Point-in-time Disclaimer付きの完全版・Sanitized版Copy / Export
+- 完全表示・Copy可能なCommandと明示的なPartial Observation
 - 管理者権限を要求しない読み取り専用動作
 - 将来のLinux対応に向けたプラットフォーム抽象化
 
@@ -128,11 +135,12 @@ HostLensは広い権限を要求せず、不足する情報を「不明」とし
 ## 開発コマンド
 
 ```bash
-yarn dev        # 開発モードでElectronを起動
-yarn typecheck  # TypeScriptの型チェック
-yarn test       # スキャナーとプロセス識別のテスト
-yarn build      # プロダクションビルドを作成
-yarn dist:mac   # 署名なしのローカル.dmgと.zipを作成
+yarn dev                # 開発モードでElectronを起動
+yarn typecheck          # TypeScriptの型チェック
+yarn test               # Scanner、Identity、Session、Privacyのテスト
+yarn benchmark:scanner  # macOSで20回のReference Benchmarkを実行
+yarn build              # プロダクションビルドを作成
+yarn dist:mac           # 署名なしのローカル.dmgと.zipを作成
 ```
 
 ## OSSにする理由
@@ -172,6 +180,7 @@ HostLensはAIがなくても有用であり続けます。将来のAI機能は�
 - [アーキテクチャ](docs/ARCHITECTURE.ja.md)
 - [セーフティモデル](docs/SAFETY.ja.md)
 - [Roadmap](docs/ROADMAP.ja.md)
+- [Scanner Benchmark](docs/BENCHMARKS.ja.md)
 - [HostLensをOSSにする理由](docs/OPEN_SOURCE.ja.md)
 
 ## コントリビューション

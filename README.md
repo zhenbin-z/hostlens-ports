@@ -30,15 +30,22 @@ database, telemetry, account, or cloud service.
 
 - Live TCP listener discovery on macOS
 - Process, PID, parent PID, user, and full command inspection
-- Human-friendly names such as `Vite · project-name` and
-  `Docker Desktop Service`
+- Executable, working-directory, and parent-process-chain evidence
+- Project-aware names for Vite, Next.js, React tooling, Nuxt, webpack, and
+  other common development servers
+- Launch-source attribution for package scripts, launchd, Homebrew Services,
+  Docker, native applications, and manually started processes
+- Confidence and inspectable evidence for inferred identities
+- In-memory New, Changed, and Closed listener detection for the current session
 - Search by port, process, project, address, or command
 - Filter by port range, process owner, and bind scope
 - Sort by port, process name, owner, or scope
 - Distinguish loopback-only listeners from network-facing listeners
 - Menu bar Quick View plus a complete desktop window
 - English, Japanese, and Simplified Chinese interfaces
-- Copyable, fully visible command details
+- Friendly summaries with expandable technical details
+- Full and sanitized copy/export summaries with point-in-time disclaimers
+- Copyable, fully visible commands and explicit partial-observation states
 - Read-only operation with no administrator helper
 - Platform scanner abstraction prepared for future Linux support
 
@@ -150,11 +157,12 @@ src/
 ## Development commands
 
 ```bash
-yarn dev        # Start Electron in development mode
-yarn typecheck  # Check main, preload, and renderer TypeScript
-yarn test       # Run scanner and process-identity tests
-yarn build      # Create a production application build
-yarn dist:mac   # Create unsigned local .dmg and .zip artifacts
+yarn dev                # Start Electron in development mode
+yarn typecheck          # Check main, preload, and renderer TypeScript
+yarn test               # Run scanner, identity, session, and privacy tests
+yarn benchmark:scanner  # Run the 20-scan macOS reference benchmark
+yarn build              # Create a production application build
+yarn dist:mac           # Create unsigned local .dmg and .zip artifacts
 ```
 
 `yarn dist:mac` intentionally disables automatic certificate discovery.
@@ -202,6 +210,7 @@ Read the full [Roadmap](docs/ROADMAP.md).
 - [Architecture](docs/ARCHITECTURE.md)
 - [Safety model](docs/SAFETY.md)
 - [Roadmap](docs/ROADMAP.md)
+- [Scanner benchmark](docs/BENCHMARKS.md)
 - [Why HostLens is open source](docs/OPEN_SOURCE.md)
 
 ## Contributing

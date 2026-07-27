@@ -35,9 +35,9 @@ Version 0.1.0 established the first useful product:
 - English, Japanese, and Simplified Chinese; and
 - a read-only, local-first architecture.
 
-## In development: 0.2.0 — Host Identity and Session Awareness
+## Released: 0.2.0 — Host Identity and Session Awareness
 
-Version 0.2 should answer:
+Version 0.2 answers:
 
 > **Who is really behind this port, where did it come from, and what changed
 > during this HostLens session?**
@@ -148,6 +148,18 @@ The release should not be considered complete only because fields exist.
 - Sanitization tests demonstrate that private home-directory prefixes and
   common secret-bearing command arguments are not included in sanitized output.
 - HostLens remains read-only and sends no machine information over the network.
+
+Completion evidence recorded on July 27, 2026:
+
+- 36 automated tests pass across scanner parsing, identity, source attribution,
+  localization, session changes, and summary sanitization;
+- the production Electron build passes TypeScript validation;
+- a real macOS scan identified package scripts, native applications, Docker,
+  launchd, and unknown sources without losing partial socket observations;
+- a live UI check confirmed New and Closed listener transitions and all three
+  interface languages; and
+- the documented 20-scan reference benchmark recorded a p95 of 78.24 ms with
+  30 listeners. See [Scanner Benchmarks](BENCHMARKS.md).
 
 ### Explicitly out of scope for 0.2
 

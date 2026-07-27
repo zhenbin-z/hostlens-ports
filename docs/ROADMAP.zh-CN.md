@@ -35,7 +35,7 @@ Operate safely
 - 支持 English、日本語、简体中文；
 - 保持只读和 Local-first Architecture。
 
-## 开发中：0.2.0 — Host Identity and Session Awareness
+## 已发布：0.2.0 — Host Identity and Session Awareness
 
 0.2 希望回答：
 
@@ -133,6 +133,16 @@ Technical Evidence 可以引用同一个 Object。
 - Sanitization Test 能证明 Private Home-directory Prefix 和常见可能携带 Secret
   的 Command Argument 不会进入 Sanitized Output；
 - HostLens 保持只读，不向网络发送机器信息。
+
+2026年7月27日记录的完成证据：
+
+- 扫描解析、身份、启动来源、国际化、Session Changes和摘要脱敏共36项自动测试通过；
+- 生产Electron构建与TypeScript验证通过；
+- 真实macOS扫描识别出Package Script、原生应用、Docker、launchd和未知来源，
+  同时保留信息不完整的Socket观测；
+- 真实UI验证了新增/关闭变化及三种界面语言；
+- 30个Listener、连续20次的参考基准测试得到p95 78.24 ms。
+  详见[扫描器基准测试](BENCHMARKS.zh-CN.md)。
 
 ### 0.2 明确不做
 

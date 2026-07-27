@@ -35,7 +35,7 @@ Operate safely
 - English、日本語、简体中文
 - 読み取り専用、Local-first Architecture
 
-## 開発中：0.2.0 — Host Identity and Session Awareness
+## リリース済み：0.2.0 — Host Identity and Session Awareness
 
 0.2 が回答する問い：
 
@@ -135,6 +135,17 @@ Fieldが存在するだけでは完了とみなしません。
 - Sanitization Testにより、Private Home-directory PrefixとSecretを含みやすい
   Command ArgumentがSanitized Outputへ含まれないことを示す
 - 読み取り専用で、マシン情報をNetworkへ送信しない
+
+2026年7月27日に記録した完了Evidence：
+
+- Scanner Parse、Identity、Source Attribution、Localization、Session Changes、
+  Summary Sanitizationを含む36件の自動Testが成功
+- Production用Electron BuildとTypeScript Validationが成功
+- 実際のmacOS ScanでPackage Script、Native App、Docker、launchd、Unknown
+  Sourceを識別し、PartialなSocket Observationも保持
+- 実UIでNew / Closedの変化と3言語Interfaceを確認
+- 30 Listenerの20回Reference Benchmarkでp95 78.24 msを記録。
+  詳細は[Scanner Benchmark](BENCHMARKS.ja.md)
 
 ### 0.2 の対象外
 

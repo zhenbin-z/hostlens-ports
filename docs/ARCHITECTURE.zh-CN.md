@@ -143,6 +143,11 @@ interface LaunchSource {
 具体 TypeScript 类型可以在实现中调整，但 Identity、Source、Confidence 和
 Evidence 必须保持为不同概念。
 
+已发布的0.2会在每个Listener上分别保存`ProcessIdentity`与`LaunchSource`，
+并用确定性的内存`SessionChanges`包装每次成功的`PortSnapshot`。
+`SessionMonitor`负责上一份成功Snapshot及累积的New / Changed / Closed事件；
+这些Session State不会写入磁盘。
+
 0.2 只关注：
 
 - `Process`

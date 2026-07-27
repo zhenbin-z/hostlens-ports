@@ -153,6 +153,12 @@ The exact TypeScript types may evolve during implementation. The important
 constraint is that identity, source, confidence, and evidence are separate
 concepts.
 
+The released 0.2 implementation stores `ProcessIdentity` and `LaunchSource` as
+separate fields on each listener, and wraps each successful `PortSnapshot`
+with deterministic in-memory `SessionChanges`. `SessionMonitor` owns the last
+successful snapshot and accumulated New / Changed / Closed events. Nothing in
+that session state is written to disk.
+
 Version 0.2 focuses on:
 
 - `Process`;
