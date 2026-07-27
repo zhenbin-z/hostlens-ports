@@ -4,6 +4,15 @@
   "private": true,
   "description": "A lightweight desktop viewer for listening ports and their processes.",
   "author": "Zhenbin Zhang",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhenbin-z/hostlens-ports.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zhenbin-z/hostlens-ports/issues"
+  },
+  "homepage": "https://github.com/zhenbin-z/hostlens-ports#readme",
   "packageManager": "yarn@1.22.22",
   "main": "./out/main/index.js",
   "type": "module",
