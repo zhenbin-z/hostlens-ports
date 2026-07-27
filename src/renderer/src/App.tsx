@@ -1,5 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createListenerSummary,
+  type SummaryLabels,
+} from "../../shared/listener-summary";
 import type {
+  HostLensState,
+  LaunchSourceKind,
+  ListenerChange,
+  ObservationConfidence,
   PortExposure,
   PortListener,
   PortSnapshot,
@@ -15,6 +23,7 @@ import {
 } from "./i18n";
 
 type SortKey = "port-asc" | "port-desc" | "name" | "owner" | "scope";
+type CopyFeedback = "command" | "full-summary" | "sanitized-summary" | "export";
 
 const isPanelMode =
   new URLSearchParams(window.location.search).get("mode") === "panel";
@@ -24,7 +33,11 @@ type Translator = (
   values?: Record<string, string | number>,
 ) => string;
 
-function formatScanTime(value: string | undefined, locale: Locale, t: Translator): string {
+function formatScanTime(
+  value: string | undefined,
+  locale: Locale,
+  t: Translator,
+): string {
   if (!value) return t("notScanned");
   return new Intl.DateTimeFormat(locale, {
     hour: "2-digit",
@@ -37,53 +50,105 @@ function exposureLabel(
   exposure: PortListener["exposure"],
   t: Translator,
 ): string {
-  switch (exposure) {
-    case "local":
-      return t("localOnly");
-    case "network":
-      return t("networkFacing");
-    default:
-      return t("unknownScope");
-  }
+  if (exposure === "local") return t("localOnly");
+  if (exposure === "network") return t("networkFacing");
+  return t("unknownScope");
 }
 
 function portTypeLabel(portType: PortType, t: Translator): string {
-  switch (portType) {
-    case "system":
-      return t("system");
-    case "service":
-      return t("service");
-    case "dynamic":
-      return t("dynamic");
-  }
+  if (portType === "system") return t("system");
+  if (portType === "service") return t("service");
+  return t("dynamic");
 }
 
-function ownerTypeLabel(
-  ownerType: ProcessOwnerType | undefined,
+function ownerTypeLabel(ownerType: ProcessOwnerType, t: Translator): string {
+  if (ownerType === "system") return t("system");
+  if (ownerType === "service") return t("service");
+  if (ownerType === "application") return t("application");
+  if (ownerType === "development") return t("development");
+  return t("unknown");
+}
+
+function confidenceLabel(
+  confidence: ObservationConfidence,
   t: Translator,
 ): string {
-  switch (ownerType) {
-    case "system":
-      return t("system");
-    case "service":
-      return t("service");
-    case "application":
-      return t("application");
-    case "development":
-      return t("development");
-    default:
-      return t("unknown");
+  if (confidence === "high") return t("highConfidence");
+  if (confidence === "medium") return t("mediumConfidence");
+  return t("lowConfidence");
+}
+
+function sourceKindLabel(kind: LaunchSourceKind, t: Translator): string {
+  if (kind === "package-script") return t("sourcePackageScript");
+  if (kind === "launchd") return t("sourceLaunchd");
+  if (kind === "homebrew") return t("sourceHomebrew");
+  if (kind === "docker") return t("sourceDocker");
+  if (kind === "native-app") return t("sourceNativeApp");
+  if (kind === "manual") return t("sourceManual");
+  return t("sourceUnknown");
+}
+
+function changeLabel(change: ListenerChange, t: Translator): string {
+  if (change.kind === "new") return t("newListener");
+  if (change.kind === "changed") return t("changedListener");
+  return t("closedListener");
+}
+
+function changeListener(change: ListenerChange): PortListener | undefined {
+  return change.after ?? change.before;
+}
+
+function bindingExplanation(listener: PortListener, t: Translator): string {
+  if (listener.exposure === "local") {
+    return t("localBindingExplanation", {
+      name: listener.identity.displayName,
+    });
   }
+  if (listener.exposure === "network") {
+    return t("networkBindingExplanation", {
+      name: listener.identity.displayName,
+    });
+  }
+  return t("unknownBindingExplanation");
+}
+
+function summaryLabels(t: Translator): SummaryLabels {
+  return {
+    title: `HostLens Ports · ${t("currentStateObservation")}`,
+    process: t("process"),
+    socket: t("listening"),
+    exposure: t("scope"),
+    source: t("launchSource"),
+    automaticStart: t("automaticStart"),
+    confidence: t("identityConfidence"),
+    collectedAt: t("collectedAt"),
+    project: t("project"),
+    workingDirectory: t("workingDirectory"),
+    executable: t("executable"),
+    command: t("command"),
+    evidence: t("evidence"),
+    unknown: t("unknown"),
+    yes: t("yes"),
+    no: t("no"),
+    disclaimer: t("pointInTimeDisclaimer"),
+  };
+}
+
+function listenerForChange(
+  listener: PortListener,
+  changes: readonly ListenerChange[],
+): ListenerChange | undefined {
+  return changes.find((change) => change.after?.id === listener.id);
 }
 
 export function App(): React.JSX.Element {
   const [locale, setLocale] = useState<Locale>(loadLocale);
-  const [snapshot, setSnapshot] = useState<PortSnapshot>();
+  const [hostState, setHostState] = useState<HostLensState>();
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<PortListener>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>();
-  const [copiedCommandId, setCopiedCommandId] = useState<string>();
+  const [copyFeedback, setCopyFeedback] = useState<CopyFeedback>();
   const [portTypeFilter, setPortTypeFilter] = useState<PortType | "all">("all");
   const [ownerFilter, setOwnerFilter] = useState<ProcessOwnerType | "all">(
     "all",
@@ -91,10 +156,23 @@ export function App(): React.JSX.Element {
   const [scopeFilter, setScopeFilter] = useState<PortExposure | "all">("all");
   const [sortKey, setSortKey] = useState<SortKey>("port-asc");
   const scanningRef = useRef(false);
+  const feedbackTimer = useRef<number | undefined>(undefined);
   const t = useCallback<Translator>(
     (key, values) => translate(locale, key, values),
     [locale],
   );
+
+  const snapshot = hostState?.snapshot;
+  const changes = hostState?.changes.events ?? [];
+
+  const showFeedback = useCallback((value: CopyFeedback) => {
+    setCopyFeedback(value);
+    if (feedbackTimer.current) window.clearTimeout(feedbackTimer.current);
+    feedbackTimer.current = window.setTimeout(
+      () => setCopyFeedback(undefined),
+      1_800,
+    );
+  }, []);
 
   const refresh = useCallback(async () => {
     if (scanningRef.current) return;
@@ -103,14 +181,16 @@ export function App(): React.JSX.Element {
     setError(undefined);
 
     try {
-      const nextSnapshot = await window.hostLens.listPorts();
-      setSnapshot(nextSnapshot);
+      const nextState = await window.hostLens.listPorts();
+      setHostState(nextState);
       setSelected((current) =>
         current
-          ? nextSnapshot.listeners.find((listener) => listener.id === current.id)
+          ? nextState.snapshot.listeners.find(
+              (listener) => listener.id === current.id,
+            )
           : isPanelMode
             ? undefined
-            : nextSnapshot.listeners[0],
+            : nextState.snapshot.listeners[0],
       );
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : t("unableToScan"));
@@ -141,11 +221,9 @@ export function App(): React.JSX.Element {
 
   useEffect(() => {
     let refreshTimer: ReturnType<typeof setInterval> | undefined;
-
     const updateRefreshSchedule = (): void => {
       if (refreshTimer) clearInterval(refreshTimer);
       refreshTimer = undefined;
-
       if (document.visibilityState === "visible") {
         void refresh();
         refreshTimer = setInterval(() => void refresh(), 5_000);
@@ -154,10 +232,10 @@ export function App(): React.JSX.Element {
 
     document.addEventListener("visibilitychange", updateRefreshSchedule);
     updateRefreshSchedule();
-
     return () => {
       document.removeEventListener("visibilitychange", updateRefreshSchedule);
       if (refreshTimer) clearInterval(refreshTimer);
+      if (feedbackTimer.current) window.clearTimeout(feedbackTimer.current);
     };
   }, [refresh]);
 
@@ -169,19 +247,26 @@ export function App(): React.JSX.Element {
         if (portTypeFilter !== "all" && listener.portType !== portTypeFilter) {
           return false;
         }
-        if (ownerFilter !== "all" && listener.ownerType !== ownerFilter) {
+        if (
+          ownerFilter !== "all" &&
+          listener.identity.kind !== ownerFilter
+        ) {
           return false;
         }
         if (scopeFilter !== "all" && listener.exposure !== scopeFilter) {
           return false;
         }
-
         if (!normalizedQuery) return true;
+
         return [
           listener.port.toString(),
-          listener.displayName,
+          listener.identity.displayName,
           listener.processName,
-          listener.projectName,
+          listener.identity.project?.name,
+          listener.identity.project?.path,
+          listener.identity.project?.tool,
+          listener.launchSource.label,
+          listener.launchSource.detail,
           listener.address,
           listener.command,
           listener.executable,
@@ -189,38 +274,36 @@ export function App(): React.JSX.Element {
           ...listener.parentChain.flatMap((ancestor) => [
             ancestor.processName,
             ancestor.executable,
+            ancestor.command,
           ]),
-          listener.source,
         ]
-          .filter(Boolean)
-          .some((value) => value!.toLowerCase().includes(normalizedQuery));
+          .filter((value): value is string => Boolean(value))
+          .some((value) => value.toLowerCase().includes(normalizedQuery));
       })
       .sort((left, right) => {
-        switch (sortKey) {
-          case "port-desc":
-            return right.port - left.port;
-          case "name":
-            return (left.displayName ?? left.processName).localeCompare(
-              right.displayName ?? right.processName,
-            );
-          case "owner":
-            return ownerTypeLabel(left.ownerType, t).localeCompare(
-              ownerTypeLabel(right.ownerType, t),
-              locale,
-            );
-          case "scope":
-            return exposureLabel(left.exposure, t).localeCompare(
-              exposureLabel(right.exposure, t),
-              locale,
-            );
-          case "port-asc":
-          default:
-            return left.port - right.port;
+        if (sortKey === "port-desc") return right.port - left.port;
+        if (sortKey === "name") {
+          return left.identity.displayName.localeCompare(
+            right.identity.displayName,
+          );
         }
+        if (sortKey === "owner") {
+          return ownerTypeLabel(left.identity.kind, t).localeCompare(
+            ownerTypeLabel(right.identity.kind, t),
+            locale,
+          );
+        }
+        if (sortKey === "scope") {
+          return exposureLabel(left.exposure, t).localeCompare(
+            exposureLabel(right.exposure, t),
+            locale,
+          );
+        }
+        return left.port - right.port;
       });
   }, [
-    ownerFilter,
     locale,
+    ownerFilter,
     portTypeFilter,
     query,
     scopeFilter,
@@ -231,33 +314,58 @@ export function App(): React.JSX.Element {
 
   useEffect(() => {
     if (isPanelMode) return;
-
     if (filteredListeners.length === 0) {
       setSelected(undefined);
       return;
     }
-
     if (!selected || !filteredListeners.some(({ id }) => id === selected.id)) {
       setSelected(filteredListeners[0]);
     }
   }, [filteredListeners, selected]);
 
   const networkCount =
-    snapshot?.listeners.filter((listener) => listener.exposure === "network").length ?? 0;
+    snapshot?.listeners.filter((listener) => listener.exposure === "network")
+      .length ?? 0;
   const localCount =
-    snapshot?.listeners.filter((listener) => listener.exposure === "local").length ?? 0;
+    snapshot?.listeners.filter((listener) => listener.exposure === "local")
+      .length ?? 0;
+  const recentChanges = changes.slice(0, isPanelMode ? 3 : 4);
 
-  const copyCommand = useCallback(async (listener: PortListener) => {
-    if (!listener.command) return;
+  const copyCommand = useCallback(
+    async (listener: PortListener) => {
+      if (!listener.command) return;
+      await window.hostLens.copyText(listener.command);
+      showFeedback("command");
+    },
+    [showFeedback],
+  );
 
-    await window.hostLens.copyText(listener.command);
-    setCopiedCommandId(listener.id);
-    window.setTimeout(() => {
-      setCopiedCommandId((current) =>
-        current === listener.id ? undefined : current,
+  const copySummary = useCallback(
+    async (listener: PortListener, currentSnapshot: PortSnapshot, sanitized: boolean) => {
+      const text = createListenerSummary(listener, currentSnapshot, {
+        sanitized,
+        labels: summaryLabels(t),
+      });
+      await window.hostLens.copyText(text);
+      showFeedback(sanitized ? "sanitized-summary" : "full-summary");
+    },
+    [showFeedback, t],
+  );
+
+  const exportSummary = useCallback(
+    async (listener: PortListener, currentSnapshot: PortSnapshot) => {
+      const text = createListenerSummary(listener, currentSnapshot, {
+        sanitized: true,
+        labels: summaryLabels(t),
+      });
+      const saved = await window.hostLens.exportText(
+        `hostlens-port-${listener.port}.txt`,
+        text,
       );
-    }, 1_500);
-  }, []);
+      if (saved) showFeedback("export");
+    },
+    [showFeedback, t],
+  );
 
   return (
     <main className={`panel ${isPanelMode ? "quick-view" : "full-app"}`}>
@@ -313,6 +421,44 @@ export function App(): React.JSX.Element {
         </div>
       </section>
 
+      <section className="change-strip" aria-label={t("recentChanges")}>
+        <div className="change-strip-heading">
+          <strong>{t("recentChanges")}</strong>
+          <span>
+            {changes.length > 0
+              ? t("changesSinceStart", { count: changes.length })
+              : t("noSessionChanges")}
+          </span>
+        </div>
+        {recentChanges.length > 0 ? (
+          <div className="change-list">
+            {recentChanges.map((change) => {
+              const item = changeListener(change);
+              return (
+                <button
+                  key={`${change.detectedAt}-${change.id}`}
+                  type="button"
+                  disabled={!change.after}
+                  onClick={() => change.after && setSelected(change.after)}
+                >
+                  <span className={`change-badge ${change.kind}`}>
+                    {changeLabel(change, t)}
+                  </span>
+                  <strong>
+                    {item?.identity.displayName ?? change.socketKey}
+                  </strong>
+                  <small>
+                    {item
+                      ? `${item.protocol.toUpperCase()} ${item.address}:${item.port}`
+                      : change.socketKey}
+                  </small>
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+      </section>
+
       <label className="search">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="11" cy="11" r="7" />
@@ -347,9 +493,7 @@ export function App(): React.JSX.Element {
             <select
               value={ownerFilter}
               onChange={(event) =>
-                setOwnerFilter(
-                  event.target.value as ProcessOwnerType | "all",
-                )
+                setOwnerFilter(event.target.value as ProcessOwnerType | "all")
               }
             >
               <option value="all">{t("allOwners")}</option>
@@ -387,9 +531,7 @@ export function App(): React.JSX.Element {
               <option value="scope">{t("scope")}</option>
             </select>
           </label>
-          <output>
-            {t("resultCount", { count: filteredListeners.length })}
-          </output>
+          <output>{t("resultCount", { count: filteredListeners.length })}</output>
         </section>
       ) : null}
 
@@ -405,61 +547,67 @@ export function App(): React.JSX.Element {
               <strong>
                 {query.trim() ? t("noMatchingPorts") : t("noTcpListeners")}
               </strong>
-              <p>
-                {query.trim()
-                  ? t("trySearchOrFilters")
-                  : t("checkAgain")}
-              </p>
+              <p>{query.trim() ? t("trySearchOrFilters") : t("checkAgain")}</p>
             </div>
           ) : (
             <div className="port-list" aria-busy={loading}>
-              {filteredListeners.map((listener) => (
-                <button
-                  className={`port-row ${selected?.id === listener.id ? "selected" : ""}`}
-                  key={listener.id}
-                  type="button"
-                  onClick={() => setSelected(listener)}
-                >
-                  <div className={`port-number ${listener.exposure}`}>
-                    <strong>{listener.port}</strong>
-                    <span>{portTypeLabel(listener.portType, t)}</span>
-                  </div>
-                  <div className="port-main">
-                    <div className="port-title">
-                      <strong>{listener.displayName ?? listener.processName}</strong>
-                      <span>{listener.protocol.toUpperCase()}</span>
-                      <span className={`owner-badge ${listener.ownerType ?? "unknown"}`}>
-                        {ownerTypeLabel(listener.ownerType, t)}
-                      </span>
+              {filteredListeners.map((listener) => {
+                const listenerChange = listenerForChange(listener, changes);
+                return (
+                  <button
+                    className={`port-row ${selected?.id === listener.id ? "selected" : ""}`}
+                    key={listener.id}
+                    type="button"
+                    onClick={() => setSelected(listener)}
+                  >
+                    <div className={`port-number ${listener.exposure}`}>
+                      <strong>{listener.port}</strong>
+                      <span>{portTypeLabel(listener.portType, t)}</span>
                     </div>
-                    {listener.command ? (
-                      <p className="port-command" title={listener.command}>
-                        {listener.command}
+                    <div className="port-main">
+                      <div className="port-title">
+                        <strong>{listener.identity.displayName}</strong>
+                        <span>{listener.protocol.toUpperCase()}</span>
+                        <span className={`owner-badge ${listener.identity.kind}`}>
+                          {ownerTypeLabel(listener.identity.kind, t)}
+                        </span>
+                        {listenerChange ? (
+                          <span className={`change-badge ${listenerChange.kind}`}>
+                            {changeLabel(listenerChange, t)}
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="port-source">
+                        {listener.launchSource.label} ·{" "}
+                        {confidenceLabel(listener.identity.confidence, t)}
                       </p>
-                    ) : null}
-                    <p className="port-meta">
-                      {listener.processName} · {listener.address} ·{" "}
-                      {exposureLabel(listener.exposure, t)}
-                    </p>
-                  </div>
-                  <svg className="chevron" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="m9 18 6-6-6-6" />
-                  </svg>
-                </button>
-              ))}
+                      <p className="port-meta">
+                        {listener.processName} · {listener.address} ·{" "}
+                        {exposureLabel(listener.exposure, t)}
+                      </p>
+                    </div>
+                    <svg className="chevron" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="m9 18 6-6-6-6" />
+                    </svg>
+                  </button>
+                );
+              })}
             </div>
           )}
         </section>
 
-        {selected ? (
+        {selected && snapshot ? (
           <section className="detail-card" aria-label={t("selectedPortDetails")}>
             <div className="detail-heading">
               <div>
-                <span>{selected.protocol.toUpperCase()} {selected.port}</span>
-                <strong>{selected.displayName ?? selected.processName}</strong>
-                {selected.displayName &&
-                selected.displayName !== selected.processName ? (
-                  <small>{t("process")}: {selected.processName}</small>
+                <span>
+                  {selected.protocol.toUpperCase()} {selected.port}
+                </span>
+                <strong>{selected.identity.displayName}</strong>
+                {selected.identity.displayName !== selected.processName ? (
+                  <small>
+                    {t("process")}: {selected.processName}
+                  </small>
                 ) : null}
               </div>
               {isPanelMode ? (
@@ -473,96 +621,207 @@ export function App(): React.JSX.Element {
                 </button>
               ) : null}
             </div>
-            <div className="command-block">
-              <div className="command-label-row">
-                <span>{t("command")}</span>
-                <button
-                  type="button"
-                  className="copy-command-button"
-                  disabled={!selected.command}
-                  onClick={() => void copyCommand(selected)}
-                >
-                  {copiedCommandId === selected.id ? t("copied") : t("copy")}
-                </button>
-              </div>
-              <code className="full-command" tabIndex={0}>
-                {selected.command ?? t("commandUnavailable")}
-              </code>
+
+            <section className="friendly-card">
+              <h2>{t("friendlySummary")}</h2>
+              <p>{bindingExplanation(selected, t)}</p>
+              <dl className="friendly-grid">
+                <div>
+                  <dt>{t("whyRunning")}</dt>
+                  <dd>{sourceKindLabel(selected.launchSource.kind, t)}</dd>
+                </div>
+                <div>
+                  <dt>{t("launchSource")}</dt>
+                  <dd>{selected.launchSource.label}</dd>
+                </div>
+                <div>
+                  <dt>{t("automaticStart")}</dt>
+                  <dd>
+                    {selected.launchSource.automatic === "yes"
+                      ? t("yes")
+                      : selected.launchSource.automatic === "no"
+                        ? t("no")
+                        : t("unknown")}
+                  </dd>
+                </div>
+                <div>
+                  <dt>{t("identityConfidence")}</dt>
+                  <dd>
+                    {confidenceLabel(selected.identity.confidence, t)}
+                  </dd>
+                </div>
+              </dl>
+            </section>
+
+            <div className="summary-actions">
+              <button
+                type="button"
+                onClick={() => void copySummary(selected, snapshot, false)}
+              >
+                {copyFeedback === "full-summary"
+                  ? t("summaryCopied")
+                  : t("copyFullSummary")}
+              </button>
+              <button
+                type="button"
+                onClick={() => void copySummary(selected, snapshot, true)}
+              >
+                {copyFeedback === "sanitized-summary"
+                  ? t("summaryCopied")
+                  : t("copySanitizedSummary")}
+              </button>
+              <button
+                type="button"
+                onClick={() => void exportSummary(selected, snapshot)}
+              >
+                {copyFeedback === "export"
+                  ? t("summaryExported")
+                  : t("exportSanitizedSummary")}
+              </button>
             </div>
-            <dl className="metadata-grid">
-              <div>
-                <dt>PID</dt>
-                <dd>{selected.pid ?? t("unavailable")}</dd>
+            <p className="sanitized-notice">{t("sanitizedNotice")}</p>
+
+            <details className="technical-details" open={!isPanelMode}>
+              <summary>{t("technicalDetails")}</summary>
+              <div className="command-block">
+                <div className="command-label-row">
+                  <span>{t("command")}</span>
+                  <button
+                    type="button"
+                    className="copy-command-button"
+                    disabled={!selected.command}
+                    onClick={() => void copyCommand(selected)}
+                  >
+                    {copyFeedback === "command" ? t("copied") : t("copy")}
+                  </button>
+                </div>
+                <code className="full-command" tabIndex={0}>
+                  {selected.command ?? t("commandUnavailable")}
+                </code>
               </div>
-              <div>
-                <dt>{t("parentPid")}</dt>
-                <dd>{selected.parentPid ?? t("unavailable")}</dd>
+
+              <dl className="metadata-grid">
+                <div><dt>PID</dt><dd>{selected.pid ?? t("unavailable")}</dd></div>
+                <div><dt>{t("parentPid")}</dt><dd>{selected.parentPid ?? t("unavailable")}</dd></div>
+                <div><dt>{t("user")}</dt><dd>{selected.user ?? t("unavailable")}</dd></div>
+                <div><dt>{t("portType")}</dt><dd>{portTypeLabel(selected.portType, t)}</dd></div>
+                <div><dt>{t("owner")}</dt><dd>{ownerTypeLabel(selected.identity.kind, t)}</dd></div>
+                <div><dt>{t("scope")}</dt><dd>{exposureLabel(selected.exposure, t)}</dd></div>
+                <div>
+                  <dt>{t("observation")}</dt>
+                  <dd>
+                    {selected.observationStatus === "complete"
+                      ? t("completeObservation")
+                      : t("partialObservation", {
+                          count: selected.unavailableFields.length,
+                        })}
+                  </dd>
+                </div>
+                <div>
+                  <dt>{t("identityConfidence")}</dt>
+                  <dd>{confidenceLabel(selected.identity.confidence, t)}</dd>
+                </div>
+              </dl>
+
+              {selected.unavailableFields.length > 0 ? (
+                <p className="unavailable-fields">
+                  <strong>{t("unavailableFields")}:</strong>{" "}
+                  {selected.unavailableFields.join(", ")}
+                </p>
+              ) : null}
+
+              {selected.identity.project ? (
+                <section className="project-card">
+                  <h2>{t("project")}</h2>
+                  <dl className="metadata-grid">
+                    <div><dt>{t("project")}</dt><dd>{selected.identity.project.name}</dd></div>
+                    <div><dt>{t("tool")}</dt><dd>{selected.identity.project.tool ?? t("unknown")}</dd></div>
+                    <div><dt>{t("runtime")}</dt><dd>{selected.identity.project.runtime ?? t("unknown")}</dd></div>
+                    <div>
+                      <dt>{t("packageScript")}</dt>
+                      <dd>
+                        {selected.identity.project.packageManager &&
+                        selected.identity.project.script
+                          ? `${selected.identity.project.packageManager} ${selected.identity.project.script}`
+                          : t("unknown")}
+                      </dd>
+                    </div>
+                  </dl>
+                </section>
+              ) : null}
+
+              <div className="detail-paths">
+                <div>
+                  <span>{t("executable")}</span>
+                  <code>{selected.executable ?? t("unavailable")}</code>
+                </div>
+                <div>
+                  <span>{t("workingDirectory")}</span>
+                  <code>{selected.workingDirectory ?? t("unavailable")}</code>
+                </div>
+                <div>
+                  <span>{t("sourceDetails")}</span>
+                  <code>{selected.launchSource.detail ?? selected.launchSource.label}</code>
+                </div>
               </div>
-              <div>
-                <dt>{t("user")}</dt>
-                <dd>{selected.user ?? t("unavailable")}</dd>
-              </div>
-              <div>
-                <dt>{t("portType")}</dt>
-                <dd>{portTypeLabel(selected.portType, t)}</dd>
-              </div>
-              <div>
-                <dt>{t("owner")}</dt>
-                <dd>{ownerTypeLabel(selected.ownerType, t)}</dd>
-              </div>
-              <div>
-                <dt>{t("scope")}</dt>
-                <dd>{exposureLabel(selected.exposure, t)}</dd>
-              </div>
-              <div>
-                <dt>{t("observation")}</dt>
-                <dd>
-                  {selected.observationStatus === "complete"
-                    ? t("completeObservation")
-                    : t("partialObservation", {
-                        count: selected.unavailableFields.length,
-                      })}
-                </dd>
-              </div>
-            </dl>
-            <div className="detail-paths">
-              <div>
-                <span>{t("executable")}</span>
-                <code>{selected.executable ?? t("unavailable")}</code>
-              </div>
-              <div>
-                <span>{t("workingDirectory")}</span>
-                <code>{selected.workingDirectory ?? t("unavailable")}</code>
-              </div>
-            </div>
-            <section className="observation-section">
-              <h2>{t("parentChain")}</h2>
-              {selected.parentChain.length > 0 ? (
-                <ol className="parent-chain">
-                  {selected.parentChain.map((ancestor) => (
-                    <li key={ancestor.pid} title={ancestor.executable}>
-                      <strong>{ancestor.processName}</strong>
-                      <span>PID {ancestor.pid}</span>
+
+              <section className="observation-section">
+                <h2>{t("parentChain")}</h2>
+                {selected.parentChain.length > 0 ? (
+                  <ol className="parent-chain">
+                    {selected.parentChain.map((ancestor) => (
+                      <li
+                        key={ancestor.pid}
+                        title={ancestor.command ?? ancestor.executable}
+                      >
+                        <strong>{ancestor.processName}</strong>
+                        <span>PID {ancestor.pid}</span>
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <p>{t("noParentChain")}</p>
+                )}
+              </section>
+
+              <section className="observation-section">
+                <h2>{t("identityEvidence")}</h2>
+                <ul className="identity-evidence-list">
+                  {[
+                    ...selected.identity.evidence,
+                    ...selected.launchSource.evidence,
+                  ].map((item, index) => (
+                    <li key={`${item.source}-${item.detail}-${index}`}>
+                      <div>
+                        <span className={`evidence-kind ${item.kind}`}>
+                          {item.kind === "observed"
+                            ? t("observed")
+                            : t("inferred")}
+                        </span>
+                        <strong>{item.source}</strong>
+                      </div>
+                      <p>{item.detail}</p>
+                      <small>{confidenceLabel(item.confidence, t)}</small>
                     </li>
                   ))}
-                </ol>
-              ) : (
-                <p>{t("noParentChain")}</p>
-              )}
-            </section>
-            <section className="observation-section">
-              <h2>{t("evidence")}</h2>
-              <ul className="evidence-list">
-                {selected.evidence.map((item) => (
-                  <li key={`${item.source}-${item.fields.join("-")}`}>
-                    <strong>{item.source}</strong>
-                    <span title={item.fields.join(", ")}>
-                      {t("evidenceFields", { count: item.fields.length })}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </section>
+                </ul>
+              </section>
+
+              <section className="observation-section">
+                <h2>{t("evidence")}</h2>
+                <ul className="evidence-list">
+                  {selected.evidence.map((item) => (
+                    <li key={`${item.source}-${item.fields.join("-")}`}>
+                      <strong>{item.source}</strong>
+                      <span title={item.fields.join(", ")}>
+                        {t("evidenceFields", { count: item.fields.length })}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+              <p className="point-in-time">{t("pointInTimeDisclaimer")}</p>
+            </details>
           </section>
         ) : !isPanelMode ? (
           <section className="detail-card detail-placeholder">
@@ -587,17 +846,10 @@ export function App(): React.JSX.Element {
           >
             {t("openApp")}
           </button>
-          <button
-            type="button"
-            onClick={() => void refresh()}
-            disabled={loading}
-          >
+          <button type="button" onClick={() => void refresh()} disabled={loading}>
             {t("refresh")}
           </button>
-          <button
-            type="button"
-            onClick={() => void window.hostLens.quitApp()}
-          >
+          <button type="button" onClick={() => void window.hostLens.quitApp()}>
             {t("quit")}
           </button>
         </nav>

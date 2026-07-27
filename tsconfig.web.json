@@ -11,5 +11,5 @@
     "skipLibCheck": true
   },
   "include": ["src/renderer/src/**/*.ts", "src/renderer/src/**/*.tsx", "src/preload/index.d.ts", "src/shared/**/*.ts"],
-  "exclude": ["src/renderer/src/**/*.test.ts"]
+  "exclude": ["src/renderer/src/**/*.test.ts", "src/shared/**/*.test.ts"]
 }

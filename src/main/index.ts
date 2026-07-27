@@ -2,14 +2,17 @@ import {
   app,
   BrowserWindow,
   clipboard,
+  dialog,
   ipcMain,
   Menu,
   nativeImage,
   screen,
   Tray,
 } from "electron";
+import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createPortScanner } from "./scanners";
+import { SessionMonitor } from "./session-monitor.ts";
 
 const PANEL_WIDTH = 540;
 const PANEL_HEIGHT = 720;
@@ -22,6 +25,7 @@ let isQuitting = false;
 app.setName("HostLens Ports");
 
 const scanner = createPortScanner();
+const sessionMonitor = new SessionMonitor(scanner);
 
 function createTrayIcon(): Electron.NativeImage {
   if (process.platform === "darwin") {
@@ -318,7 +322,7 @@ function configureApplicationMenu(): void {
 }
 
 function registerIpc(): void {
-  ipcMain.handle("ports:list", () => scanner.scan());
+  ipcMain.handle("ports:list", () => sessionMonitor.scan());
   ipcMain.handle("clipboard:write", (_event, text: unknown) => {
     if (typeof text !== "string") {
       throw new TypeError("Clipboard content must be text.");
@@ -326,6 +330,25 @@ function registerIpc(): void {
 
     clipboard.writeText(text);
   });
+  ipcMain.handle(
+    "file:export-text",
+    async (_event, suggestedName: unknown, text: unknown) => {
+      if (typeof suggestedName !== "string" || typeof text !== "string") {
+        throw new TypeError("Export requires a file name and text content.");
+      }
+      const result = await dialog.showSaveDialog({
+        title: "Export HostLens observation",
+        defaultPath: suggestedName,
+        filters: [
+          { name: "Text", extensions: ["txt"] },
+          { name: "All files", extensions: ["*"] },
+        ],
+      });
+      if (result.canceled || !result.filePath) return false;
+      await writeFile(result.filePath, text, "utf8");
+      return true;
+    },
+  );
   ipcMain.handle("app:open-main-window", () => {
     panelWindow?.hide();
     showMainWindow();

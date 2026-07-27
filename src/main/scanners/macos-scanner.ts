@@ -3,6 +3,7 @@ import type {
   PortSnapshot,
 } from "../../shared/ports";
 import { execFile } from "node:child_process";
+import { access } from "node:fs/promises";
 import { promisify } from "node:util";
 import {
   buildParentChain,
@@ -12,14 +13,32 @@ import {
   parsePsProcessTable,
 } from "./macos-parser.ts";
 import type { PortScanner } from "./port-scanner";
-import { identifyProcess } from "./process-identity.ts";
+import {
+  resolveProcess,
+  type AttributionContext,
+} from "./process-identity.ts";
+import {
+  parseDockerPsJsonLines,
+  parseLaunchctlList,
+} from "./source-attribution-parser.ts";
 
 const execFileAsync = promisify(execFile);
 const LSOF_PATH = "/usr/sbin/lsof";
 const PS_PATH = "/bin/ps";
+const LAUNCHCTL_PATH = "/bin/launchctl";
+const DOCKER_PATHS = [
+  "/usr/local/bin/docker",
+  "/opt/homebrew/bin/docker",
+  "/Applications/Docker.app/Contents/Resources/bin/docker",
+];
 const MAX_BUFFER_BYTES = 4 * 1024 * 1024;
+const ATTRIBUTION_CACHE_MS = 30_000;
 
 export class MacOsPortScanner implements PortScanner {
+  private attributionCache:
+    | { expiresAt: number; context: AttributionContext }
+    | undefined;
+
   private async inspectProcessTable(): Promise<
     ReturnType<typeof parsePsProcessTable>
   > {
@@ -39,20 +58,11 @@ export class MacOsPortScanner implements PortScanner {
     }
   }
 
-  private async inspectCommands(processIds: number[]): Promise<Map<number, string>> {
-    if (processIds.length === 0) return new Map();
-
+  private async inspectCommands(): Promise<Map<number, string>> {
     try {
       const { stdout } = await execFileAsync(
         PS_PATH,
-        [
-          "-p",
-          processIds.join(","),
-          "-o",
-          "pid=",
-          "-o",
-          "command=",
-        ],
+        ["-axo", "pid=,command="],
         {
           encoding: "utf8",
           maxBuffer: MAX_BUFFER_BYTES,
@@ -64,6 +74,70 @@ export class MacOsPortScanner implements PortScanner {
       const error = cause as { stdout?: string };
       return parsePsCommands(error.stdout ?? "");
     }
+  }
+
+  private async inspectLaunchdJobs(): Promise<
+    AttributionContext["launchdJobs"]
+  > {
+    try {
+      const { stdout } = await execFileAsync(LAUNCHCTL_PATH, ["list"], {
+        encoding: "utf8",
+        maxBuffer: MAX_BUFFER_BYTES,
+        timeout: 2_000,
+      });
+      return parseLaunchctlList(stdout);
+    } catch {
+      return [];
+    }
+  }
+
+  private async inspectDockerBindings(): Promise<
+    AttributionContext["dockerBindings"]
+  > {
+    let dockerPath: string | undefined;
+    for (const candidate of DOCKER_PATHS) {
+      try {
+        await access(candidate);
+        dockerPath = candidate;
+        break;
+      } catch {
+        // Keep checking known, absolute Docker CLI paths.
+      }
+    }
+    if (!dockerPath) return [];
+
+    try {
+      const { stdout } = await execFileAsync(
+        dockerPath,
+        ["ps", "--format", "{{json .}}"],
+        {
+          encoding: "utf8",
+          maxBuffer: MAX_BUFFER_BYTES,
+          timeout: 1_500,
+        },
+      );
+      return parseDockerPsJsonLines(stdout);
+    } catch {
+      return [];
+    }
+  }
+
+  private async inspectAttributionContext(): Promise<AttributionContext> {
+    const now = Date.now();
+    if (this.attributionCache && this.attributionCache.expiresAt > now) {
+      return this.attributionCache.context;
+    }
+
+    const [launchdJobs, dockerBindings] = await Promise.all([
+      this.inspectLaunchdJobs(),
+      this.inspectDockerBindings(),
+    ]);
+    const context = { launchdJobs, dockerBindings };
+    this.attributionCache = {
+      expiresAt: now + ATTRIBUTION_CACHE_MS,
+      context,
+    };
+    return context;
   }
 
   private async inspectWorkingDirectories(
@@ -138,11 +212,12 @@ export class MacOsPortScanner implements PortScanner {
           .filter((pid): pid is number => pid !== undefined),
       ),
     ];
-    const [processTableEntries, commandsByPid, directoriesByPid] =
+    const [processTableEntries, commandsByPid, directoriesByPid, attribution] =
       await Promise.all([
         this.inspectProcessTable(),
-        this.inspectCommands(processIds),
+        this.inspectCommands(),
         this.inspectWorkingDirectories(processIds),
+        this.inspectAttributionContext(),
       ]);
     const processTable = new Map(
       processTableEntries.map((entry) => [entry.pid, entry] as const),
@@ -166,7 +241,11 @@ export class MacOsPortScanner implements PortScanner {
             processDetails.parentPid > 0 ? processDetails.parentPid : undefined;
           listener.user = processDetails.user || listener.user;
           listener.executable = processDetails.executable || undefined;
-          listener.parentChain = buildParentChain(listener.pid, processTable);
+          listener.parentChain = buildParentChain(
+            listener.pid,
+            processTable,
+            commandsByPid,
+          );
           listener.evidence.push({
             source: "macOS ps process table",
             collectedAt,
@@ -211,6 +290,10 @@ export class MacOsPortScanner implements PortScanner {
         ["command", listener.command],
         ["executable", listener.executable],
         ["workingDirectory", listener.workingDirectory],
+        [
+          "parentChain",
+          listener.parentChain.length > 0 ? listener.parentChain.length : undefined,
+        ],
       ];
       listener.unavailableFields = requiredDetails
         .filter(([, value]) => value === undefined || value === "")
@@ -218,10 +301,9 @@ export class MacOsPortScanner implements PortScanner {
       listener.observationStatus =
         listener.unavailableFields.length === 0 ? "complete" : "partial";
 
-      const identity = identifyProcess(listener);
-      listener.displayName = identity.displayName;
-      listener.ownerType = identity.ownerType;
-      listener.projectName = identity.projectName;
+      const resolved = resolveProcess(listener, attribution);
+      listener.identity = resolved.identity;
+      listener.launchSource = resolved.launchSource;
     }
 
     if (listeners.some((listener) => listener.observationStatus === "partial")) {

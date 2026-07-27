@@ -4,7 +4,11 @@ import type {
   PortListener,
   ProcessAncestor,
 } from "../../shared/ports";
-import { classifyPortType } from "./process-identity.ts";
+import {
+  classifyPortType,
+  createUnknownLaunchSource,
+  createUnresolvedIdentity,
+} from "./process-identity.ts";
 
 interface ProcessRecord {
   pid?: number;
@@ -123,6 +127,10 @@ export function parseLsofListeners(output: string): PortListener[] {
         "parentChain",
       ],
       evidence: [],
+      identity: createUnresolvedIdentity(
+        process.processName || "Unknown process",
+      ),
+      launchSource: createUnknownLaunchSource(),
     });
   }
 
@@ -225,6 +233,7 @@ export function parseLsofWorkingDirectories(output: string): Map<number, string>
 export function buildParentChain(
   pid: number,
   processTable: ReadonlyMap<number, ProcessTableEntry>,
+  commandsByPid: ReadonlyMap<number, string> = new Map(),
   maxDepth = 8,
 ): ProcessAncestor[] {
   const chain: ProcessAncestor[] = [];
@@ -241,11 +250,13 @@ export function buildParentChain(
     const parent = processTable.get(parentPid);
     if (!parent) break;
 
+    const command = commandsByPid.get(parent.pid);
     chain.push({
       pid: parent.pid,
       parentPid: parent.parentPid > 0 ? parent.parentPid : undefined,
       processName: basename(parent.executable) || parent.executable,
       executable: parent.executable || undefined,
+      ...(command ? { command } : {}),
     });
     parentPid = parent.parentPid;
   }

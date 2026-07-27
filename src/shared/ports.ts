@@ -19,6 +19,16 @@ export type ProcessOwnerType =
   | "development"
   | "unknown";
 export type TransportProtocol = "tcp" | "udp";
+export type LaunchSourceKind =
+  | "launchd"
+  | "homebrew"
+  | "docker"
+  | "package-script"
+  | "native-app"
+  | "manual"
+  | "unknown";
+export type AutomaticStart = "yes" | "no" | "unknown";
+export type IdentityEvidenceKind = "observed" | "inferred";
 
 export interface ObservationEvidence {
   source: string;
@@ -32,6 +42,40 @@ export interface ProcessAncestor {
   parentPid?: number;
   processName: string;
   executable?: string;
+  command?: string;
+}
+
+export interface IdentityEvidence {
+  kind: IdentityEvidenceKind;
+  source: string;
+  detail: string;
+  confidence: ObservationConfidence;
+}
+
+export interface ProjectIdentity {
+  name: string;
+  path?: string;
+  tool?: string;
+  runtime?: string;
+  packageManager?: "npm" | "yarn" | "pnpm";
+  script?: string;
+}
+
+export interface LaunchSource {
+  kind: LaunchSourceKind;
+  label: string;
+  detail?: string;
+  automatic: AutomaticStart;
+  confidence: ObservationConfidence;
+  evidence: IdentityEvidence[];
+}
+
+export interface ProcessIdentity {
+  displayName: string;
+  kind: ProcessOwnerType;
+  project?: ProjectIdentity;
+  confidence: ObservationConfidence;
+  evidence: IdentityEvidence[];
 }
 
 export interface PortListener {
@@ -43,10 +87,7 @@ export interface PortListener {
   parentPid?: number;
   user?: string;
   processName: string;
-  displayName?: string;
-  ownerType?: ProcessOwnerType;
   portType: PortType;
-  projectName?: string;
   command?: string;
   executable?: string;
   workingDirectory?: string;
@@ -54,8 +95,9 @@ export interface PortListener {
   observationStatus: ObservationStatus;
   unavailableFields: ObservationField[];
   evidence: ObservationEvidence[];
+  identity: ProcessIdentity;
+  launchSource: LaunchSource;
   exposure: PortExposure;
-  source?: string;
 }
 
 export interface PortSnapshot {
@@ -65,9 +107,32 @@ export interface PortSnapshot {
   warnings: string[];
 }
 
+export type ListenerChangeKind = "new" | "changed" | "closed";
+
+export interface ListenerChange {
+  id: string;
+  kind: ListenerChangeKind;
+  detectedAt: string;
+  socketKey: string;
+  changedFields: string[];
+  before?: PortListener;
+  after?: PortListener;
+}
+
+export interface SessionChanges {
+  startedAt: string;
+  events: ListenerChange[];
+}
+
+export interface HostLensState {
+  snapshot: PortSnapshot;
+  changes: SessionChanges;
+}
+
 export interface HostLensApi {
-  listPorts(): Promise<PortSnapshot>;
+  listPorts(): Promise<HostLensState>;
   copyText(text: string): Promise<void>;
+  exportText(suggestedName: string, text: string): Promise<boolean>;
   openMainWindow(): Promise<void>;
   quitApp(): Promise<void>;
 }
