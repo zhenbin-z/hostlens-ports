@@ -160,13 +160,83 @@ Fieldが存在するだけでは完了とみなしません。
 - Process終了
 - 自動修復
 
+## 開発中：0.3.0 — Services & Startup Inspector
+
+0.3が回答する問い：
+
+> **このMacにはどのServiceとStartup Itemが設定され、現在どれが動作し、
+> どのProcessと待受Portがそれらに属するのか？**
+
+### Service Inventory
+
+- 現在のUser launchd DomainからLoadedだがInactiveなJobも収集
+- UserおよびLocal Libraryのplistから設定済みThird-party LaunchAgent /
+  LaunchDaemonを発見
+- Homebrewが利用可能な場合はHomebrew Servicesも収集
+- Running Processだけでなく設定済み・停止中のItemも保持
+- User Agent、System Agent、System Daemonを区別
+- Apple所有System Jobを別分類し、Evidenceを捨てずDefault ViewのNoiseを抑制
+
+### StatusとStartup Behavior
+
+- Running、Loaded、Stopped、Failed、Disabled、Unknownを正規化
+- 観測できたPIDとLast Exit Statusを表示
+- plist、launchd、Homebrew EvidenceからAutomatic、On demand、Disabled、
+  Unknownを推定
+- Program、Arguments、plist Path、Label、Manager、Scopeを表示
+- plistやCommandを取得できなくてもPartial Objectを保持
+- 推論したStatus / Startup PolicyにConfidenceとEvidenceを付与
+
+### Unified Relationship
+
+- `Service`を`Process`、`Socket`、`LaunchSource`とは別ObjectとしてModel化
+- ServiceとDirect / Descendant Processを関連付け
+- それらProcessが所有するListening Socketを関連付け
+- 同一Serviceを表すHomebrewとlaunchd Observationを統合
+- 二つ目のIdentity Systemを作らずServiceと関連Portを移動可能にする
+
+### Services Interface
+
+- Full AppとMenu-bar PanelにPorts / Servicesの一等Viewを追加
+- Search、Manager、Status、Startup、Scope、Apple-system Filterを提供
+- 決定的なSortを提供
+- Technical Fieldより先に普通の言葉のService Summaryを表示
+- Exact Label、Path、Arguments、Relationship、Confidence、Evidenceを
+  Expand可能なTechnical Detailsに表示
+- 英語、日本語、簡体字中国語へ対応
+
+### 0.3 完了条件
+
+- Sanitized Fixtureがlaunchctl、plist、Disabled State、Homebrew Outputと
+  Malformed / Permission-limited Caseをカバー
+- Relationship TestがDirect Process、Descendant、Multiple Socket、
+  Stopped Service、Homebrew / launchd Deduplicationをカバー
+- 設定済み・停止中Serviceが表示され続ける
+- Optional Collector失敗時も他CollectorのPort / Service Factを失わない
+- UIがObserved FactとInferred Status / Startup Behaviorを明確に区別
+- Default Personal ViewがRaw launchd知識なしで理解できる
+- Technical UserがすべてのRelationshipのEvidenceを確認できる
+- Reference Development Workloadで20回Benchmarkが応答性を維持
+- Production Buildと実macOS UI / Collectorを3言語で確認
+- Read-only、Local、Persistent Historyなしを維持し、Machine情報を送信しない
+
+### 0.3 の対象外
+
+- ServiceのStart / Stop / Enable / Disable / Delete
+- plist編集
+- Persistent History / Alert
+- Network Interface、Route、DNS、VPN、Firewall Inspection
+- Linux Service Parity
+- Privileged / Private APIによるLogin Item管理
+- MCP、LLM、Chat
+- Multi-host Management
+
 ## 次：Unified Host Model と macOS Inspector
 
-0.2 で Host Identity を検証した後：
+0.3でService Relationshipを検証した後：
 
 - `Process`、`Socket`、`Project`、`LaunchSource`、`Evidence` を正式化
-- launchd Service / Startup Item
-- Homebrew Services / Docker の関係
+- Docker / Startup Item Relationshipを拡張
 - Network Interface、Route、DNS、VPN Context
 - Background ActivityとStartup Behaviorを示すPersonal Overview
 - Project、Runtime、Local Serviceを示すDeveloper View

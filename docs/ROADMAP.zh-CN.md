@@ -157,13 +157,82 @@ Technical Evidence 可以引用同一个 Object。
 - 结束进程；
 - 自动修复。
 
+## 开发中：0.3.0 — Services & Startup Inspector
+
+0.3需要回答：
+
+> **这台Mac配置了哪些服务和启动项、哪些正在运行，以及哪些进程与监听端口
+> 属于它们？**
+
+### 服务清单
+
+- 收集当前用户launchd Domain，包括已加载但未运行的Job；
+- 从用户与Local Library的plist目录发现已配置的第三方LaunchAgent /
+  LaunchDaemon；
+- Homebrew可用时收集Homebrew Services；
+- 保留已配置但停止的项目，而不是只显示正在运行的进程；
+- 区分用户Agent、系统Agent与系统Daemon；
+- 单独分类Apple系统Job，在保留技术证据的同时降低默认视图噪音。
+
+### 状态与启动行为
+
+- 统一Running、Loaded、Stopped、Failed、Disabled和Unknown状态；
+- 显示观测到的PID与Last Exit Status；
+- 根据plist、launchd状态和Homebrew证据推断Automatic、On demand、
+  Disabled或Unknown；
+- 显示Program、Arguments、plist路径、Label、Manager和Scope；
+- plist或命令无法读取时仍保留Partial Object；
+- 为推断的状态与启动策略提供Confidence和Evidence。
+
+### 统一关系
+
+- 将`Service`建模为独立于`Process`、`Socket`和`LaunchSource`的对象；
+- 关联Service与直接、后代Process；
+- 关联Service与这些Process拥有的监听Socket；
+- 合并描述同一Service的Homebrew与launchd观测；
+- 允许用户在Service和相关Port之间跳转，而不创建第二套Identity。
+
+### Services界面
+
+- 在完整App与菜单栏Panel中加入一等Ports / Services视图；
+- 提供搜索、Manager、Status、Startup、Scope和Apple-system筛选；
+- 提供确定性排序；
+- 技术字段之前先显示普通语言Service摘要；
+- 在可展开技术详情中显示准确Label、路径、Arguments、关系、Confidence与Evidence；
+- 支持英语、日语和简体中文。
+
+### 0.3完成标准
+
+- 脱敏Fixture覆盖launchctl、plist、Disabled State、Homebrew Output，
+  包括Malformed与Permission-limited情况；
+- Relationship Test覆盖直接Process、后代、多个Socket、停止Service以及
+  Homebrew / launchd去重；
+- 已配置但停止的Service始终可见；
+- Optional Collector失败不会丢失其他Collector取得的Port或Service事实；
+- UI明确区分Observed Fact和Inferred Status / Startup Behavior；
+- 默认Personal View无需launchd知识也能理解；
+- 技术用户能够检查每个Relationship背后的Evidence；
+- 20次参考Benchmark在正常开发负载下保持响应；
+- Production Build与真实macOS UI / Collector在三种语言下通过；
+- HostLens保持只读、本地、不使用持久化历史，也不发送机器信息。
+
+### 0.3明确不做
+
+- 启动、停止、启用、禁用或删除Service；
+- 编辑plist；
+- 持久化历史或Alert；
+- Network Interface、Route、DNS、VPN或Firewall检查；
+- Linux Service功能对等；
+- 通过Privileged / Private API管理Login Item；
+- MCP、LLM或Chat；
+- Multi-host Management。
+
 ## 下一步：Unified Host Model 与 macOS Inspector
 
-在 0.2 验证 Host Identity 之后：
+在0.3验证Service Relationship之后：
 
 - 正式定义 `Process`、`Socket`、`Project`、`LaunchSource` 与 `Evidence`；
-- 增加 launchd Service 和 Startup Item；
-- 建立 Homebrew Services 与 Docker 关系；
+- 扩展Docker与Startup Item关系；
 - 展示 Network Interface、Route、DNS 和 VPN Context；
 - 增加展示 Background Activity 与 Startup Behavior 的 Personal Overview；
 - 增加展示 Project、Runtime 与 Local Service 的 Developer View；
