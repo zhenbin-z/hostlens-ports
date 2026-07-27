@@ -3,6 +3,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { parseLsofListeners, parsePsDetails } from "./macos-parser.ts";
 import type { PortScanner } from "./port-scanner";
+import { identifyProcess } from "./process-identity.ts";
 
 const execFileAsync = promisify(execFile);
 const LSOF_PATH = "/usr/sbin/lsof";
@@ -79,13 +80,19 @@ export class MacOsPortScanner implements PortScanner {
     );
 
     for (const listener of listeners) {
-      if (!listener.pid) continue;
-      const processDetails = detailsByPid.get(listener.pid);
-      if (!processDetails) continue;
+      if (listener.pid) {
+        const processDetails = detailsByPid.get(listener.pid);
+        if (processDetails) {
+          listener.parentPid = processDetails.parentPid;
+          listener.user = processDetails.user ?? listener.user;
+          listener.command = processDetails.command;
+        }
+      }
 
-      listener.parentPid = processDetails.parentPid;
-      listener.user = processDetails.user ?? listener.user;
-      listener.command = processDetails.command;
+      const identity = identifyProcess(listener);
+      listener.displayName = identity.displayName;
+      listener.ownerType = identity.ownerType;
+      listener.projectName = identity.projectName;
     }
 
     if (listeners.some((listener) => !listener.command)) {

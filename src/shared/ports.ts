@@ -1,4 +1,11 @@
 export type PortExposure = "local" | "network" | "unknown";
+export type PortType = "system" | "service" | "dynamic";
+export type ProcessOwnerType =
+  | "system"
+  | "service"
+  | "application"
+  | "development"
+  | "unknown";
 export type TransportProtocol = "tcp" | "udp";
 
 export interface PortListener {
@@ -10,6 +17,10 @@ export interface PortListener {
   parentPid?: number;
   user?: string;
   processName: string;
+  displayName?: string;
+  ownerType?: ProcessOwnerType;
+  portType: PortType;
+  projectName?: string;
   command?: string;
   executable?: string;
   exposure: PortExposure;

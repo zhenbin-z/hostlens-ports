@@ -1,4 +1,5 @@
 import type { PortExposure, PortListener } from "../../shared/ports";
+import { classifyPortType } from "./process-identity.ts";
 
 interface ProcessRecord {
   pid?: number;
@@ -99,6 +100,7 @@ export function parseLsofListeners(output: string): PortListener[] {
       processName: process.processName || "Unknown process",
       user: process.userId,
       exposure: classifyExposure(endpoint.address),
+      portType: classifyPortType(endpoint.port),
     });
   }
 
@@ -123,4 +125,3 @@ export function parsePsDetails(output: string): ProcessDetails {
     command: match[3]?.trim(),
   };
 }
-
