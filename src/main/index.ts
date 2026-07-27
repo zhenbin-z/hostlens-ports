@@ -218,7 +218,13 @@ app.whenReady().then(() => {
 
   if (process.platform === "darwin") {
     app.setActivationPolicy("regular");
-    void app.dock?.show();
+    const dock = app.dock;
+    if (dock) {
+      void dock.show();
+      if (!app.isPackaged) {
+        dock.setIcon(join(app.getAppPath(), "build/icon.png"));
+      }
+    }
   }
 
   registerIpc();
