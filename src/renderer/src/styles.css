@@ -413,6 +413,33 @@ footer {
   font-size: 10px;
 }
 
+.warning-strip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  overflow: hidden;
+  margin: 0 12px 6px;
+  padding: 7px 9px;
+  border-radius: 9px;
+  background: #fff4dc;
+  color: #805c18;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.warning-strip span {
+  display: grid;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 99px;
+  background: #e2a82e;
+  color: #fff;
+  font-weight: 800;
+}
+
 .status-dot {
   width: 6px;
   height: 6px;
@@ -486,5 +513,9 @@ footer {
   .sample-badge {
     background: rgb(255 255 255 / 8%);
   }
-}
 
+  .warning-strip {
+    background: rgb(194 139 30 / 15%);
+    color: #e4bd69;
+  }
+}

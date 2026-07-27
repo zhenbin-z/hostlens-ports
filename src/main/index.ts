@@ -1,4 +1,12 @@
-import { app, BrowserWindow, ipcMain, nativeImage, screen, Tray } from "electron";
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  Menu,
+  nativeImage,
+  screen,
+  Tray,
+} from "electron";
 import { join } from "node:path";
 import { createPortScanner } from "./scanners";
 
@@ -96,17 +104,39 @@ function positionPanel(): void {
   panelWindow.setPosition(x, y, false);
 }
 
-function togglePanel(): void {
+function showPanel(): void {
   if (!panelWindow) return;
-
-  if (panelWindow.isVisible()) {
-    panelWindow.hide();
-    return;
-  }
 
   positionPanel();
   panelWindow.show();
   panelWindow.focus();
+}
+
+function togglePanel(): void {
+  if (panelWindow?.isVisible()) {
+    panelWindow.hide();
+  } else {
+    showPanel();
+  }
+}
+
+function openTrayMenu(): void {
+  if (!tray) return;
+
+  tray.popUpContextMenu(
+    Menu.buildFromTemplate([
+      {
+        label: panelWindow?.isVisible() ? "Hide HostLens Ports" : "Open HostLens Ports",
+        click: togglePanel,
+      },
+      { type: "separator" },
+      {
+        label: "Quit HostLens Ports",
+        accelerator: "CommandOrControl+Q",
+        click: () => app.quit(),
+      },
+    ]),
+  );
 }
 
 function registerIpc(): void {
@@ -114,6 +144,8 @@ function registerIpc(): void {
 }
 
 app.whenReady().then(() => {
+  app.setName("HostLens Ports");
+
   if (process.platform === "darwin") {
     app.dock?.hide();
   }
@@ -123,6 +155,7 @@ app.whenReady().then(() => {
   tray = new Tray(createTrayIcon());
   tray.setToolTip("HostLens Ports");
   tray.on("click", togglePanel);
+  tray.on("right-click", openTrayMenu);
 });
 
 app.on("window-all-closed", () => {});

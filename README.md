@@ -3,16 +3,19 @@
 A lightweight desktop app for viewing listening ports and their processes on
 macOS and Linux.
 
-This repository currently contains the first UI scaffold:
+The first usable macOS version includes:
 
 - Electron + React + TypeScript + Vite
 - menu bar / system tray entry
 - custom popover-style window
-- searchable placeholder port list
+- live TCP listener collection using macOS `lsof`
+- process command and ownership enrichment using `ps`
+- searchable port list with local/network exposure labels
 - process detail panel
 - platform scanner abstraction for future macOS and Linux implementations
 
-The MVP intentionally has no LLM, database, history, or mutation features.
+The MVP intentionally has no LLM, database, history, elevated helper, or
+mutation features.
 
 ## Development
 
@@ -26,12 +29,22 @@ npm run dev
 ```bash
 npm run typecheck
 npm run build
+npm test
 ```
+
+To create local macOS `.dmg` and `.zip` artifacts:
+
+```bash
+npm run dist:mac
+```
+
+The local packaging command intentionally skips signing. A public release
+should be built with a Developer ID identity and notarized before distribution.
 
 ## Project boundaries
 
 The renderer never executes system commands. Port collection belongs in the
-Electron main process behind the `PortScanner` interface. The macOS and Linux
-adapters currently return placeholder data and are ready to be replaced with
-real `lsof` and `ss` implementations.
-
+Electron main process behind the `PortScanner` interface. The macOS adapter is
+live; the Linux adapter remains isolated behind the same interface and
+currently returns clearly labeled sample data until its `ss` implementation is
+added.

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PortListener, PortSnapshot } from "../../shared/ports";
 
 function formatScanTime(value?: string): string {
@@ -15,7 +15,7 @@ function exposureLabel(exposure: PortListener["exposure"]): string {
     case "local":
       return "Local only";
     case "network":
-      return "Network exposed";
+      return "Network-facing";
     default:
       return "Unknown scope";
   }
@@ -27,8 +27,11 @@ export function App(): React.JSX.Element {
   const [selected, setSelected] = useState<PortListener>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>();
+  const scanningRef = useRef(false);
 
   const refresh = useCallback(async () => {
+    if (scanningRef.current) return;
+    scanningRef.current = true;
     setLoading(true);
     setError(undefined);
 
@@ -43,12 +46,31 @@ export function App(): React.JSX.Element {
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Unable to scan ports.");
     } finally {
+      scanningRef.current = false;
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    void refresh();
+    let refreshTimer: ReturnType<typeof setInterval> | undefined;
+
+    const updateRefreshSchedule = (): void => {
+      if (refreshTimer) clearInterval(refreshTimer);
+      refreshTimer = undefined;
+
+      if (document.visibilityState === "visible") {
+        void refresh();
+        refreshTimer = setInterval(() => void refresh(), 5_000);
+      }
+    };
+
+    document.addEventListener("visibilitychange", updateRefreshSchedule);
+    updateRefreshSchedule();
+
+    return () => {
+      document.removeEventListener("visibilitychange", updateRefreshSchedule);
+      if (refreshTimer) clearInterval(refreshTimer);
+    };
   }, [refresh]);
 
   const filteredListeners = useMemo(() => {
@@ -109,7 +131,7 @@ export function App(): React.JSX.Element {
         </div>
         <div className={networkCount > 0 ? "attention" : undefined}>
           <strong>{networkCount}</strong>
-          <span>Network</span>
+          <span>Network-facing</span>
         </div>
       </section>
 
@@ -134,8 +156,14 @@ export function App(): React.JSX.Element {
           </div>
         ) : filteredListeners.length === 0 && !loading ? (
           <div className="empty-state">
-            <strong>No matching ports</strong>
-            <p>Try another port number or process name.</p>
+            <strong>
+              {query.trim() ? "No matching ports" : "No TCP listeners detected"}
+            </strong>
+            <p>
+              {query.trim()
+                ? "Try another port number or process name."
+                : "HostLens will check again while this window is open."}
+            </p>
           </div>
         ) : (
           <div className="port-list" aria-busy={loading}>
@@ -189,8 +217,16 @@ export function App(): React.JSX.Element {
               <dd>{selected.pid ?? "Unavailable"}</dd>
             </div>
             <div>
-              <dt>Source</dt>
-              <dd>{selected.source ?? "Unknown"}</dd>
+              <dt>Parent PID</dt>
+              <dd>{selected.parentPid ?? "Unavailable"}</dd>
+            </div>
+            <div>
+              <dt>User</dt>
+              <dd>{selected.user ?? "Unavailable"}</dd>
+            </div>
+            <div>
+              <dt>Scope</dt>
+              <dd>{exposureLabel(selected.exposure)}</dd>
             </div>
             <div className="wide">
               <dt>Command</dt>
@@ -200,12 +236,22 @@ export function App(): React.JSX.Element {
         </section>
       ) : null}
 
+      {snapshot?.warnings[0] ? (
+        <div className="warning-strip" title={snapshot.warnings.join("\n")}>
+          <span>!</span>
+          {snapshot.warnings[0]}
+        </div>
+      ) : null}
+
       <footer>
         <span className={loading ? "status-dot scanning" : "status-dot"} />
         {loading ? "Scanning…" : `Updated ${formatScanTime(snapshot?.scannedAt)}`}
-        <span className="sample-badge">Sample data</span>
+        <span className="sample-badge">
+          {snapshot?.warnings.some((warning) => warning.includes("sample data"))
+            ? "Sample data"
+            : "Live"}
+        </span>
       </footer>
     </main>
   );
 }
-
