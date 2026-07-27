@@ -463,6 +463,31 @@ export function App(): React.JSX.Element {
         </div>
       ) : null}
 
+      {isPanelMode ? (
+        <nav className="panel-actions" aria-label="HostLens actions">
+          <button
+            className="primary-action"
+            type="button"
+            onClick={() => void window.hostLens.openMainWindow()}
+          >
+            Open App
+          </button>
+          <button
+            type="button"
+            onClick={() => void refresh()}
+            disabled={loading}
+          >
+            Refresh
+          </button>
+          <button
+            type="button"
+            onClick={() => void window.hostLens.quitApp()}
+          >
+            Quit
+          </button>
+        </nav>
+      ) : null}
+
       <footer>
         <span className={loading ? "status-dot scanning" : "status-dot"} />
         {loading ? "Scanning…" : `Updated ${formatScanTime(snapshot?.scannedAt)}`}

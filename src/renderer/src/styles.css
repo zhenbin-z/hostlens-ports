@@ -634,6 +634,49 @@ footer {
   font-weight: 800;
 }
 
+.panel-actions {
+  display: flex;
+  gap: 7px;
+  padding: 8px 20px;
+  border-top: 1px solid rgb(38 64 45 / 7%);
+}
+
+.panel-actions button {
+  min-height: 30px;
+  padding: 0 12px;
+  border: 1px solid rgb(38 64 45 / 10%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 62%);
+  color: #536158;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.panel-actions button:hover {
+  border-color: rgb(28 112 62 / 22%);
+  background: #fff;
+  color: #1d6f3f;
+}
+
+.panel-actions button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.panel-actions .primary-action {
+  flex: 1;
+  border-color: #1d7040;
+  background: #1d7040;
+  color: #fff;
+}
+
+.panel-actions .primary-action:hover {
+  background: #185f36;
+  color: #fff;
+}
+
 .status-dot {
   width: 6px;
   height: 6px;
@@ -733,11 +776,21 @@ footer {
   .search,
   .filter-bar,
   .filter-bar select,
+  .panel-actions button,
   .icon-button,
   .port-row:hover,
   .port-row.selected {
     border-color: rgb(255 255 255 / 8%);
     background: rgb(255 255 255 / 5%);
+  }
+
+  .panel-actions {
+    border-color: rgb(255 255 255 / 8%);
+  }
+
+  .panel-actions .primary-action {
+    border-color: #4caa6e;
+    background: #367e50;
   }
 
   .search input {

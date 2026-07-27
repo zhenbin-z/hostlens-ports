@@ -37,4 +37,6 @@ export interface PortSnapshot {
 export interface HostLensApi {
   listPorts(): Promise<PortSnapshot>;
   copyText(text: string): Promise<void>;
+  openMainWindow(): Promise<void>;
+  quitApp(): Promise<void>;
 }

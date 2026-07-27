@@ -3,7 +3,6 @@ import {
   BrowserWindow,
   clipboard,
   ipcMain,
-  Menu,
   nativeImage,
   screen,
   Tray,
@@ -198,29 +197,6 @@ function showMainWindow(): void {
   mainWindow.focus();
 }
 
-function openTrayMenu(): void {
-  if (!tray) return;
-
-  tray.popUpContextMenu(
-    Menu.buildFromTemplate([
-      {
-        label: "Open HostLens Ports",
-        click: showMainWindow,
-      },
-      {
-        label: panelWindow?.isVisible() ? "Hide Quick View" : "Show Quick View",
-        click: togglePanel,
-      },
-      { type: "separator" },
-      {
-        label: "Quit HostLens Ports",
-        accelerator: "CommandOrControl+Q",
-        click: () => app.quit(),
-      },
-    ]),
-  );
-}
-
 function registerIpc(): void {
   ipcMain.handle("ports:list", () => scanner.scan());
   ipcMain.handle("clipboard:write", (_event, text: unknown) => {
@@ -230,6 +206,11 @@ function registerIpc(): void {
 
     clipboard.writeText(text);
   });
+  ipcMain.handle("app:open-main-window", () => {
+    panelWindow?.hide();
+    showMainWindow();
+  });
+  ipcMain.handle("app:quit", () => app.quit());
 }
 
 app.whenReady().then(() => {
@@ -244,7 +225,6 @@ app.whenReady().then(() => {
   tray = new Tray(createTrayIcon());
   tray.setToolTip("HostLens Ports");
   tray.on("click", togglePanel);
-  tray.on("right-click", openTrayMenu);
   panelWindow = createPanelWindow();
   mainWindow = createMainWindow();
 });
