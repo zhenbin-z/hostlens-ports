@@ -10,7 +10,11 @@
   ![Built with Electron](https://img.shields.io/badge/Electron-React%20%2B%20TypeScript-47848f.svg)
 </div>
 
-[English](README.md) · [日本語](README.ja.md) · [简体中文](README.zh-CN.md)
+<p align="center">
+  <a href="README.md"><img src="https://img.shields.io/badge/English-6f7d72?style=for-the-badge" alt="English"></a>
+  <a href="README.ja.md"><img src="https://img.shields.io/badge/日本語-6f7d72?style=for-the-badge" alt="日本語"></a>
+  <a href="README.zh-CN.md"><img src="https://img.shields.io/badge/简体中文-1f7040?style=for-the-badge" alt="简体中文"></a>
+</p>
 
 HostLens Ports是一款轻量、开源的桌面工具，让你无需记忆`lsof`、`netstat`
 或`ss`命令，也能检查TCP监听端口。它会关联端口对应的进程、完整命令、
