@@ -3,6 +3,7 @@ import {
   BrowserWindow,
   clipboard,
   ipcMain,
+  Menu,
   nativeImage,
   screen,
   Tray,
@@ -17,6 +18,8 @@ let mainWindow: BrowserWindow | null = null;
 let panelWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isQuitting = false;
+
+app.setName("HostLens Ports");
 
 const scanner = createPortScanner();
 
@@ -197,6 +200,76 @@ function showMainWindow(): void {
   mainWindow.focus();
 }
 
+function configureApplicationMenu(): void {
+  if (process.platform !== "darwin") return;
+
+  const template: Electron.MenuItemConstructorOptions[] = [
+    {
+      label: "HostLens Ports",
+      submenu: [
+        {
+          label: "About HostLens Ports",
+          role: "about",
+        },
+        { type: "separator" },
+        { role: "services" },
+        { type: "separator" },
+        {
+          label: "Hide HostLens Ports",
+          accelerator: "Command+H",
+          role: "hide",
+        },
+        {
+          label: "Hide Others",
+          accelerator: "Command+Option+H",
+          role: "hideOthers",
+        },
+        { role: "unhide" },
+        { type: "separator" },
+        {
+          label: "Quit HostLens Ports",
+          accelerator: "Command+Q",
+          click: () => app.quit(),
+        },
+      ],
+    },
+    {
+      label: "Edit",
+      submenu: [
+        { role: "undo" },
+        { role: "redo" },
+        { type: "separator" },
+        { role: "cut" },
+        { role: "copy" },
+        { role: "paste" },
+        { role: "selectAll" },
+      ],
+    },
+    {
+      label: "View",
+      submenu: [
+        { role: "resetZoom" },
+        { role: "zoomIn" },
+        { role: "zoomOut" },
+        { type: "separator" },
+        { role: "togglefullscreen" },
+      ],
+    },
+    {
+      label: "Window",
+      submenu: [
+        { role: "minimize" },
+        { role: "zoom" },
+        { role: "close" },
+        { type: "separator" },
+        { role: "front" },
+      ],
+    },
+  ];
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}
+
 function registerIpc(): void {
   ipcMain.handle("ports:list", () => scanner.scan());
   ipcMain.handle("clipboard:write", (_event, text: unknown) => {
@@ -214,8 +287,6 @@ function registerIpc(): void {
 }
 
 app.whenReady().then(() => {
-  app.setName("HostLens Ports");
-
   if (process.platform === "darwin") {
     app.setActivationPolicy("regular");
     const dock = app.dock;
@@ -225,8 +296,15 @@ app.whenReady().then(() => {
         dock.setIcon(join(app.getAppPath(), "build/icon.png"));
       }
     }
+
+    app.setAboutPanelOptions({
+      applicationName: "HostLens Ports",
+      applicationVersion: app.getVersion(),
+      copyright: "Copyright © 2026 Zhenbin Zhang",
+    });
   }
 
+  configureApplicationMenu();
   registerIpc();
   tray = new Tray(createTrayIcon());
   tray.setToolTip("HostLens Ports");
