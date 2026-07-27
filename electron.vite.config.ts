@@ -6,6 +6,9 @@ export default defineConfig({
   preload: {},
   renderer: {
     plugins: [react()],
+    server: {
+      port: 5190,
+      strictPort: true,
+    },
   },
 });
-
