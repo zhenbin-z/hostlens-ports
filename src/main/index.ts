@@ -20,6 +20,17 @@ let isQuitting = false;
 const scanner = createPortScanner();
 
 function createTrayIcon(): Electron.NativeImage {
+  if (process.platform === "darwin") {
+    const systemIcon = nativeImage.createFromNamedImage("network", {
+      pointSize: 18,
+    });
+
+    if (!systemIcon.isEmpty()) {
+      systemIcon.setTemplateImage(true);
+      return systemIcon;
+    }
+  }
+
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
       <g fill="none" stroke="#000" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
@@ -31,6 +42,11 @@ function createTrayIcon(): Electron.NativeImage {
   const icon = nativeImage.createFromDataURL(
     `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`,
   );
+
+  if (icon.isEmpty()) {
+    throw new Error("HostLens could not create its menu bar icon.");
+  }
+
   icon.setTemplateImage(true);
   return icon.resize({ width: 18, height: 18 });
 }
@@ -62,6 +78,14 @@ function createPanelWindow(): BrowserWindow {
   }
 
   window.on("blur", () => window.hide());
+  window.once("ready-to-show", () => {
+    // In development there is no Dock icon, so reveal the panel once to make
+    // a successful launch immediately visible. Packaged builds stay tray-only.
+    if (process.env.ELECTRON_RENDERER_URL) {
+      showPanel();
+      console.info("[HostLens] Development panel shown.");
+    }
+  });
   window.on("close", (event) => {
     if (!isQuitting) {
       event.preventDefault();
