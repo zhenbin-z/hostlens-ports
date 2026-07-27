@@ -7,6 +7,8 @@ export interface PortListener {
   address: string;
   port: number;
   pid?: number;
+  parentPid?: number;
+  user?: string;
   processName: string;
   command?: string;
   executable?: string;
@@ -18,6 +20,7 @@ export interface PortSnapshot {
   scannedAt: string;
   platform: string;
   listeners: PortListener[];
+  warnings: string[];
 }
 
 export interface HostLensApi {

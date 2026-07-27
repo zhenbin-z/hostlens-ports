@@ -56,7 +56,9 @@ export class PlaceholderPortScanner implements PortScanner {
       scannedAt: new Date().toISOString(),
       platform: this.platform,
       listeners: sampleListeners,
+      warnings: [
+        `Live scanning is not implemented for ${this.platform}; showing sample data.`,
+      ],
     };
   }
 }
-

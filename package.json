@@ -3,12 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "description": "A lightweight desktop viewer for listening ports and their processes.",
+  "author": "Zhenbin Zhang",
   "main": "./out/main/index.js",
   "type": "module",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "npm run typecheck && electron-vite build",
+    "dist:mac": "npm run build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg zip",
     "preview": "electron-vite preview",
+    "test": "node --test src/main/scanners/*.test.ts",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json"
   },
   "dependencies": {
@@ -21,8 +24,30 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.2.0",
     "electron": "^43.2.0",
+    "electron-builder": "^26.15.3",
     "electron-vite": "^5.0.0",
     "typescript": "^7.0.2",
     "vite": "^7.3.6"
+  },
+  "build": {
+    "appId": "dev.hostlens.ports",
+    "productName": "HostLens Ports",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities",
+      "extendInfo": {
+        "LSUIElement": true
+      },
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    }
   }
 }
