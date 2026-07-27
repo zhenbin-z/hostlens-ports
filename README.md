@@ -24,6 +24,9 @@ yarn install
 yarn dev
 ```
 
+`yarn install` also downloads the Electron runtime required by development
+mode.
+
 ## Validation
 
 ```bash
