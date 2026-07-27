@@ -10,6 +10,8 @@
   ![Built with Electron](https://img.shields.io/badge/Electron-React%20%2B%20TypeScript-47848f.svg)
 </div>
 
+[English](README.md) · [日本語](README.ja.md) · [简体中文](README.zh-CN.md)
+
 HostLens Ports is a lightweight, open-source desktop utility for inspecting
 TCP listening ports without memorizing `lsof`, `netstat`, or `ss` commands.
 It connects each port to its owning process, command, bind address, and
@@ -31,6 +33,7 @@ database, telemetry, account, or cloud service.
 - Sort by port, process name, owner, or scope
 - Distinguish loopback-only listeners from network-facing listeners
 - Menu bar Quick View plus a complete desktop window
+- English, Japanese, and Simplified Chinese interfaces
 - Copyable, fully visible command details
 - Read-only operation with no administrator helper
 - Platform scanner abstraction prepared for future Linux support
@@ -147,7 +150,7 @@ notarized before distribution.
 - launchd, Homebrew, Docker, and systemd source attribution
 - Port-change history and notifications
 - Optional multi-host view
-- Accessibility and localization improvements
+- Accessibility and additional localization improvements
 
 HostLens will remain useful without AI. Any future diagnostic assistant should
 be optional and operate on structured, explicitly selected local information.

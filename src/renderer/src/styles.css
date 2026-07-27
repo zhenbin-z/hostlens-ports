@@ -35,6 +35,17 @@ button {
   color: inherit;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  white-space: nowrap;
+}
+
 .panel {
   position: relative;
   display: flex;
@@ -104,6 +115,61 @@ h1 {
   font-size: 21px;
   font-weight: 760;
   letter-spacing: -0.035em;
+}
+
+.language-picker {
+  position: relative;
+  -webkit-app-region: no-drag;
+}
+
+.language-picker::before {
+  position: absolute;
+  top: 50%;
+  left: 9px;
+  width: 11px;
+  height: 11px;
+  border: 1.4px solid #6f7d72;
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.language-picker::after {
+  position: absolute;
+  top: 50%;
+  left: 13px;
+  width: 3px;
+  height: 11px;
+  border-right: 1px solid #6f7d72;
+  border-left: 1px solid #6f7d72;
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.language-picker select {
+  width: 92px;
+  height: 34px;
+  padding: 0 22px 0 26px;
+  border: 1px solid rgb(33 64 42 / 10%);
+  border-radius: 10px;
+  outline: none;
+  background: rgb(255 255 255 / 62%);
+  color: #536158;
+  font-size: 10px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.language-picker select:hover {
+  background: #fff;
+}
+
+.language-picker select:focus {
+  border-color: rgb(29 107 58 / 30%);
+  box-shadow: 0 0 0 3px rgb(29 107 58 / 7%);
 }
 
 .icon-button,
@@ -776,6 +842,7 @@ footer {
   .search,
   .filter-bar,
   .filter-bar select,
+  .language-picker select,
   .panel-actions button,
   .icon-button,
   .port-row:hover,

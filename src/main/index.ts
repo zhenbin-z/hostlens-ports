@@ -200,41 +200,88 @@ function showMainWindow(): void {
   mainWindow.focus();
 }
 
+function getApplicationMenuText(): {
+  about: string;
+  edit: string;
+  hide: string;
+  hideOthers: string;
+  quit: string;
+  view: string;
+  window: string;
+} {
+  const locale = app.getLocale().toLowerCase();
+
+  if (locale.startsWith("ja")) {
+    return {
+      about: "HostLens Portsについて",
+      edit: "編集",
+      hide: "HostLens Portsを隠す",
+      hideOthers: "ほかを隠す",
+      quit: "HostLens Portsを終了",
+      view: "表示",
+      window: "ウィンドウ",
+    };
+  }
+
+  if (locale.startsWith("zh")) {
+    return {
+      about: "关于HostLens Ports",
+      edit: "编辑",
+      hide: "隐藏HostLens Ports",
+      hideOthers: "隐藏其他应用",
+      quit: "退出HostLens Ports",
+      view: "显示",
+      window: "窗口",
+    };
+  }
+
+  return {
+    about: "About HostLens Ports",
+    edit: "Edit",
+    hide: "Hide HostLens Ports",
+    hideOthers: "Hide Others",
+    quit: "Quit HostLens Ports",
+    view: "View",
+    window: "Window",
+  };
+}
+
 function configureApplicationMenu(): void {
   if (process.platform !== "darwin") return;
+  const text = getApplicationMenuText();
 
   const template: Electron.MenuItemConstructorOptions[] = [
     {
       label: "HostLens Ports",
       submenu: [
         {
-          label: "About HostLens Ports",
+          label: text.about,
           role: "about",
         },
         { type: "separator" },
         { role: "services" },
         { type: "separator" },
         {
-          label: "Hide HostLens Ports",
+          label: text.hide,
           accelerator: "Command+H",
           role: "hide",
         },
         {
-          label: "Hide Others",
+          label: text.hideOthers,
           accelerator: "Command+Option+H",
           role: "hideOthers",
         },
         { role: "unhide" },
         { type: "separator" },
         {
-          label: "Quit HostLens Ports",
+          label: text.quit,
           accelerator: "Command+Q",
           click: () => app.quit(),
         },
       ],
     },
     {
-      label: "Edit",
+      label: text.edit,
       submenu: [
         { role: "undo" },
         { role: "redo" },
@@ -246,7 +293,7 @@ function configureApplicationMenu(): void {
       ],
     },
     {
-      label: "View",
+      label: text.view,
       submenu: [
         { role: "resetZoom" },
         { role: "zoomIn" },
@@ -256,7 +303,7 @@ function configureApplicationMenu(): void {
       ],
     },
     {
-      label: "Window",
+      label: text.window,
       submenu: [
         { role: "minimize" },
         { role: "zoom" },

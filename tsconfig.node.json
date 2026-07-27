@@ -4,11 +4,18 @@
     "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["node", "electron-vite/node"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true
   },
-  "include": ["electron.vite.config.ts", "src/main/**/*.ts", "src/preload/**/*.ts", "src/shared/**/*.ts"]
+  "include": [
+    "electron.vite.config.ts",
+    "src/main/**/*.ts",
+    "src/preload/**/*.ts",
+    "src/renderer/src/i18n.ts",
+    "src/renderer/src/**/*.test.ts",
+    "src/shared/**/*.ts"
+  ]
 }
