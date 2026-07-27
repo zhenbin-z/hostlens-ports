@@ -21,9 +21,11 @@ const scanner = createPortScanner();
 
 function createTrayIcon(): Electron.NativeImage {
   if (process.platform === "darwin") {
-    const systemIcon = nativeImage.createFromNamedImage("network", {
-      pointSize: 18,
-    });
+    const systemIcon = nativeImage
+      .createFromNamedImage("server.rack", {
+        pointSize: 16,
+      })
+      .resize({ width: 18, height: 18, quality: "best" });
 
     if (!systemIcon.isEmpty()) {
       systemIcon.setTemplateImage(true);
@@ -64,7 +66,7 @@ function createPanelWindow(): BrowserWindow {
     transparent: true,
     hasShadow: true,
     webPreferences: {
-      preload: join(__dirname, "../preload/index.mjs"),
+      preload: join(__dirname, "../preload/index.cjs"),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
