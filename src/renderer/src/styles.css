@@ -642,6 +642,119 @@ dd {
   white-space: nowrap;
 }
 
+.detail-paths {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.detail-paths > div {
+  min-width: 0;
+}
+
+.detail-paths span,
+.observation-section h2 {
+  display: block;
+  margin: 0 0 4px;
+  color: #718076;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.detail-paths code {
+  display: block;
+  overflow-wrap: anywhere;
+  padding: 7px 8px;
+  border: 1px solid rgb(37 70 46 / 8%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 48%);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.observation-section {
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid rgb(37 70 46 / 8%);
+}
+
+.observation-section > p {
+  margin: 0;
+  color: #7a867d;
+  font-size: 9px;
+}
+
+.parent-chain,
+.evidence-list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.parent-chain {
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.parent-chain li {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 5px 7px;
+  border-radius: 7px;
+  background: rgb(255 255 255 / 52%);
+}
+
+.parent-chain strong {
+  overflow: hidden;
+  max-width: 130px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 8.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.parent-chain span {
+  color: #7a867d;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.evidence-list {
+  flex-direction: column;
+  gap: 4px;
+}
+
+.evidence-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 7px;
+  border-radius: 7px;
+  background: rgb(255 255 255 / 45%);
+}
+
+.evidence-list strong {
+  overflow: hidden;
+  font-size: 8.5px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.evidence-list span {
+  color: #7a867d;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
 .empty-state {
   display: grid;
   min-height: 180px;
@@ -874,7 +987,10 @@ footer {
   }
 
   .full-command,
-  .copy-command-button {
+  .copy-command-button,
+  .detail-paths code,
+  .parent-chain li,
+  .evidence-list li {
     border-color: rgb(255 255 255 / 9%);
     background: rgb(255 255 255 / 5%);
     color: #edf4ee;

@@ -184,6 +184,12 @@ export function App(): React.JSX.Element {
           listener.projectName,
           listener.address,
           listener.command,
+          listener.executable,
+          listener.workingDirectory,
+          ...listener.parentChain.flatMap((ancestor) => [
+            ancestor.processName,
+            ancestor.executable,
+          ]),
           listener.source,
         ]
           .filter(Boolean)
@@ -508,7 +514,55 @@ export function App(): React.JSX.Element {
                 <dt>{t("scope")}</dt>
                 <dd>{exposureLabel(selected.exposure, t)}</dd>
               </div>
+              <div>
+                <dt>{t("observation")}</dt>
+                <dd>
+                  {selected.observationStatus === "complete"
+                    ? t("completeObservation")
+                    : t("partialObservation", {
+                        count: selected.unavailableFields.length,
+                      })}
+                </dd>
+              </div>
             </dl>
+            <div className="detail-paths">
+              <div>
+                <span>{t("executable")}</span>
+                <code>{selected.executable ?? t("unavailable")}</code>
+              </div>
+              <div>
+                <span>{t("workingDirectory")}</span>
+                <code>{selected.workingDirectory ?? t("unavailable")}</code>
+              </div>
+            </div>
+            <section className="observation-section">
+              <h2>{t("parentChain")}</h2>
+              {selected.parentChain.length > 0 ? (
+                <ol className="parent-chain">
+                  {selected.parentChain.map((ancestor) => (
+                    <li key={ancestor.pid} title={ancestor.executable}>
+                      <strong>{ancestor.processName}</strong>
+                      <span>PID {ancestor.pid}</span>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p>{t("noParentChain")}</p>
+              )}
+            </section>
+            <section className="observation-section">
+              <h2>{t("evidence")}</h2>
+              <ul className="evidence-list">
+                {selected.evidence.map((item) => (
+                  <li key={`${item.source}-${item.fields.join("-")}`}>
+                    <strong>{item.source}</strong>
+                    <span title={item.fields.join(", ")}>
+                      {t("evidenceFields", { count: item.fields.length })}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
           </section>
         ) : !isPanelMode ? (
           <section className="detail-card detail-placeholder">

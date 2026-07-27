@@ -12,6 +12,10 @@ function listener(overrides: Partial<PortListener>): PortListener {
     processName: "unknown",
     exposure: "local",
     portType: "service",
+    parentChain: [],
+    observationStatus: "partial",
+    unavailableFields: [],
+    evidence: [],
     ...overrides,
   };
 }
@@ -76,4 +80,3 @@ describe("identifyProcess", () => {
     );
   });
 });
-

@@ -1,5 +1,17 @@
 export type PortExposure = "local" | "network" | "unknown";
 export type PortType = "system" | "service" | "dynamic";
+export type ObservationConfidence = "high" | "medium" | "low";
+export type ObservationStatus = "complete" | "partial";
+export type ObservationField =
+  | "socket"
+  | "pid"
+  | "processName"
+  | "parentPid"
+  | "user"
+  | "command"
+  | "executable"
+  | "workingDirectory"
+  | "parentChain";
 export type ProcessOwnerType =
   | "system"
   | "service"
@@ -7,6 +19,20 @@ export type ProcessOwnerType =
   | "development"
   | "unknown";
 export type TransportProtocol = "tcp" | "udp";
+
+export interface ObservationEvidence {
+  source: string;
+  collectedAt: string;
+  confidence: ObservationConfidence;
+  fields: ObservationField[];
+}
+
+export interface ProcessAncestor {
+  pid: number;
+  parentPid?: number;
+  processName: string;
+  executable?: string;
+}
 
 export interface PortListener {
   id: string;
@@ -23,6 +49,11 @@ export interface PortListener {
   projectName?: string;
   command?: string;
   executable?: string;
+  workingDirectory?: string;
+  parentChain: ProcessAncestor[];
+  observationStatus: ObservationStatus;
+  unavailableFields: ObservationField[];
+  evidence: ObservationEvidence[];
   exposure: PortExposure;
   source?: string;
 }

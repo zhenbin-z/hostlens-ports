@@ -1,7 +1,16 @@
-import type { PortSnapshot } from "../../shared/ports";
+import type {
+  ObservationField,
+  PortSnapshot,
+} from "../../shared/ports";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { parseLsofListeners, parsePsDetails } from "./macos-parser.ts";
+import {
+  buildParentChain,
+  parseLsofListeners,
+  parseLsofWorkingDirectories,
+  parsePsCommands,
+  parsePsProcessTable,
+} from "./macos-parser.ts";
 import type { PortScanner } from "./port-scanner";
 import { identifyProcess } from "./process-identity.ts";
 
@@ -11,28 +20,84 @@ const PS_PATH = "/bin/ps";
 const MAX_BUFFER_BYTES = 4 * 1024 * 1024;
 
 export class MacOsPortScanner implements PortScanner {
-  private async inspectProcess(pid: number): Promise<ReturnType<typeof parsePsDetails>> {
+  private async inspectProcessTable(): Promise<
+    ReturnType<typeof parsePsProcessTable>
+  > {
     try {
       const { stdout } = await execFileAsync(
         PS_PATH,
-        ["-p", String(pid), "-o", "ppid=", "-o", "user=", "-o", "command="],
+        ["-axo", "pid=,ppid=,user=,comm="],
         {
           encoding: "utf8",
           maxBuffer: MAX_BUFFER_BYTES,
           timeout: 3_000,
         },
       );
-      return parsePsDetails(stdout);
+      return parsePsProcessTable(stdout);
     } catch {
-      // The process may have exited between the lsof and ps calls, or macOS may
-      // not permit details for another user's process. The listener is still
-      // useful, so process enrichment is best effort.
-      return {};
+      return [];
+    }
+  }
+
+  private async inspectCommands(processIds: number[]): Promise<Map<number, string>> {
+    if (processIds.length === 0) return new Map();
+
+    try {
+      const { stdout } = await execFileAsync(
+        PS_PATH,
+        [
+          "-p",
+          processIds.join(","),
+          "-o",
+          "pid=",
+          "-o",
+          "command=",
+        ],
+        {
+          encoding: "utf8",
+          maxBuffer: MAX_BUFFER_BYTES,
+          timeout: 3_000,
+        },
+      );
+      return parsePsCommands(stdout);
+    } catch (cause) {
+      const error = cause as { stdout?: string };
+      return parsePsCommands(error.stdout ?? "");
+    }
+  }
+
+  private async inspectWorkingDirectories(
+    processIds: number[],
+  ): Promise<Map<number, string>> {
+    if (processIds.length === 0) return new Map();
+
+    try {
+      const { stdout } = await execFileAsync(
+        LSOF_PATH,
+        [
+          "-a",
+          "-p",
+          processIds.join(","),
+          "-d",
+          "cwd",
+          "-Fpn",
+        ],
+        {
+          encoding: "utf8",
+          maxBuffer: MAX_BUFFER_BYTES,
+          timeout: 4_000,
+        },
+      );
+      return parseLsofWorkingDirectories(stdout);
+    } catch (cause) {
+      const error = cause as { stdout?: string };
+      return parseLsofWorkingDirectories(error.stdout ?? "");
     }
   }
 
   public async scan(): Promise<PortSnapshot> {
     const warnings: string[] = [];
+    const collectedAt = new Date().toISOString();
     let output = "";
 
     try {
@@ -73,21 +138,85 @@ export class MacOsPortScanner implements PortScanner {
           .filter((pid): pid is number => pid !== undefined),
       ),
     ];
-    const detailsByPid = new Map(
-      await Promise.all(
-        processIds.map(async (pid) => [pid, await this.inspectProcess(pid)] as const),
-      ),
+    const [processTableEntries, commandsByPid, directoriesByPid] =
+      await Promise.all([
+        this.inspectProcessTable(),
+        this.inspectCommands(processIds),
+        this.inspectWorkingDirectories(processIds),
+      ]);
+    const processTable = new Map(
+      processTableEntries.map((entry) => [entry.pid, entry] as const),
     );
 
     for (const listener of listeners) {
-      if (listener.pid) {
-        const processDetails = detailsByPid.get(listener.pid);
+      listener.evidence.push({
+        source: "macOS lsof listening sockets",
+        collectedAt,
+        confidence: "high",
+        fields: ["socket", "pid", "processName"],
+      });
+
+      if (listener.pid !== undefined) {
+        const processDetails = processTable.get(listener.pid);
+        const command = commandsByPid.get(listener.pid);
+        const workingDirectory = directoriesByPid.get(listener.pid);
+
         if (processDetails) {
-          listener.parentPid = processDetails.parentPid;
-          listener.user = processDetails.user ?? listener.user;
-          listener.command = processDetails.command;
+          listener.parentPid =
+            processDetails.parentPid > 0 ? processDetails.parentPid : undefined;
+          listener.user = processDetails.user || listener.user;
+          listener.executable = processDetails.executable || undefined;
+          listener.parentChain = buildParentChain(listener.pid, processTable);
+          listener.evidence.push({
+            source: "macOS ps process table",
+            collectedAt,
+            confidence: "high",
+            fields: [
+              "parentPid",
+              "user",
+              "executable",
+              ...(listener.parentChain.length > 0
+                ? (["parentChain"] satisfies ObservationField[])
+                : []),
+            ],
+          });
+        }
+
+        if (command) {
+          listener.command = command;
+          listener.evidence.push({
+            source: "macOS ps command",
+            collectedAt,
+            confidence: "high",
+            fields: ["command"],
+          });
+        }
+
+        if (workingDirectory) {
+          listener.workingDirectory = workingDirectory;
+          listener.evidence.push({
+            source: "macOS lsof process cwd",
+            collectedAt,
+            confidence: "high",
+            fields: ["workingDirectory"],
+          });
         }
       }
+
+      const requiredDetails: Array<
+        [ObservationField, string | number | undefined]
+      > = [
+        ["parentPid", listener.parentPid],
+        ["user", listener.user],
+        ["command", listener.command],
+        ["executable", listener.executable],
+        ["workingDirectory", listener.workingDirectory],
+      ];
+      listener.unavailableFields = requiredDetails
+        .filter(([, value]) => value === undefined || value === "")
+        .map(([field]) => field);
+      listener.observationStatus =
+        listener.unavailableFields.length === 0 ? "complete" : "partial";
 
       const identity = identifyProcess(listener);
       listener.displayName = identity.displayName;
@@ -95,14 +224,14 @@ export class MacOsPortScanner implements PortScanner {
       listener.projectName = identity.projectName;
     }
 
-    if (listeners.some((listener) => !listener.command)) {
+    if (listeners.some((listener) => listener.observationStatus === "partial")) {
       warnings.push(
         "Some process details are unavailable because the process exited or macOS restricted access.",
       );
     }
 
     return {
-      scannedAt: new Date().toISOString(),
+      scannedAt: collectedAt,
       platform: "darwin",
       listeners,
       warnings,
