@@ -120,6 +120,56 @@ Socket
 ローカルに限定します。将来外部AIを利用する場合は、送信する構造化情報を
 最小化し、ユーザーに明示します。
 
+## HostLens の対象ユーザー
+
+HostLens は一つの Evidence-backed Environment Model を維持し、ユーザーに
+応じて異なる View と言葉で表示します。
+
+### 個人ユーザー
+
+個人ユーザーが知りたいのはOS用語ではなく結果です。
+
+- バックグラウンドで何が動いているか
+- なぜこのAppが自動起動するか
+- 最近何が変わったか
+- Memory、Storage、Battery、Networkを何が使用しているか
+- Network-facing Processは意図したものか
+
+通常は分かりやすい言葉で表示し、確認したいユーザーには一段深い技術的Evidence
+を提供します。
+
+### 開発者
+
+開発者には正確なローカル関係が必要です。
+
+- Socket、Process、Parent Process、Command、Working Directory
+- launchd、Homebrew、Docker、Development Server
+- Runtime、Project、Package Script、Configuration
+- Local Network Exposure と Source Attribution
+
+HostLens Ports はこのPersona向けの最初の具体的なProductです。
+
+### 中小企業の情シス
+
+経営者、兼任管理者、少人数の情シスには、Enterprise向け監視Stackを導入せずに
+信頼できる回答が必要です。
+
+- 重要な各マシンにどのServiceとStartup Itemが存在するか
+- 前回確認時から何が変わったか
+- 共有Printer、NAS、Server、Local Applicationがなぜ利用できないか
+- オフィス全体の問題がどのMachineやDependencyに起因するか
+- 何を確認すべきで、何が通常動作か
+- 確認可能なInventoryやReportをどう作るか
+
+長期的には、Single HostからPC、Mac、Linux Server、NAS、Printer、Router、
+Wi-Fi、選択されたCloud DependencyまでをLocal-firstで理解できるようにします。
+
+### AI と外部Tool
+
+外部Assistantには、現在の事実を安全に取得できる安定した情報源が必要です。
+読み取り専用QueryとMCPは、任意Shellを許可せず、必要な構造化Contextだけを
+提供します。
+
 ## HostLens とは
 
 - ホスト情報インスペクター
@@ -127,6 +177,7 @@ Socket
 - 正規化されたOSデータレイヤー
 - ホスト識別情報と関係のローカルな信頼できる情報源
 - 状態変化を把握するツール
+- 個人と中小企業がDigital Environmentを理解するための基盤
 - 将来の読み取り専用APIおよびMCP Server
 - 将来的には監督・ポリシー制約付きの運用システム
 
@@ -184,4 +235,3 @@ HostLens の成功とは、次のことができる状態です。
 - 明確な権限範囲内でのみ安全に操作する
 
 対応コマンド数や機能数そのものは成功指標ではありません。
-

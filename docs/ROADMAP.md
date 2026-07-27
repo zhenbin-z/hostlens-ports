@@ -35,12 +35,16 @@ Version 0.1.0 established the first useful product:
 - English, Japanese, and Simplified Chinese; and
 - a read-only, local-first architecture.
 
-## In development: 0.2.0 — Host Identity
+## In development: 0.2.0 — Host Identity and Session Awareness
 
 Version 0.2 should answer:
 
 > **Who is really behind this port, where did it come from, and what changed
 > during this HostLens session?**
+
+It is still a focused single-host port inspector. The goal is to make the same
+trusted facts useful to personal users, developers, and small-company IT—not to
+build three separate products.
 
 ### Scanner reliability
 
@@ -81,6 +85,47 @@ Without adding a database:
 - show changes in the application and menu bar quick view; and
 - reset the history when HostLens exits.
 
+### Audience-aware presentation
+
+Use one identity and evidence model with different levels of detail:
+
+- **Personal:** show a plain-language identity, why it is likely running,
+  whether it starts automatically, and whether it is local-only or
+  network-facing. Keep commands and evidence expandable.
+- **Developer:** prioritize project, tool, package script, working directory,
+  parent chain, runtime, and exact command.
+- **IT:** provide a consistent technical identity, collection status, evidence,
+  and a copyable current-state summary suitable for an inventory, support
+  ticket, or manual review.
+
+Version 0.2 does not need a full persona-switching system. The UI should prove
+that friendly summaries and technical evidence can refer to the same object.
+
+### Shareable current-state summary
+
+Without a database or cloud service:
+
+- let the user copy or export the current selected listener details;
+- provide a sanitized summary option that omits or shortens private paths and
+  other sensitive fields;
+- include collection time, identity confidence, source, exposure, and evidence;
+  and
+- make clear that the export is a point-in-time observation, not a security
+  certification.
+
+### 0.2 implementation order
+
+Implement the release as vertical slices:
+
+1. make raw socket and process observations reliable;
+2. introduce identity, evidence, confidence, and partial-result semantics;
+3. add source-attribution resolvers with sanitized fixtures;
+4. add deterministic in-memory session changes; and
+5. add friendly/technical presentation and sanitized current-state summaries.
+
+Do not begin a later slice by bypassing unfinished shared-model work in an
+earlier slice.
+
 ### 0.2 completion criteria
 
 The release should not be considered complete only because fields exist.
@@ -88,11 +133,20 @@ The release should not be considered complete only because fields exist.
 - Existing scanner tests continue to pass.
 - Representative sanitized fixtures cover supported development-server and
   source-attribution patterns.
+- A documented 20-scan benchmark on the reference Mac records a p95 scan time
+  below two seconds under a normal development workload.
 - Every inferred identity includes evidence and confidence.
 - Missing process details degrade to an unknown or partial result without
   losing the socket.
 - A normal scan remains responsive on a developer Mac.
 - New, changed, and closed states are deterministic across identical snapshots.
+- A non-technical user can understand the primary identity and exposure without
+  opening the raw command.
+- A technical user can inspect the evidence behind every friendly identity.
+- The current-state summary can be copied without introducing persistence or
+  background network traffic.
+- Sanitization tests demonstrate that private home-directory prefixes and
+  common secret-bearing command arguments are not included in sanitized output.
 - HostLens remains read-only and sends no machine information over the network.
 
 ### Explicitly out of scope for 0.2
@@ -101,6 +155,7 @@ The release should not be considered complete only because fields exist.
 - UDP scanning;
 - full macOS host inventory;
 - Linux GUI parity;
+- device discovery, multi-host management, or a business hub;
 - MCP;
 - LLM or chat features;
 - firewall modification;
@@ -115,7 +170,9 @@ After 0.2 validates Host Identity:
 - add launchd services and startup items;
 - add Homebrew Services and Docker relationships;
 - show network interfaces, routes, DNS, and VPN context;
-- add a macOS host overview; and
+- add a personal overview for background activity and startup behavior;
+- add a developer view for projects, runtimes, and local services;
+- add an IT view for machine inventory, evidence, and reviewable summaries; and
 - introduce new resource types only with real collectors and UI.
 
 ## Linux first-class support
@@ -149,6 +206,31 @@ Once normalized identities are stable:
 
 Alerts should explain evidence and change, not manufacture security verdicts.
 
+## Personal and small-business experiences
+
+The shared model should grow into two additional experiences without forking
+the underlying facts.
+
+### Personal host understanding
+
+- background applications and startup behavior;
+- ordinary-language explanations with expandable evidence;
+- recent changes;
+- resource and network context; and
+- attention guidance that avoids unsupported security claims.
+
+### Small-business IT
+
+- consistent inspection across Macs and Linux hosts;
+- current-state inventory and reviewable reports;
+- changes and alerts for important machines;
+- service, startup, schedule, and firewall context;
+- local deployment and local processing; and
+- evidence suitable for troubleshooting and handoff.
+
+These begin as single-host capabilities. They do not require enterprise fleet
+management.
+
 ## Local Query API, MCP, and Explain
 
 A stable query layer can serve:
@@ -173,6 +255,25 @@ Explanation, implications, and next investigation steps
 No unrestricted shell, free-form agent, or automatic tool execution is part
 of this stage.
 
+## Small-business environment intelligence
+
+Only after the single-host model and changes are trustworthy, HostLens may
+connect the office environment:
+
+- Macs, PCs, and Linux servers;
+- NAS devices and shared storage;
+- printers;
+- routers, switches, Wi-Fi, and local network services;
+- selected cloud dependencies;
+- a local business hub;
+- topology and dependency relationships;
+- centralized changes, alerts, and reports; and
+- local-first AI context.
+
+The exit criterion is not “many devices are listed.” HostLens should help
+determine whether an office-wide symptom comes from an endpoint, shared
+service, network device, or upstream dependency.
+
 ## Advisory and supervised operations
 
 Only after reliable identity, relationships, snapshots, and evidence:
@@ -193,22 +294,9 @@ failure behavior, and user override.
 The long-term agent remains bounded. HostLens should never become a generic
 root shell controlled by an LLM.
 
-## Multi-host
-
-Multi-host management should build on the proven single-host model:
-
-- a headless Linux collector;
-- read-only SSH collection where appropriate;
-- host lists and host comparison;
-- centralized changes and alerts;
-- host-scoped MCP queries; and
-- separately authorized remote operations.
-
-Multi-host scale is not a prerequisite for making the single-host inspector
-excellent.
-
 ## Related documents
 
 - [Product philosophy](PRODUCT.md)
 - [Architecture](ARCHITECTURE.md)
 - [Safety model](SAFETY.md)
+- [Why HostLens is open source](OPEN_SOURCE.md)

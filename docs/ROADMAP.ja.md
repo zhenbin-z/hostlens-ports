@@ -35,12 +35,16 @@ Operate safely
 - English、日本語、简体中文
 - 読み取り専用、Local-first Architecture
 
-## 開発中：0.2.0 — Host Identity
+## 開発中：0.2.0 — Host Identity and Session Awareness
 
 0.2 が回答する問い：
 
 > **このポートの実体は誰か、どこから起動されたか、今回のHostLens Sessionで
 > 何が変わったか？**
+
+0.2は引き続きSingle-hostのPort Inspectorに集中します。同じ信頼できる事実を
+個人、Developer、中小企業の情シスに役立てることが目的であり、3つの別Product
+を作るものではありません。
 
 ### Scanner の信頼性
 
@@ -78,16 +82,58 @@ Databaseを追加せず、次を実装します。
 - App と Menu Bar Quick View に変化を表示
 - HostLens 終了時に履歴をReset
 
+### 対象ユーザーに応じた表示
+
+一つのIdentity / Evidence Modelから、情報量の異なる表示を作ります。
+
+- **個人：** 分かりやすい名前、動作している可能性の高い理由、自動起動か、
+  Local-onlyかNetwork-facingかを表示し、CommandとEvidenceは展開可能にする
+- **Developer：** Project、Tool、Package Script、Working Directory、
+  Parent Chain、Runtime、正確なCommandを優先する
+- **情シス：** 一貫した技術Identity、Collection Status、Evidence、
+  Inventory・Support Ticket・手動確認に使える現在状態Summaryを提供する
+
+0.2で完全なPersona切替Systemは不要です。Friendly SummaryとTechnical Evidence
+が同じObjectを参照できることを証明します。
+
+### 共有可能な現在状態Summary
+
+DatabaseやCloud Serviceを使わずに：
+
+- 選択したListenerの現在詳細をCopy / Exportする
+- Private PathなどのSensitive Fieldを省略・短縮するSanitized Summaryを用意する
+- Collection Time、Identity Confidence、Source、Exposure、Evidenceを含める
+- Point-in-time Observationであり、Security Certificationではないと明示する
+
+### 0.2 の実装順序
+
+Vertical Sliceとして順番に実装します。
+
+1. 生のSocket / Process Observationを信頼できる状態にする
+2. Identity、Evidence、Confidence、Partial Result Semanticsを導入する
+3. Sanitized Fixtureを使ってSource Attribution Resolverを追加する
+4. 決定的なIn-memory Session Changesを追加する
+5. Friendly / Technical表示とSanitized Current-state Summaryを追加する
+
+前のSliceに必要なShared Modelを迂回して、後のSliceを先に実装しません。
+
 ### 0.2 完了条件
 
 Fieldが存在するだけでは完了とみなしません。
 
 - 既存Scanner Testがすべて成功する
 - サニタイズされた代表Fixtureが開発ServerとSource Attributionをカバーする
+- Reference Macで20回のScan Benchmarkを記録し、通常の開発Workloadで
+  p95 Scan Timeが2秒未満である
 - 推論したIdentityにEvidenceとConfidenceがある
 - Process情報が不足してもSocketを失わずPartial / Unknownとして表示する
 - 一般的な開発用MacでScan中もUIが応答する
 - 同一Snapshot間のNew / Changed / Closed判定が決定的である
+- 非技術ユーザーがRaw Commandを開かなくてもIdentityとExposureを理解できる
+- 技術ユーザーがFriendly Identityの根拠Evidenceを確認できる
+- Current-state SummaryをPersistenceやBackground Network TrafficなしでCopyできる
+- Sanitization Testにより、Private Home-directory PrefixとSecretを含みやすい
+  Command ArgumentがSanitized Outputへ含まれないことを示す
 - 読み取り専用で、マシン情報をNetworkへ送信しない
 
 ### 0.2 の対象外
@@ -96,6 +142,7 @@ Fieldが存在するだけでは完了とみなしません。
 - UDP Scan
 - 完全な macOS Host Inventory
 - Linux GUI の同等機能
+- Device Discovery、Multi-host Management、Business Hub
 - MCP
 - LLM / Chat
 - Firewall変更
@@ -110,7 +157,9 @@ Fieldが存在するだけでは完了とみなしません。
 - launchd Service / Startup Item
 - Homebrew Services / Docker の関係
 - Network Interface、Route、DNS、VPN Context
-- macOS Host Overview
+- Background ActivityとStartup Behaviorを示すPersonal Overview
+- Project、Runtime、Local Serviceを示すDeveloper View
+- Machine Inventory、Evidence、Reviewable Summaryを示すIT View
 - 実際のCollectorとUIがある場合のみResource Typeを追加
 
 ## Linux 一等対応
@@ -144,6 +193,29 @@ Identityが安定した後：
 
 Alert は Security Verdict を作るのではなく、Evidence と変化を説明します。
 
+## 個人・中小企業向けExperience
+
+Underlying Factを分岐させず、Shared Modelから二つのExperienceを発展させます。
+
+### Personal Host Understanding
+
+- Background ApplicationとStartup Behavior
+- 普通の言葉による説明と展開可能なEvidence
+- Recent Changes
+- Resource / Network Context
+- 根拠のないSecurity Claimを避けたAttention Guidance
+
+### 中小企業の情シス
+
+- MacとLinux Hostに共通するInspection
+- Current-state InventoryとReviewable Report
+- 重要MachineのChanges / Alerts
+- Service、Startup、Schedule、Firewall Context
+- Local DeploymentとLocal Processing
+- Troubleshootingと引き継ぎに使えるEvidence
+
+最初はSingle-host機能として提供し、Enterprise Fleet Managementを前提にしません。
+
 ## Local Query API、MCP、Explain
 
 安定した Query Layer は次から共有できます。
@@ -167,6 +239,25 @@ Explanation, implications, and next investigation steps
 
 無制限Shell、Free-form Agent、自動Tool実行は含みません。
 
+## 中小企業向けEnvironment Intelligence
+
+Single-host ModelとChangesが信頼できる段階になってから、Office Environmentを
+接続します。
+
+- Mac、PC、Linux Server
+- NAS / Shared Storage
+- Printer
+- Router、Switch、Wi-Fi、Local Network Service
+- 選択されたCloud Dependency
+- Local Business Hub
+- Topology / Dependency Relationship
+- 集中Changes、Alerts、Reports
+- Local-first AI Context
+
+完了条件は「多くのDeviceを一覧表示できる」ことではありません。Office全体の
+症状がEndpoint、Shared Service、Network Device、Upstream Dependencyのどれに
+起因するかを判断できることです。
+
 ## Advisory / Supervised Operations
 
 信頼できるIdentity、Relationship、Snapshot、Evidenceが完成した後：
@@ -187,22 +278,9 @@ Supervised Operations の安全性を確認した後、低リスクの自動化�
 長期的なAgentも必ず境界を持ちます。HostLensをLLMが制御する汎用root Shell
 にはしません。
 
-## Multi-host
-
-単一Hostで検証されたModelを基盤にします。
-
-- Headless Linux Collector
-- 必要に応じた読み取り専用SSH収集
-- Host一覧とHost比較
-- 集中Changes / Alerts
-- Host Scope付きMCP Query
-- 個別認可されたRemote Operations
-
-Multi-host Scaleは、優れたSingle-host Inspectorを作る前提条件ではありません。
-
 ## 関連ドキュメント
 
 - [プロダクト思想](PRODUCT.ja.md)
 - [アーキテクチャ](ARCHITECTURE.ja.md)
 - [セーフティモデル](SAFETY.ja.md)
-
+- [HostLensをOSSにする理由](OPEN_SOURCE.ja.md)

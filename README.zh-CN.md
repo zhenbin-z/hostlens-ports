@@ -45,6 +45,18 @@ HostLens Ports是一款轻量、开源的桌面工具，让你无需记忆`lsof`
        alt="HostLens Ports菜单栏快速视图">
 </p>
 
+## 面向哪些用户
+
+- **个人用户：** 用普通语言理解后台和 Network-facing 活动，并在需要时检查
+  技术 Evidence。
+- **Developer：** 将 Port 关联到 Project、Command、Runtime、Parent Process
+  与 Launch Source。
+- **中小企业情信人员：** 无需部署企业级监控系统，即可一致检查重要 Mac 与
+  Linux Host、查看 Changes 并生成带 Evidence 的 Summary。
+
+HostLens 从一台 Machine 开始。长期方向是以 Local-first 方式理解 Computer、
+Server、NAS、Printer、Router、Wi-Fi 和 Shared Service 组成的环境。
+
 ## 快速开始
 
 ### 环境要求
@@ -119,6 +131,15 @@ yarn build      # 创建生产构建
 yarn dist:mac   # 创建未签名的本地.dmg和.zip
 ```
 
+## 为什么开源
+
+HostLens 会检查敏感的 Local System Context，因此用户应该能够确认它采集什么，
+以及数据是否离开本机。开放开发也让 Community 可以共同改善不同 OS Version、
+安装方式、Hardware 与 Local Configuration 的兼容性。
+
+HostLens 希望成为长期公开的 Infrastructure Project，而不是薄弱的 AI Wrapper。
+详细说明请阅读[为什么HostLens选择开源](docs/OPEN_SOURCE.zh-CN.md)。
+
 ## Roadmap
 
 HostLens 按照以下层次逐步构建：
@@ -128,10 +149,12 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 ```
 
 - **0.1.0 — See：** 实时显示 macOS TCP Listener 及其对应进程。
-- **0.2.0 — Host Identity：** 提升 Scanner 可靠性，识别项目和启动来源，
-  附带 Evidence 与 Confidence，并显示内存中的 New / Changed / Closed 状态。
-- **之后：** 扩展 Unified Host Model，加入 Linux 一等支持、持久化变化与
-  Alert、只读 MCP 和可选 Explain，最后才考虑 Supervised Operations。
+- **0.2.0 — Host Identity and Session Awareness：** 提升 Scanner 可靠性，
+  识别 Project 与启动来源，附带 Evidence 与 Confidence，显示内存中的 New /
+  Changed / Closed，并提供 Friendly / Technical View 与可共享Current-state Summary。
+- **之后：** 扩展 Unified Host Model，加入 Linux 一等支持、个人与情信体验、
+  持久化 Changes 与 Alerts、只读 MCP、可选 Explain 和 Environment
+  Intelligence，最后才考虑 Supervised Operations。
 
 HostLens 在没有 AI 时也必须保持实用。未来 AI 功能只能使用用户明确选择的最少
 结构化数据，并且不能获得无限制 Shell。
@@ -144,6 +167,7 @@ HostLens 在没有 AI 时也必须保持实用。未来 AI 功能只能使用用
 - [架构](docs/ARCHITECTURE.zh-CN.md)
 - [安全模型](docs/SAFETY.zh-CN.md)
 - [Roadmap](docs/ROADMAP.zh-CN.md)
+- [为什么HostLens选择开源](docs/OPEN_SOURCE.zh-CN.md)
 
 ## 参与贡献
 

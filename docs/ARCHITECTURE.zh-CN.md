@@ -17,7 +17,9 @@ Identity and Relationship Resolution
         ↓
 Snapshot and Change Engine
         ↓
-Query, UI, Alerts, MCP, and Explain
+Query and Context Selection
+        ↓
+UI, Alerts, MCP, and Explain
 ```
 
 桌面 UI、未来的 MCP Server 和未来的 LLM 功能应该使用同一份结构化模型，
@@ -91,6 +93,15 @@ Removed
 桌面 UI、Local API、MCP Tool、Alert 与 Explain 都应查询 Host Model。
 显示层可以格式化事实，但不能维护第二套身份识别逻辑。
 
+### Context Selection
+
+未来的 Explanation 与 External Query 只应接收完成任务所需的最少 Fact、
+Relationship、Change、Policy 与 Evidence。Context Selection 不只是 LLM
+优化，也是 Privacy 与 Accuracy 边界。
+
+0.2 的 Export 同样遵循该原则。Sanitized Summary 是从 Host Model 中有意选择的
+Projection，而不是所有采集 Field 的 Dump。
+
 ## 0.2 版本的 Host Model
 
 0.2 有意从一个小模型开始：
@@ -148,7 +159,11 @@ Evidence 必须保持为不同概念。
 长期模型可能包含：
 
 ```text
+Environment
 Host
+NetworkDevice
+Peripheral
+User
 Process
 Service
 Socket
@@ -172,6 +187,43 @@ AuditEvent
 ```
 
 这是一份方向清单，不要求过早创建没有实现的抽象对象。
+
+## 一份模型，多种视图
+
+相同的观测事实应该支持不同体验，而不能产生彼此矛盾的真相：
+
+```text
+Unified Environment Model
+  ├── Personal view
+  ├── Developer view
+  ├── IT view
+  ├── Small-business view
+  └── MCP and AI view
+```
+
+不同 View 可以改变术语、默认设置和信息密度。个人视图可以显示“在后台自动启动”，
+Evidence View 则显示 launchd Label 与 plist Path。二者必须引用同一个 Object
+与 Evidence。
+
+## 从 Host 走向 Environment
+
+Single-host Inspection 与中小企业 Environment Intelligence 应共享概念，但采用
+不同的 Deployment 形态：
+
+```text
+Desktop
+local collectors → local model → local UI / query
+
+Small business
+host and device collectors → local hub → environment graph
+  → business console / alerts / local AI
+```
+
+未来 Environment Resource 可以包括 PC、Mac、Linux Server、NAS、Printer、
+Router、Switch、Wi-Fi Access Point 与部分 Cloud Service。
+
+这并不意味着 0.2 应引入 Multi-host Complexity。可靠的 Single-host Identity
+Model 是有意义的 Topology 和 Cross-device Diagnosis 的前提。
 
 ## 网络语义
 
@@ -230,4 +282,3 @@ HostLens 应在不要求管理员权限的情况下工作，并优雅降级。
 在 Host Model 成为公开 API 前，共享类型需要具备版本管理能力。只有在稳定的
 资源 ID、可空规则、Evidence 语义和兼容性测试建立以后，才开始 MCP 与
 Local API 工作。
-

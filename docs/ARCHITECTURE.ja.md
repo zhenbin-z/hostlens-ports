@@ -18,7 +18,9 @@ Identity and Relationship Resolution
         ↓
 Snapshot and Change Engine
         ↓
-Query, UI, Alerts, MCP, and Explain
+Query and Context Selection
+        ↓
+UI, Alerts, MCP, and Explain
 ```
 
 UI、将来の MCP Server、将来の LLM 機能は同じ構造化モデルを利用します。
@@ -95,6 +97,15 @@ Removed
 Desktop UI、Local API、MCP Tool、Alert、Explain は Host Model を参照します。
 表示コードの中に別の識別ロジックを作りません。
 
+### Context Selection
+
+将来のExplanationとExternal Queryには、そのTaskに必要な最小限のFact、
+Relationship、Change、Policy、Evidenceだけを渡します。Context Selectionは
+単なるLLM最適化ではなく、PrivacyとAccuracyの境界です。
+
+0.2のExportにも同じ原則を適用します。Sanitized Summaryは収集FieldのDumpでは
+なく、Host Modelから意図的に選択したProjectionです。
+
 ## バージョン0.2の Host Model
 
 0.2 では意図的に小さなモデルから始めます。
@@ -152,7 +163,11 @@ Collector と UI を実装するときに追加します。
 長期的には次のオブジェクトを含む可能性があります。
 
 ```text
+Environment
 Host
+NetworkDevice
+Peripheral
+User
 Process
 Service
 Socket
@@ -176,6 +191,44 @@ AuditEvent
 ```
 
 これは方向性であり、早期に空の抽象化を作る要件ではありません。
+
+## 一つのModel、複数のView
+
+異なる真実を作らず、同じ観測事実から複数のExperienceを提供します。
+
+```text
+Unified Environment Model
+  ├── Personal view
+  ├── Developer view
+  ├── IT view
+  ├── Small-business view
+  └── MCP and AI view
+```
+
+Viewごとに用語、Default、情報量を変えることができます。Personal Viewでは
+「バックグラウンドで自動起動」と表示し、Evidence Viewではlaunchd Labelと
+plist Pathを表示できます。どちらも同じObjectとEvidenceを参照します。
+
+## HostからEnvironmentへ
+
+Single-host Inspectionと中小企業向けEnvironment Intelligenceは同じ概念を共有し、
+Deployment形態を分けます。
+
+```text
+Desktop
+local collectors → local model → local UI / query
+
+Small business
+host and device collectors → local hub → environment graph
+  → business console / alerts / local AI
+```
+
+将来のEnvironment Resourceには、PC、Mac、Linux Server、NAS、Printer、
+Router、Switch、Wi-Fi Access Point、選択されたCloud Serviceを含められます。
+
+これは0.2へMulti-host Complexityを持ち込む理由ではありません。信頼できる
+Single-host Identity Modelが、意味のあるTopologyとCross-device Diagnosisの
+前提です。
 
 ## ネットワークの意味
 
@@ -235,4 +288,3 @@ Unknown
 Host Model を公開APIにする前に Schema をバージョン管理できるようにします。
 MCP と Local API は、安定した ID、nullability、Evidence の意味、互換性テスト
 が揃った後で開始します。
-

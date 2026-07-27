@@ -18,7 +18,9 @@ Identity and Relationship Resolution
         ↓
 Snapshot and Change Engine
         ↓
-Query, UI, Alerts, MCP, and Explain
+Query and Context Selection
+        ↓
+UI, Alerts, MCP, and Explain
 ```
 
 The UI, future MCP server, and future LLM features should consume the same
@@ -100,6 +102,15 @@ The desktop UI, local API, MCP tools, alerts, and Explain feature should query
 the host model. Presentation code may format facts, but should not create a
 second identity system.
 
+### Context selection
+
+Future explanations and external queries should receive the minimum relevant
+facts, relationships, changes, policies, and evidence for the task. Context
+selection is a privacy and accuracy boundary, not merely an LLM optimization.
+
+Version 0.2 applies the same principle to exports: a sanitized summary is a
+deliberate projection of the host model, not a dump of every collected field.
+
 ## Version 0.2 host model
 
 Version 0.2 intentionally starts with a small model.
@@ -158,7 +169,11 @@ should be added only when their collectors and UI are actively implemented.
 The long-term model may include:
 
 ```text
+Environment
 Host
+NetworkDevice
+Peripheral
+User
 Process
 Service
 Socket
@@ -182,6 +197,47 @@ AuditEvent
 ```
 
 This list is a direction, not a requirement to create empty abstractions early.
+
+## One model, multiple views
+
+The same observed facts should support different experiences without creating
+different truths:
+
+```text
+Unified Environment Model
+  ├── Personal view
+  ├── Developer view
+  ├── IT view
+  ├── Small-business view
+  └── MCP and AI view
+```
+
+Views may change terminology, defaults, and information density. A personal
+view may say “starts automatically in the background,” while an evidence view
+shows the launchd label and plist path. Both must refer to the same object and
+evidence.
+
+## From a host to an environment
+
+Single-host inspection and small-business environment intelligence should
+share concepts but use different deployment shapes.
+
+```text
+Desktop
+local collectors → local model → local UI / query
+
+Small business
+host and device collectors → local hub → environment graph
+  → business console / alerts / local AI
+```
+
+Future environment resources may include PCs, Macs, Linux servers, NAS
+appliances, printers, routers, switches, Wi-Fi access points, and selected
+cloud services.
+
+This is not a reason to introduce multi-host complexity into version 0.2. A
+reliable single-host identity model is the prerequisite for meaningful
+topology and cross-device diagnosis.
 
 ## Network semantics
 

@@ -48,6 +48,20 @@ database, telemetry, account, or cloud service.
        alt="HostLens Ports menu bar Quick View">
 </p>
 
+## Who it is for
+
+- **Personal users:** understand background and network-facing activity in
+  ordinary language, with technical evidence available when needed.
+- **Developers:** connect ports to projects, commands, runtimes, parent
+  processes, and launch sources.
+- **Small-business IT:** inspect important Macs and Linux hosts consistently,
+  review changes, and produce evidence-backed summaries without an enterprise
+  monitoring stack.
+
+HostLens begins with one machine. Its long-term direction includes local-first
+environment understanding across computers, servers, NAS devices, printers,
+routers, Wi-Fi, and shared services.
+
 ## Quick start
 
 ### Requirements
@@ -147,6 +161,17 @@ yarn dist:mac   # Create unsigned local .dmg and .zip artifacts
 Public macOS releases should be signed with a Developer ID certificate and
 notarized before distribution.
 
+## Why open source
+
+HostLens inspects private local system context, so users should be able to
+verify what it collects and whether data leaves the machine. Open development
+also lets the community improve compatibility across operating-system versions,
+installation methods, hardware, and local configurations.
+
+HostLens is intended to be a long-lived public infrastructure project, not a
+thin AI wrapper. Read [Why HostLens Is Open Source](docs/OPEN_SOURCE.md) for the
+full project position.
+
 ## Roadmap
 
 HostLens is being built in layers:
@@ -156,12 +181,14 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 ```
 
 - **0.1.0 — See:** live macOS TCP listeners and their processes.
-- **0.2.0 — Host Identity:** improve scanner reliability, identify projects
-  and launch sources, attach evidence and confidence, and show in-memory
-  New / Changed / Closed states.
+- **0.2.0 — Host Identity and Session Awareness:** improve scanner reliability,
+  identify projects and launch sources, attach evidence and confidence, show
+  in-memory New / Changed / Closed states, and provide friendly and technical
+  views plus a shareable current-state summary.
 - **Later:** expand the unified host model, add first-class Linux support,
-  persistent changes and alerts, read-only MCP, optional Explain, and only
-  then consider supervised operations.
+  personal and small-business IT experiences, persistent changes and alerts,
+  read-only MCP, optional Explain, environment intelligence, and only then
+  consider supervised operations.
 
 HostLens will remain useful without AI. Future AI features must operate on
 minimal, explicitly selected structured data and will not receive an
@@ -175,6 +202,7 @@ Read the full [Roadmap](docs/ROADMAP.md).
 - [Architecture](docs/ARCHITECTURE.md)
 - [Safety model](docs/SAFETY.md)
 - [Roadmap](docs/ROADMAP.md)
+- [Why HostLens is open source](docs/OPEN_SOURCE.md)
 
 ## Contributing
 

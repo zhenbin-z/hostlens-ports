@@ -47,6 +47,18 @@ TCP待受ポートを確認できる軽量なオープンソースのデスク�
        alt="HostLens Ports メニューバー クイックビュー">
 </p>
 
+## 対象ユーザー
+
+- **個人：** バックグラウンドやNetwork-facingの動作を普通の言葉で理解し、
+  必要なときは技術的Evidenceを確認できます。
+- **Developer：** PortをProject、Command、Runtime、Parent Process、
+  Launch Sourceへ関連付けます。
+- **中小企業の情シス：** Enterprise監視Stackなしで重要なMacとLinux Hostを
+  一貫して確認し、ChangesとEvidence付きSummaryを利用できます。
+
+HostLensは一台のMachineから始まります。長期的にはComputer、Server、NAS、
+Printer、Router、Wi-Fi、Shared ServiceをLocal-firstで理解できる環境へ発展します。
+
 ## クイックスタート
 
 ### 必要環境
@@ -123,6 +135,16 @@ yarn build      # プロダクションビルドを作成
 yarn dist:mac   # 署名なしのローカル.dmgと.zipを作成
 ```
 
+## OSSにする理由
+
+HostLensは機密性のあるLocal System Contextを扱うため、何を収集し、データが
+Machine外へ出るかをユーザーが確認できる必要があります。Open Developmentにより、
+OS Version、Install方法、Hardware、Local Configurationごとの互換性もCommunity
+とともに改善できます。
+
+HostLensは薄いAI Wrapperではなく、長く続く公開Infrastructure Projectを目指します。
+詳しくは[HostLensをOSSにする理由](docs/OPEN_SOURCE.ja.md)をご覧ください。
+
 ## Roadmap
 
 HostLensは段階的に構築します。
@@ -132,10 +154,12 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 ```
 
 - **0.1.0 — See：** macOSのTCP Listenerと対応Processをリアルタイム表示
-- **0.2.0 — Host Identity：** Scannerの信頼性、Projectと起動元の識別、
-  EvidenceとConfidence、メモリ上のNew / Changed / Closedを実装
-- **その後：** Unified Host Model、Linux一等対応、永続ChangesとAlerts、
-  読み取り専用MCP、任意のExplainを進め、その後にSupervised Operationsを検討
+- **0.2.0 — Host Identity and Session Awareness：** Scannerの信頼性、
+  Projectと起動元の識別、EvidenceとConfidence、メモリ上のNew / Changed /
+  Closed、Friendly / Technical View、共有可能なCurrent-state Summaryを実装
+- **その後：** Unified Host Model、Linux一等対応、個人・情シス向けExperience、
+  永続ChangesとAlerts、読み取り専用MCP、任意のExplain、Environment
+  Intelligenceを進め、その後にSupervised Operationsを検討
 
 HostLensはAIがなくても有用であり続けます。将来のAI機能は、明示的に選択された
 最小限の構造化データのみを利用し、無制限のShellにはアクセスしません。
@@ -148,6 +172,7 @@ HostLensはAIがなくても有用であり続けます。将来のAI機能は�
 - [アーキテクチャ](docs/ARCHITECTURE.ja.md)
 - [セーフティモデル](docs/SAFETY.ja.md)
 - [Roadmap](docs/ROADMAP.ja.md)
+- [HostLensをOSSにする理由](docs/OPEN_SOURCE.ja.md)
 
 ## コントリビューション
 

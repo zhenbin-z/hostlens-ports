@@ -120,6 +120,57 @@ Host data may contain usernames, paths, project names, commands, network
 addresses, and secrets. Collection stays local by default. Any future external
 AI feature must show and minimize the exact structured information being sent.
 
+## Who HostLens serves
+
+HostLens should maintain one evidence-backed environment model while presenting
+different views for different users.
+
+### Personal users
+
+Personal users care about outcomes, not operating-system vocabulary:
+
+- What is running in the background?
+- Why does this application start automatically?
+- What changed recently?
+- What is using memory, storage, battery, or network access?
+- Is this network-facing process expected?
+
+HostLens should use ordinary language by default and keep technical evidence
+one level deeper for users who want to verify the explanation.
+
+### Developers
+
+Developers need precise local relationships:
+
+- sockets, processes, parent processes, commands, and working directories;
+- launchd, Homebrew, Docker, and development servers;
+- runtimes, projects, package scripts, and configuration; and
+- local network exposure and source attribution.
+
+HostLens Ports is the first concrete product for this audience.
+
+### Small-business IT
+
+An owner, part-time administrator, or small-company information-systems team
+needs reliable answers without deploying an enterprise observability stack:
+
+- which services and startup items exist on each important machine;
+- what changed since the last check;
+- why a shared printer, NAS, server, or local application is unavailable;
+- which machine or dependency is responsible for an office-wide symptom;
+- which findings need attention and which are normal; and
+- how to produce a reviewable inventory or report.
+
+The long-term experience should extend from a single host to a local-first view
+of PCs, Macs, Linux servers, NAS devices, printers, routers, Wi-Fi, and selected
+cloud dependencies.
+
+### AI and external tools
+
+External assistants need a stable, safe source of current facts. Read-only
+queries and MCP should expose focused structured context without granting
+arbitrary shell access.
+
 ## What HostLens is
 
 - a host information inspector;
@@ -127,6 +178,7 @@ AI feature must show and minimize the exact structured information being sent.
 - a normalized operating-system data layer;
 - a local source of truth for host identity and relationships;
 - a change-awareness tool;
+- a foundation for personal and small-business environment understanding;
 - a future read-only API and MCP server; and
 - eventually, a supervised and policy-bounded operations system.
 
