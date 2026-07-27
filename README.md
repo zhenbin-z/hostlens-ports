@@ -149,15 +149,32 @@ notarized before distribution.
 
 ## Roadmap
 
-- UDP sockets
-- Linux scanners for Ubuntu and RHEL
-- launchd, Homebrew, Docker, and systemd source attribution
-- Port-change history and notifications
-- Optional multi-host view
-- Accessibility and additional localization improvements
+HostLens is being built in layers:
 
-HostLens will remain useful without AI. Any future diagnostic assistant should
-be optional and operate on structured, explicitly selected local information.
+```text
+See → Identify → Relate → Remember → Explain → Advise → Operate safely
+```
+
+- **0.1.0 — See:** live macOS TCP listeners and their processes.
+- **0.2.0 — Host Identity:** improve scanner reliability, identify projects
+  and launch sources, attach evidence and confidence, and show in-memory
+  New / Changed / Closed states.
+- **Later:** expand the unified host model, add first-class Linux support,
+  persistent changes and alerts, read-only MCP, optional Explain, and only
+  then consider supervised operations.
+
+HostLens will remain useful without AI. Future AI features must operate on
+minimal, explicitly selected structured data and will not receive an
+unrestricted shell.
+
+Read the full [Roadmap](docs/ROADMAP.md).
+
+## Project documents
+
+- [Product philosophy](docs/PRODUCT.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Safety model](docs/SAFETY.md)
+- [Roadmap](docs/ROADMAP.md)
 
 ## Contributing
 

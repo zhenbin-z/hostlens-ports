@@ -119,6 +119,32 @@ yarn build      # 创建生产构建
 yarn dist:mac   # 创建未签名的本地.dmg和.zip
 ```
 
+## Roadmap
+
+HostLens 按照以下层次逐步构建：
+
+```text
+See → Identify → Relate → Remember → Explain → Advise → Operate safely
+```
+
+- **0.1.0 — See：** 实时显示 macOS TCP Listener 及其对应进程。
+- **0.2.0 — Host Identity：** 提升 Scanner 可靠性，识别项目和启动来源，
+  附带 Evidence 与 Confidence，并显示内存中的 New / Changed / Closed 状态。
+- **之后：** 扩展 Unified Host Model，加入 Linux 一等支持、持久化变化与
+  Alert、只读 MCP 和可选 Explain，最后才考虑 Supervised Operations。
+
+HostLens 在没有 AI 时也必须保持实用。未来 AI 功能只能使用用户明确选择的最少
+结构化数据，并且不能获得无限制 Shell。
+
+请阅读完整的[Roadmap](docs/ROADMAP.zh-CN.md)。
+
+## 项目文档
+
+- [产品理念](docs/PRODUCT.zh-CN.md)
+- [架构](docs/ARCHITECTURE.zh-CN.md)
+- [安全模型](docs/SAFETY.zh-CN.md)
+- [Roadmap](docs/ROADMAP.zh-CN.md)
+
 ## 参与贡献
 
 欢迎提交Issue和Pull Request。提交更改前请阅读

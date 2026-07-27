@@ -123,6 +123,32 @@ yarn build      # プロダクションビルドを作成
 yarn dist:mac   # 署名なしのローカル.dmgと.zipを作成
 ```
 
+## Roadmap
+
+HostLensは段階的に構築します。
+
+```text
+See → Identify → Relate → Remember → Explain → Advise → Operate safely
+```
+
+- **0.1.0 — See：** macOSのTCP Listenerと対応Processをリアルタイム表示
+- **0.2.0 — Host Identity：** Scannerの信頼性、Projectと起動元の識別、
+  EvidenceとConfidence、メモリ上のNew / Changed / Closedを実装
+- **その後：** Unified Host Model、Linux一等対応、永続ChangesとAlerts、
+  読み取り専用MCP、任意のExplainを進め、その後にSupervised Operationsを検討
+
+HostLensはAIがなくても有用であり続けます。将来のAI機能は、明示的に選択された
+最小限の構造化データのみを利用し、無制限のShellにはアクセスしません。
+
+詳細は[Roadmap](docs/ROADMAP.ja.md)をご覧ください。
+
+## プロジェクトドキュメント
+
+- [プロダクト思想](docs/PRODUCT.ja.md)
+- [アーキテクチャ](docs/ARCHITECTURE.ja.md)
+- [セーフティモデル](docs/SAFETY.ja.md)
+- [Roadmap](docs/ROADMAP.ja.md)
+
 ## コントリビューション
 
 IssueとPull Requestを歓迎します。変更を送る前に
