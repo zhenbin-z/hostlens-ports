@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { PortListener, PortSnapshot } from "../shared/ports.ts";
+import type {
+  ServiceScanner,
+  ServiceSnapshot,
+} from "../shared/services.ts";
 import type { PortScanner } from "./scanners/port-scanner.ts";
 import { SessionMonitor } from "./session-monitor.ts";
 
@@ -50,6 +54,23 @@ class FixtureScanner implements PortScanner {
   }
 }
 
+class FixtureServiceScanner implements ServiceScanner {
+  public async scan(_listeners: PortListener[]): Promise<ServiceSnapshot> {
+    return {
+      scannedAt: "2026-07-27T01:00:00Z",
+      platform: "darwin",
+      services: [],
+      warnings: [],
+    };
+  }
+}
+
+class FailingServiceScanner implements ServiceScanner {
+  public async scan(_listeners: PortListener[]): Promise<ServiceSnapshot> {
+    throw new Error("launchctl unavailable");
+  }
+}
+
 describe("SessionMonitor", () => {
   it("uses the first scan as baseline and accumulates later changes in memory", async () => {
     const first = {
@@ -64,7 +85,11 @@ describe("SessionMonitor", () => {
       listeners: [listener(4000)],
       warnings: [],
     };
-    const monitor = new SessionMonitor(new FixtureScanner([first, second]), 0);
+    const monitor = new SessionMonitor(
+      new FixtureScanner([first, second]),
+      new FixtureServiceScanner(),
+      0,
+    );
 
     const baseline = await monitor.scan();
     assert.deepEqual(baseline.changes.events, []);
@@ -74,5 +99,25 @@ describe("SessionMonitor", () => {
       changed.changes.events.map((event) => event.kind),
       ["closed", "new"],
     );
+  });
+
+  it("keeps port observations when optional service inspection fails", async () => {
+    const snapshot = {
+      scannedAt: "2026-07-27T01:00:00Z",
+      platform: "darwin",
+      listeners: [listener(3000)],
+      warnings: [],
+    };
+    const monitor = new SessionMonitor(
+      new FixtureScanner([snapshot]),
+      new FailingServiceScanner(),
+      0,
+    );
+
+    const state = await monitor.scan();
+
+    assert.equal(state.snapshot.listeners.length, 1);
+    assert.deepEqual(state.services.services, []);
+    assert.match(state.services.warnings[0] ?? "", /launchctl unavailable/);
   });
 });

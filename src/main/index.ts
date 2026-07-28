@@ -12,6 +12,7 @@ import {
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createPortScanner } from "./scanners";
+import { createServiceScanner } from "./services/index.ts";
 import { SessionMonitor } from "./session-monitor.ts";
 
 const PANEL_WIDTH = 540;
@@ -25,7 +26,8 @@ let isQuitting = false;
 app.setName("HostLens Ports");
 
 const scanner = createPortScanner();
-const sessionMonitor = new SessionMonitor(scanner);
+const serviceScanner = createServiceScanner();
+const sessionMonitor = new SessionMonitor(scanner, serviceScanner);
 
 function createTrayIcon(): Electron.NativeImage {
   if (process.platform === "darwin") {

@@ -25,6 +25,23 @@ describe("HostLens localization", () => {
       ),
       "プロセスの終了またはmacOSのアクセス制限により、一部の詳細を取得できません。",
     );
-    assert.equal(localizeWarning("zh-CN", "Original scanner evidence"), "Original scanner evidence");
+    assert.equal(
+      localizeWarning(
+        "zh-CN",
+        "2 configured launchd item(s) could not be parsed completely.",
+      ),
+      "有2个Configured launchd Item无法完整解析。",
+    );
+    assert.equal(
+      localizeWarning(
+        "ja",
+        "Could not inspect /Library/LaunchDaemons.",
+      ),
+      "Configured Serviceの場所を確認できませんでした：/Library/LaunchDaemons",
+    );
+    assert.equal(
+      localizeWarning("zh-CN", "Original scanner evidence"),
+      "Original scanner evidence",
+    );
   });
 });

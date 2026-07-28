@@ -121,6 +121,85 @@ const english = {
     "Some process details are unavailable because the process exited or macOS restricted access.",
   sampleDataWarning:
     "Live scanning is not implemented for {platform}; showing sample data.",
+  serviceInspectionWarning:
+    "Service inspection failed, but port results are still available.",
+  serviceLocationWarning:
+    "A configured service location could not be inspected: {path}",
+  servicePlistWarning:
+    "{count} configured launchd item(s) could not be parsed completely.",
+  portsView: "Ports",
+  servicesView: "Services",
+  serviceSummary: "Service summary",
+  configuredServices: "Configured",
+  runningServices: "Running",
+  attentionServices: "Needs attention",
+  searchServicesPlaceholder: "Search service, label, program, or path",
+  searchServices: "Search services",
+  serviceFiltersAndSorting: "Service filters and sorting",
+  manager: "Manager",
+  allManagers: "All managers",
+  launchd: "launchd",
+  homebrew: "Homebrew",
+  status: "Status",
+  allStatuses: "All statuses",
+  running: "Running",
+  loaded: "Loaded",
+  stopped: "Stopped",
+  failed: "Failed",
+  disabled: "Disabled",
+  startup: "Startup",
+  allStartup: "All startup modes",
+  automatic: "Automatic",
+  onDemand: "On demand",
+  includeAppleSystem: "Show Apple system jobs",
+  includeApplicationJobs: "Show app runtime jobs",
+  serviceName: "Service name",
+  statusThenName: "Status, then name",
+  noMatchingServices: "No matching services",
+  noConfiguredServices: "No configured services detected",
+  serviceCheckAgain:
+    "HostLens checks launchd configuration and Homebrew Services locally.",
+  selectedServiceDetails: "Selected service details",
+  selectService: "Select a service to inspect its startup configuration and relationships.",
+  serviceKind: "Service kind",
+  userAgent: "User agent",
+  systemAgent: "System agent",
+  systemDaemon: "System daemon",
+  program: "Program",
+  arguments: "Arguments",
+  plistPath: "Property list",
+  label: "Label",
+  lastExitStatus: "Last exit status",
+  relatedProcesses: "Related processes",
+  relatedPorts: "Related listening ports",
+  noRelatedProcesses: "No related running processes were observed.",
+  noRelatedPorts: "No related listening ports were observed.",
+  openPort: "Open port",
+  serviceFriendlySummary: "Service overview",
+  serviceRunningExplanation:
+    "{name} has a running process observed by HostLens.",
+  serviceLoadedExplanation:
+    "{name} is loaded by its service manager but has no running PID right now.",
+  serviceStoppedExplanation:
+    "{name} is configured but is not currently loaded or running.",
+  serviceFailedExplanation:
+    "{name} reported a non-zero last exit status and needs review.",
+  serviceDisabledExplanation:
+    "{name} is configured but disabled in launchd.",
+  serviceUnknownExplanation:
+    "HostLens found {name}, but available evidence is insufficient to determine its state.",
+  startupAutomaticExplanation:
+    "Configuration evidence indicates that this service starts automatically.",
+  startupOnDemandExplanation:
+    "Configuration evidence indicates that this service starts when requested.",
+  startupDisabledExplanation:
+    "The service manager reports that this service is disabled.",
+  startupUnknownExplanation:
+    "The available configuration does not prove how this service starts.",
+  serviceEvidence: "Service and relationship evidence",
+  appleSystem: "Apple system",
+  applicationRuntime: "App runtime",
+  thirdParty: "Third-party",
 } as const;
 
 type MessageKey = keyof typeof english;
@@ -247,6 +326,86 @@ const japanese: Messages = {
     "プロセスの終了またはmacOSのアクセス制限により、一部の詳細を取得できません。",
   sampleDataWarning:
     "{platform}のライブスキャンは未実装のため、サンプルデータを表示しています。",
+  serviceInspectionWarning:
+    "Serviceの確認に失敗しましたが、Portの結果は引き続き利用できます。",
+  serviceLocationWarning:
+    "Configured Serviceの場所を確認できませんでした：{path}",
+  servicePlistWarning:
+    "{count}件のConfigured launchd Itemを完全には解析できませんでした。",
+  portsView: "ポート",
+  servicesView: "サービス",
+  serviceSummary: "サービスの概要",
+  configuredServices: "設定済み",
+  runningServices: "実行中",
+  attentionServices: "要確認",
+  searchServicesPlaceholder: "サービス、Label、Program、Pathを検索",
+  searchServices: "サービスを検索",
+  serviceFiltersAndSorting: "サービスの絞り込みと並べ替え",
+  manager: "Manager",
+  allManagers: "すべてのManager",
+  launchd: "launchd",
+  homebrew: "Homebrew",
+  status: "状態",
+  allStatuses: "すべての状態",
+  running: "実行中",
+  loaded: "Loaded",
+  stopped: "停止",
+  failed: "失敗",
+  disabled: "無効",
+  startup: "起動方法",
+  allStartup: "すべての起動方法",
+  automatic: "自動",
+  onDemand: "オンデマンド",
+  includeAppleSystem: "AppleのSystem Jobも表示",
+  includeApplicationJobs: "App Runtime Jobも表示",
+  serviceName: "サービス名",
+  statusThenName: "状態、名前の順",
+  noMatchingServices: "一致するサービスはありません",
+  noConfiguredServices: "設定済みサービスは見つかりませんでした",
+  serviceCheckAgain:
+    "HostLensはlaunchd設定とHomebrew Servicesをローカルで確認します。",
+  selectedServiceDetails: "選択したサービスの詳細",
+  selectService:
+    "サービスを選択すると、起動設定と関連するProcess / Portを確認できます。",
+  serviceKind: "サービス種別",
+  userAgent: "User Agent",
+  systemAgent: "System Agent",
+  systemDaemon: "System Daemon",
+  program: "Program",
+  arguments: "引数",
+  plistPath: "Property List",
+  label: "Label",
+  lastExitStatus: "最終終了Status",
+  relatedProcesses: "関連Process",
+  relatedPorts: "関連する待受Port",
+  noRelatedProcesses: "関連する実行中Processは観測されませんでした。",
+  noRelatedPorts: "関連する待受Portは観測されませんでした。",
+  openPort: "Portを開く",
+  serviceFriendlySummary: "サービスの概要",
+  serviceRunningExplanation:
+    "{name}にはHostLensが観測した実行中Processがあります。",
+  serviceLoadedExplanation:
+    "{name}はService ManagerにLoadedされていますが、現在PIDはありません。",
+  serviceStoppedExplanation:
+    "{name}は設定済みですが、現在Loadedまたは実行中ではありません。",
+  serviceFailedExplanation:
+    "{name}は0以外の最終終了Statusを報告しており、確認が必要です。",
+  serviceDisabledExplanation:
+    "{name}は設定されていますが、launchdで無効化されています。",
+  serviceUnknownExplanation:
+    "HostLensは{name}を発見しましたが、状態を判断できるEvidenceが不足しています。",
+  startupAutomaticExplanation:
+    "設定Evidenceから、このサービスは自動起動すると判断されます。",
+  startupOnDemandExplanation:
+    "設定Evidenceから、このサービスは要求時に起動すると判断されます。",
+  startupDisabledExplanation:
+    "Service Managerはこのサービスが無効であると報告しています。",
+  startupUnknownExplanation:
+    "現在の設定では、このサービスがどのように起動するかを証明できません。",
+  serviceEvidence: "サービスと関係性の根拠",
+  appleSystem: "Apple System",
+  applicationRuntime: "App Runtime",
+  thirdParty: "サードパーティ",
 };
 
 const simplifiedChinese: Messages = {
@@ -366,6 +525,72 @@ const simplifiedChinese: Messages = {
   sourceDetails: "启动来源详情",
   partialDetails: "部分进程已退出或受到macOS权限限制，因此无法获取完整信息。",
   sampleDataWarning: "尚未实现{platform}的实时扫描，当前显示示例数据。",
+  serviceInspectionWarning: "Service检查失败，但Port结果仍然可以使用。",
+  serviceLocationWarning: "无法检查Configured Service位置：{path}",
+  servicePlistWarning: "有{count}个Configured launchd Item无法完整解析。",
+  portsView: "端口",
+  servicesView: "服务",
+  serviceSummary: "服务概览",
+  configuredServices: "已配置",
+  runningServices: "正在运行",
+  attentionServices: "需要关注",
+  searchServicesPlaceholder: "搜索服务、Label、程序或路径",
+  searchServices: "搜索服务",
+  serviceFiltersAndSorting: "服务筛选与排序",
+  manager: "管理器",
+  allManagers: "全部管理器",
+  launchd: "launchd",
+  homebrew: "Homebrew",
+  status: "状态",
+  allStatuses: "全部状态",
+  running: "正在运行",
+  loaded: "已加载",
+  stopped: "已停止",
+  failed: "失败",
+  disabled: "已禁用",
+  startup: "启动方式",
+  allStartup: "全部启动方式",
+  automatic: "自动",
+  onDemand: "按需",
+  includeAppleSystem: "显示Apple系统任务",
+  includeApplicationJobs: "显示应用运行任务",
+  serviceName: "服务名称",
+  statusThenName: "先按状态，再按名称",
+  noMatchingServices: "没有匹配的服务",
+  noConfiguredServices: "未检测到已配置的服务",
+  serviceCheckAgain: "HostLens会在本地检查launchd配置和Homebrew Services。",
+  selectedServiceDetails: "所选服务详情",
+  selectService: "选择一个服务以查看启动配置及关联的进程和端口。",
+  serviceKind: "服务类型",
+  userAgent: "用户Agent",
+  systemAgent: "系统Agent",
+  systemDaemon: "系统Daemon",
+  program: "程序",
+  arguments: "参数",
+  plistPath: "Property List",
+  label: "Label",
+  lastExitStatus: "上次退出状态",
+  relatedProcesses: "关联进程",
+  relatedPorts: "关联监听端口",
+  noRelatedProcesses: "未观测到关联的运行中进程。",
+  noRelatedPorts: "未观测到关联的监听端口。",
+  openPort: "打开端口",
+  serviceFriendlySummary: "服务说明",
+  serviceRunningExplanation: "HostLens观测到{name}存在正在运行的进程。",
+  serviceLoadedExplanation: "{name}已由服务管理器加载，但目前没有运行PID。",
+  serviceStoppedExplanation: "{name}已经配置，但当前未加载或运行。",
+  serviceFailedExplanation: "{name}上次退出状态不为0，需要检查。",
+  serviceDisabledExplanation: "{name}已经配置，但在launchd中被禁用。",
+  serviceUnknownExplanation:
+    "HostLens发现了{name}，但当前证据不足以判断其状态。",
+  startupAutomaticExplanation: "配置证据表明该服务会自动启动。",
+  startupOnDemandExplanation: "配置证据表明该服务会在被请求时启动。",
+  startupDisabledExplanation: "服务管理器报告该服务已被禁用。",
+  startupUnknownExplanation: "现有配置无法证明该服务如何启动。",
+  serviceEvidence: "服务及关系证据",
+  appleSystem: "Apple系统",
+  applicationRuntime: "应用运行任务",
+  thirdParty: "第三方",
 };
 
 const messages: Record<Locale, Messages> = {
@@ -416,6 +641,30 @@ export function localizeWarning(locale: Locale, warning: string): string {
   if (sampleMatch) {
     return translate(locale, "sampleDataWarning", {
       platform: sampleMatch[1]!,
+    });
+  }
+
+  if (
+    warning.startsWith(
+      "Service inspection failed without affecting port results:",
+    )
+  ) {
+    return translate(locale, "serviceInspectionWarning");
+  }
+
+  const locationMatch = warning.match(/^Could not inspect (.+)\.$/);
+  if (locationMatch) {
+    return translate(locale, "serviceLocationWarning", {
+      path: locationMatch[1]!,
+    });
+  }
+
+  const plistMatch = warning.match(
+    /^(\d+) configured launchd item\(s\) could not be parsed completely\.$/,
+  );
+  if (plistMatch) {
+    return translate(locale, "servicePlistWarning", {
+      count: plistMatch[1]!,
     });
   }
 
