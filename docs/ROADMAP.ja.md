@@ -220,6 +220,19 @@ Fieldが存在するだけでは完了とみなしません。
 - Production Buildと実macOS UI / Collectorを3言語で確認
 - Read-only、Local、Persistent Historyなしを維持し、Machine情報を送信しない
 
+2026年7月28日に`develop/0.3.0` Branchで記録したCompletion Evidence：
+
+- Port / Service Parsing、Permission-limited Partial Object、Status / Startup
+  Normalization、Relationship、Deduplication、Optional Collector Failure、
+  Filter、Sort、Localizationを含む52件のAutomated Testが成功
+- Production Electron BuildとTypeScript Validationが成功
+- 実macOS CollectorでConfigured、Running、Loaded、StoppedのThird-party
+  Serviceを確認し、Apple / Application Runtime Jobは明示Filterの背後に保持
+- 英語、日本語、簡体字中国語の実UI確認、Default Filter、ServiceからRelated
+  Portへの移動が成功
+- 20回Combined BenchmarkでEvidence不足0件、p95 751.64 msを記録。
+  詳細は[Scanner Benchmark](BENCHMARKS.ja.md)
+
 ### 0.3 の対象外
 
 - ServiceのStart / Stop / Enable / Disable / Delete

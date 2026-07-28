@@ -170,6 +170,29 @@ Version 0.2 focuses on:
 Objects such as `Service`, `FirewallPolicy`, `ScheduledJob`, and `Package`
 should be added only when their collectors and UI are actively implemented.
 
+## Version 0.3 service model
+
+Version 0.3 adds `Service` because both its collectors and its first-class UI
+now exist. A service is not inferred to be the same object as a process,
+socket, or launch source.
+
+```text
+Configured Plist ─┐
+launchctl State ──┼─→ Service ─→ direct/descendant Process ─→ Socket
+Homebrew State ───┘
+```
+
+Each service preserves manager, label, kind, scope, ownership, normalized
+status, startup behavior, program, arguments, plist path, PID, exit status,
+observation completeness, confidence, and evidence. Failed or
+permission-limited collection creates a partial object instead of deleting the
+known configuration.
+
+Relationships are evidence-backed identifiers. Homebrew and launchd
+observations for the same plist label are merged into one service. Apple jobs
+and transient application runtime jobs remain in the model but are hidden by
+default so the ordinary view prioritizes configured third-party services.
+
 ## Future model
 
 The long-term model may include:

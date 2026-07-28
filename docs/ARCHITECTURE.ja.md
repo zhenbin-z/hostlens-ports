@@ -163,6 +163,27 @@ Confidence、Evidence は別の概念として維持します。
 `Service`、`FirewallPolicy`、`ScheduledJob`、`Package` などは、実際の
 Collector と UI を実装するときに追加します。
 
+## バージョン0.3のService Model
+
+0.3ではCollectorと独立したUIの両方が実装されたため、`Service`を追加します。
+ServiceはProcess、Socket、Launch Sourceと同一のObjectとして推測しません。
+
+```text
+Configured Plist ─┐
+launchctl State ──┼─→ Service ─→ Direct / Descendant Process ─→ Socket
+Homebrew State ───┘
+```
+
+各ServiceはManager、Label、Kind、Scope、Ownership、正規化したStatus、Startup
+Behavior、Program、Arguments、Plist Path、PID、Exit Status、Observationの完全性、
+Confidence、Evidenceを保持します。Collector失敗や権限制限があっても、既知の設定を
+削除せずPartial Objectとして残します。
+
+RelationshipはEvidence付きIdentifierで表現します。同じPlist Labelを示すHomebrew
+とlaunchdのObservationは一つのServiceへ統合します。Apple Jobと一時的なApplication
+Runtime JobはModel内に保持しますが、通常の画面ではConfigured Third-party Serviceを
+優先するためDefaultで非表示にします。
+
 ## 将来のモデル
 
 長期的には次のオブジェクトを含む可能性があります。

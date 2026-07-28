@@ -5,6 +5,40 @@
 本文记录可重复执行的扫描器检查结果，而不是营销性质的性能承诺。监听端口数量、
 正在运行的应用、权限、存储负载和操作系统版本都会影响实际结果。
 
+## 0.3版本参考测试
+
+记录于2026年7月28日：
+
+| 项目 | 结果 |
+| --- | --- |
+| 平台 | macOS、Apple Silicon（`arm64`） |
+| 运行时 | Node.js `v22.22.2` |
+| 连续扫描次数 | 20 |
+| 最后一次扫描的Listener数量 | 29 |
+| 最后一次扫描的Service数量 | 535 |
+| 默认显示的Service数量 | 18 |
+| 与监听端口相关联的Service数量 | 5 |
+| 缺少Evidence的Service数量 | 0 |
+| Combined最小值 | 710.34 ms |
+| Combined中位数 | 726.53 ms |
+| Combined p95 | 751.64 ms |
+| Combined最大值 | 2,262.05 ms |
+
+Combined测试会依次运行生产版本的Port Scanner、Services Scanner和Relationship
+Resolver。第一次扫描还会构建Configured Service Cache。0.3的完成目标是Combined
+p95低于3秒，且每个Service都有Evidence。本次测试通过了两个目标。
+
+macOS的User launchd Domain包含数百个Runtime Job。由于launchd只提供Label和
+State，而不提供Configured Plist或Program Path，其中大部分只能作为Partial
+Observation保留。Apple所属Job和临时Application Job不会丢弃，但默认隐藏；本次
+参考测试中，默认视图保留了18个Configured Third-party Service。
+
+可以在本机运行相同测试：
+
+```bash
+yarn benchmark:services
+```
+
 ## 0.2版本参考测试
 
 记录于2026年7月27日：

@@ -216,6 +216,18 @@ Technical Evidence 可以引用同一个 Object。
 - Production Build与真实macOS UI / Collector在三种语言下通过；
 - HostLens保持只读、本地、不使用持久化历史，也不发送机器信息。
 
+2026年7月28日在`develop/0.3.0`分支记录的完成证据：
+
+- 52项自动化测试全部通过，覆盖Port / Service解析、权限受限时的Partial
+  Object、Status / Startup统一、Relationship、去重、Optional Collector失败、
+  筛选、排序和多语言；
+- Production Electron Build与TypeScript检查通过；
+- 真实macOS Collector确认了Configured、Running、Loaded和Stopped的第三方
+  Service，同时通过明确筛选保留Apple及Application Runtime Job；
+- 英文、日文、简体中文真实UI检查、默认筛选以及Service跳转到Related Port通过；
+- 20次Combined Benchmark中没有Service缺少Evidence，p95为751.64 ms。
+  详见[扫描器基准测试](BENCHMARKS.zh-CN.md)。
+
 ### 0.3明确不做
 
 - 启动、停止、启用、禁用或删除Service；

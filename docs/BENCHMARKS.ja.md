@@ -6,6 +6,42 @@
 結果はListener数、実行中のApplication、権限、Storage負荷、OS Versionによって
 変化します。
 
+## バージョン0.3 Reference Run
+
+2026年7月28日に記録：
+
+| 項目 | 結果 |
+| --- | --- |
+| Platform | macOS、Apple Silicon（`arm64`） |
+| Runtime | Node.js `v22.22.2` |
+| 連続Scan回数 | 20 |
+| 最終ScanのListener数 | 29 |
+| 最終ScanのService数 | 535 |
+| Default表示のService数 | 18 |
+| Listening Portと関連付いたService数 | 5 |
+| EvidenceのないService数 | 0 |
+| Combined最小値 | 710.34 ms |
+| Combined中央値 | 726.53 ms |
+| Combined p95 | 751.64 ms |
+| Combined最大値 | 2,262.05 ms |
+
+Combined測定ではProduction Port Scannerに続いてServices ScannerとRelationship
+Resolverを実行します。初回ScanではConfigured Service Cacheも構築されます。
+0.3の完了基準はCombined p95が3秒未満で、すべてのServiceにEvidenceがあること
+です。本テストは両方を満たしました。
+
+macOSのUser launchd Domainには数百のRuntime Jobがあります。多くはlaunchdが
+LabelとStateだけを公開し、Configured PlistやProgram Pathを提供しないため
+Partial Observationです。Apple所有Jobと一時的なApplication Jobは技術調査用に
+保持しますがDefaultでは非表示にします。このReference Runでは18件のConfigured
+Third-party ServiceがDefault表示に残りました。
+
+同じBenchmarkは次のCommandで実行できます。
+
+```bash
+yarn benchmark:services
+```
+
 ## バージョン0.2 Reference Run
 
 2026年7月27日に記録：

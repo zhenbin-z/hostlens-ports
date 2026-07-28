@@ -20,11 +20,15 @@ HostLens Portsは、`lsof`、`netstat`、`ss`などのコマンドを覚えな�
 TCP待受ポートを確認できる軽量なオープンソースのデスクトップツールです。
 ポートとプロセス、コマンド、バインドアドレス、ネットワーク公開範囲を関連付け、
 検索しやすい画面にまとめます。
+0.3ではlaunchd JobとHomebrew Servicesも収集し、現在停止中のConfigured
+Serviceも表示します。
 
 現在のリリースは、ローカル専用かつ読み取り専用です。LLM、データベース、
 テレメトリー、アカウント、クラウドサービスは使用しません。
 
 ![HostLens Ports アプリ](docs/images/hostlens-ports-app.png)
+
+![HostLens Services Inspector](docs/images/hostlens-services-app.jpg)
 
 ## 主な機能
 
@@ -34,6 +38,13 @@ TCP待受ポートを確認できる軽量なオープンソースのデスク�
 - Vite、Next.js、React Tooling、Nuxt、webpackなどのProjectを考慮した名称
 - Package Script、launchd、Homebrew Services、Docker、Native App、
   手動起動のLaunch Source識別
+- launchdとHomebrew Servicesのための独立したServices View
+- Running、Loaded、Stopped、Failed、Disabled、UnknownのService状態
+- Automatic、On-demand、Disabled、UnknownのStartup Behavior
+- ServiceからProcess、Listening PortへのRelationship
+- LaunchAgent / LaunchDaemon Plistから停止中のConfigured Serviceも検出
+- Apple System Jobと一時的なApplication Jobは保持しつつDefaultで非表示
+- Serviceの検索、Manager / Status / Startup / Scope Filter、安定したSort
 - 推論したIdentityごとのConfidenceと確認可能なEvidence
 - 現在のSession内におけるNew / Changed / Closedのメモリ内検出
 - ポート、プロセス、プロジェクト、アドレス、コマンドで検索
@@ -139,6 +150,7 @@ yarn dev                # 開発モードでElectronを起動
 yarn typecheck          # TypeScriptの型チェック
 yarn test               # Scanner、Identity、Session、Privacyのテスト
 yarn benchmark:scanner  # macOSで20回のReference Benchmarkを実行
+yarn benchmark:services # Port、Service、RelationshipをBenchmark
 yarn build              # プロダクションビルドを作成
 yarn dist:mac           # 署名なしのローカル.dmgと.zipを作成
 ```
@@ -165,6 +177,9 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 - **0.2.0 — Host Identity and Session Awareness：** Scannerの信頼性、
   Projectと起動元の識別、EvidenceとConfidence、メモリ上のNew / Changed /
   Closed、Friendly / Technical View、共有可能なCurrent-state Summaryを実装
+- **0.3.0 — Services & Startup Inspector：** launchdとHomebrew Serviceを収集し、
+  停止中の設定を保持、StatusとStartup Behaviorを正規化し、ServiceをProcessと
+  Listening Portへ関連付け
 - **その後：** Unified Host Model、Linux一等対応、個人・情シス向けExperience、
   永続ChangesとAlerts、読み取り専用MCP、任意のExplain、Environment
   Intelligenceを進め、その後にSupervised Operationsを検討

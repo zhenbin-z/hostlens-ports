@@ -241,6 +241,20 @@ Version 0.3 should answer:
 - HostLens remains read-only, local, free of persistent history, and sends no
   machine information over the network.
 
+Completion evidence recorded on the `develop/0.3.0` branch on July 28, 2026:
+
+- 52 automated tests pass across port and service parsing, permission-limited
+  partial objects, status/startup normalization, relationships, deduplication,
+  optional-collector failure, filtering, sorting, and localization;
+- the production Electron build passes TypeScript validation;
+- a live macOS collector found configured, running, loaded, and stopped
+  third-party services while retaining Apple and application runtime jobs
+  behind explicit filters;
+- live English, Japanese, and Simplified Chinese UI checks passed, including
+  default filtering and navigation from a service to its related port; and
+- the documented 20-scan combined benchmark recorded a p95 of 751.64 ms with
+  no service missing evidence. See [Scanner Benchmarks](BENCHMARKS.md).
+
 ### Explicitly out of scope for 0.3
 
 - starting, stopping, enabling, disabling, or deleting services;
