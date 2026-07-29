@@ -282,7 +282,7 @@ Technical Evidence 可以引用同一个 Object。
 - MCP、LLM或Chat；
 - Multi-host Management。
 
-## 计划：0.5.0 — Runtimes & Global Packages Inspector
+## 已发布：0.5.0 — Runtimes & Global Packages Inspector
 
 0.5把已安装开发工具与当前运行状态关联起来：
 
@@ -294,6 +294,29 @@ Technical Evidence 可以引用同一个 Object。
 - 提供Search、Filter、Summary、Export和英日中三语UI；
 - 不执行Install、Update、Uninstall、Vulnerability Verdict或每个Project的完整
   Dependency Scan。
+
+2026年7月29日记录的完成证据：
+
+- 70项自动化测试通过，覆盖Runtime / Package解析、关系、摘要、脱敏、已有
+  Collector与显示模型；
+- TypeScript检查与Production Electron构建通过；
+- 在真实Mac上发现5个Node.js / Python Runtime和34个Package，不可用的Package
+  Manager会保留为明确Warning；
+- 英文、日文、简体中文实机UI检查通过，并验证了同名Package按Environment搜索；
+- 每条Runtime / Package关系都带Evidence，Package Summary可复制或在脱敏私人
+  路径后导出；
+- Runtime Benchmark的Cold Scan为3,034.22 ms，缓存p95为0.03 ms，通过Cold低于
+  6秒、缓存p95低于100 ms的目标。参见[扫描器基准](BENCHMARKS.zh-CN.md)。
+
+### 0.5明确不包含
+
+- Runtime / Package的Install、Update或Uninstall；
+- Vulnerability、License或Security Verdict；
+- 每个Project的完整Dependency与Lockfile分析；
+- Inventory持久历史或Package Alert；
+- Linux Runtime / Package同等支持；
+- MCP、LLM或Chat功能；
+- 通过网络发送Package或Machine Data。
 
 ## 计划：0.6.0 — Persistent Changes & Alerts
 

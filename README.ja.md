@@ -20,9 +20,9 @@ HostLens Portsは、`lsof`、`netstat`、`ss`などのコマンドを覚えな�
 TCP待受ポートを確認できる軽量なオープンソースのデスクトップツールです。
 ポートとプロセス、コマンド、バインドアドレス、ネットワーク公開範囲を関連付け、
 検索しやすい画面にまとめます。
-0.4ではHost Overviewを追加し、Network Interface、Address、Default Route、
-DNS、観測可能なVPN Context、Background Service、Socket-to-Interface
-Relationshipを表示します。
+0.5ではRuntimes Inspectorを追加し、Node.js / PythonのInstallation、
+npm / Yarn / pnpm / pip / pipxのPackage Inventory、Environment、
+実行中のHost ActivityとのEvidence付きRelationshipを表示します。
 
 現在のリリースは、ローカル専用かつ読み取り専用です。LLM、データベース、
 テレメトリー、アカウント、クラウドサービスは使用しません。
@@ -32,6 +32,8 @@ Relationshipを表示します。
 ![HostLens Host Overview](docs/images/hostlens-overview-app.jpg)
 
 ![HostLens Services Inspector](docs/images/hostlens-services-app.jpg)
+
+![HostLens Runtimes Inspector](docs/images/hostlens-runtimes-app.jpg)
 
 ## 主な機能
 
@@ -54,6 +56,11 @@ Relationshipを表示します。
 - LaunchAgent / LaunchDaemon Plistから停止中のConfigured Serviceも検出
 - Apple System Jobと一時的なApplication Jobは保持しつつDefaultで非表示
 - Serviceの検索、Manager / Status / Startup / Scope Filter、安定したSort
+- System、Homebrew、nvm、pyenvなどからNode.js / Python Runtimeを検出
+- npm、Yarn、pnpm、pip、pipxのPackageをManager、Version、Environment、
+  Install Path、ExecutableのEvidenceとともに表示
+- Package検索、Runtime / Manager Filter、安定したSort、Listener /
+  Serviceとの高ConfidenceなRelationship
 - 推論したIdentityごとのConfidenceと確認可能なEvidence
 - 現在のSession内におけるNew / Changed / Closedのメモリ内検出
 - ポート、プロセス、プロジェクト、アドレス、コマンドで検索
@@ -161,6 +168,7 @@ yarn test               # Scanner、Identity、Session、Privacyのテスト
 yarn benchmark:scanner  # macOSで20回のReference Benchmarkを実行
 yarn benchmark:services # Port、Service、RelationshipをBenchmark
 yarn benchmark:network  # macOS Network ContextをBenchmark
+yarn benchmark:runtimes # Runtime / PackageのCold / Cache ScanをBenchmark
 yarn build              # プロダクションビルドを作成
 yarn dist:mac           # 署名なしのローカル.dmgと.zipを作成
 ```
@@ -193,7 +201,7 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 - **0.4.0 — Host Overview & Network Context：** Interface、Address、Route、
   DNS、VPN Context、SocketとInterfaceのRelationshipを実装済み
 - **0.5.0 — Runtimes & Global Packages：** Node.js / Python Runtimeと
-  npm / Yarn / pnpm / pip / pipx Global PackageをProcess / Portへ関連付け
+  npm / Yarn / pnpm / pip / pipx PackageのHost Activityへの関連付けを実装済み
 - **0.6.0 — Persistent Changes & Alerts：** Local Snapshot、型付きChange、
   Timeline、Watch Resource、Cooldown、Desktop Notification
 - **0.7.0 — Ubuntu / RHEL First-class Support：** Linux Collector、systemd、

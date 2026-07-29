@@ -20,9 +20,9 @@ HostLens Ports is a lightweight, open-source desktop utility for inspecting
 TCP listening ports without memorizing `lsof`, `netstat`, or `ss` commands.
 It connects each port to its owning process, command, bind address, and
 network exposure, then presents the result in a searchable interface.
-Version 0.4 adds a Host Overview with network interfaces, addresses, default
-routes, DNS, observable VPN context, background services, and evidence-backed
-socket-to-interface relationships.
+Version 0.5 adds a Runtimes inspector for Node.js and Python installations,
+npm/Yarn/pnpm/pip/pipx package inventories, installation environments, and
+evidence-backed relationships to running host activity.
 
 The current release is intentionally local and read-only. It has no LLM,
 database, telemetry, account, or cloud service.
@@ -32,6 +32,8 @@ database, telemetry, account, or cloud service.
 ![HostLens Host Overview](docs/images/hostlens-overview-app.jpg)
 
 ![HostLens Services inspector](docs/images/hostlens-services-app.jpg)
+
+![HostLens Runtimes inspector](docs/images/hostlens-runtimes-app.jpg)
 
 ## Features
 
@@ -58,6 +60,12 @@ database, telemetry, account, or cloud service.
   default
 - Service search, manager/status/startup/scope filters, and deterministic
   sorting
+- Node.js and Python runtime discovery across system, Homebrew, nvm, pyenv, and
+  other observable installations
+- npm, Yarn, pnpm, pip, and pipx package inventories with manager, version,
+  environment, installation path, and provided executable evidence
+- Package search, runtime/manager filters, deterministic sorting, and
+  high-confidence relationships to listeners and services
 - Confidence and inspectable evidence for inferred identities
 - In-memory New, Changed, and Closed listener detection for the current session
 - Search by port, process, project, address, or command
@@ -169,6 +177,7 @@ src/
 ├── main/
 │   ├── index.ts                 Electron windows, tray, and IPC
 │   ├── network/                 Network collectors and relationships
+│   ├── runtimes/                Runtime/package collectors and relationships
 │   ├── scanners/                Port scanners and process identity
 │   └── services/                Service collectors and relationships
 ├── preload/
@@ -178,6 +187,7 @@ src/
 └── shared/
     ├── ports.ts                 Port and host snapshot types
     ├── network.ts               Network context and relationship types
+    ├── runtimes.ts              Runtime and package inventory types
     └── services.ts              Service and startup types
 ```
 
@@ -190,6 +200,7 @@ yarn test               # Run scanner, identity, session, and privacy tests
 yarn benchmark:scanner  # Run the 20-scan macOS reference benchmark
 yarn benchmark:services # Benchmark ports, services, and relationships
 yarn benchmark:network  # Benchmark macOS network context collection
+yarn benchmark:runtimes # Benchmark runtime/package cold and cached scans
 yarn build              # Create a production application build
 yarn dist:mac           # Create unsigned local .dmg and .zip artifacts
 ```
@@ -227,8 +238,8 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
   behavior, and connect services to processes and listening ports.
 - **0.4.0 — Host Overview & Network Context:** released with interfaces,
   addresses, routes, DNS, VPN context, and socket-to-interface relationships.
-- **0.5.0 — Runtimes & Global Packages:** Node.js/Python runtimes and
-  npm/Yarn/pnpm/pip/pipx global packages related to processes and ports.
+- **0.5.0 — Runtimes & Global Packages:** released with Node.js/Python
+  runtimes and npm/Yarn/pnpm/pip/pipx packages related to host activity.
 - **0.6.0 — Persistent Changes & Alerts:** local snapshots, typed changes,
   timeline, watched resources, cooldowns, and desktop notifications.
 - **0.7.0 — Ubuntu / RHEL First-class Support:** Linux collectors, systemd,

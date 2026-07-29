@@ -19,8 +19,8 @@
 HostLens Ports是一款轻量、开源的桌面工具，让你无需记忆`lsof`、`netstat`
 或`ss`命令，也能检查TCP监听端口。它会关联端口对应的进程、完整命令、
 监听地址和网络暴露范围，并通过可搜索的界面展示结果。
-0.4版本增加Host Overview，显示Network Interface、地址、Default Route、
-DNS、可观察的VPN Context、后台服务以及基于证据的Socket-to-Interface关系。
+0.5版本增加Runtimes检查界面，显示Node.js / Python安装、npm / Yarn /
+pnpm / pip / pipx软件包清单、安装环境，以及与主机运行活动的证据关联。
 
 当前版本完全在本地以只读方式运行，不包含LLM、数据库、遥测、账号或云服务。
 
@@ -29,6 +29,8 @@ DNS、可观察的VPN Context、后台服务以及基于证据的Socket-to-Inter
 ![HostLens Host Overview](docs/images/hostlens-overview-app.jpg)
 
 ![HostLens Services检查界面](docs/images/hostlens-services-app.jpg)
+
+![HostLens Runtimes检查界面](docs/images/hostlens-runtimes-app.jpg)
 
 ## 功能
 
@@ -49,6 +51,11 @@ DNS、可观察的VPN Context、后台服务以及基于证据的Socket-to-Inter
 - 从LaunchAgent / LaunchDaemon Plist发现已经配置但未运行的Service
 - 保留Apple系统任务和临时Application Job，但默认隐藏
 - 按Service搜索，并按Manager、Status、Startup和Scope筛选及稳定排序
+- 从System、Homebrew、nvm、pyenv等可观察位置发现Node.js与Python Runtime
+- 显示npm、Yarn、pnpm、pip、pipx软件包的Manager、Version、Environment、
+  安装路径与可执行文件证据
+- 软件包搜索、Runtime / Manager筛选、稳定排序，以及与Listener /
+  Service的高可信关联
 - 为推断出的身份提供可信度和可检查的证据
 - 在本次运行期间检测内存中的新增、变化和关闭状态
 - 按端口、进程、项目、地址或命令搜索
@@ -154,6 +161,7 @@ yarn test               # 运行扫描、身份、Session和隐私测试
 yarn benchmark:scanner  # 运行20次macOS参考基准测试
 yarn benchmark:services # 测试Port、Service和Relationship性能
 yarn benchmark:network  # 测试macOS Network Context性能
+yarn benchmark:runtimes # 测试Runtime / Package冷扫描与缓存扫描
 yarn build              # 创建生产构建
 yarn dist:mac           # 创建未签名的本地.dmg和.zip
 ```
@@ -184,8 +192,8 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
   Listening Port。
 - **0.4.0 — Host Overview & Network Context：** Interface、Address、Route、
   DNS、VPN Context以及Socket到Interface的Relationship，已经实现。
-- **0.5.0 — Runtimes & Global Packages：** 将Node.js / Python Runtime与
-  npm / Yarn / pnpm / pip / pipx Global Package关联到Process和Port。
+- **0.5.0 — Runtimes & Global Packages：** 已实现Node.js / Python Runtime、
+  npm / Yarn / pnpm / pip / pipx Package与Host Activity的关联。
 - **0.6.0 — Persistent Changes & Alerts：** Local Snapshot、类型化Change、
   Timeline、Watch Resource、Cooldown和Desktop Notification。
 - **0.7.0 — Ubuntu / RHEL First-class Support：** Linux Collector、systemd、

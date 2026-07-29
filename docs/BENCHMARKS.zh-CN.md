@@ -5,6 +5,34 @@
 本文记录可重复执行的扫描器检查结果，而不是营销性质的性能承诺。监听端口数量、
 正在运行的应用、权限、存储负载和操作系统版本都会影响实际结果。
 
+## 0.5版本参考测试
+
+记录于2026年7月29日：
+
+| 项目 | 结果 |
+| --- | --- |
+| 平台 | macOS，Apple Silicon（`arm64`） |
+| Runtime | Node.js `v22.22.2` |
+| 连续缓存扫描 | 10 |
+| Runtime Installation | 5 |
+| Package | 34 |
+| Collector Warning | 2 |
+| 缺少Evidence的Relationship | 0 |
+| Cold Scan | 3,034.22 ms |
+| 缓存最小值 | 0.01 ms |
+| 缓存中位数 | 0.01 ms |
+| 缓存p95 | 0.03 ms |
+| 缓存最大值 | 0.03 ms |
+
+Cold测量会发现可观察的Runtime Installation，并查询可用Package Manager。
+由于Inventory的变化频率远低于Socket，结果会在内存中缓存60秒。不可用的Package
+Manager会产生Partial Warning，而不会删除成功取得的Observation。目标为Cold Scan
+低于6秒、缓存p95低于100 ms，并且每条Relationship都有Evidence。本次测试全部通过。
+
+```bash
+yarn benchmark:runtimes
+```
+
 ## 0.4版本参考测试
 
 记录于2026年7月29日：

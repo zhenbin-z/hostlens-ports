@@ -179,6 +179,31 @@ Relationship使用带Evidence的Identifier表示。同一Plist Label对应的Hom
 launchd Observation会合并为一个Service。Apple Job和临时Application Runtime Job
 仍保留在Model中，但默认隐藏，让普通视图优先显示Configured Third-party Service。
 
+## 0.5版本的Runtime / Package模型
+
+0.5在不把HostLens变成Package Manager的前提下，加入Runtime Installation与
+Package Manager Environment：
+
+```text
+Runtime installation
+  └── Package-manager environment
+        └── Package
+              └── Provided executable
+                    └── Process / Service / Socket
+```
+
+`RuntimeInstallation`、`GlobalPackage`和`RuntimeRelationship`保留稳定ID、
+Observation完整度、不可用字段、Confidence与Evidence。只有存在可观察的Executable
+或Install Path Evidence时才建立Relationship；仅仅Package Name相同并不充分。
+
+Node.js Manager可能提供传统Global Inventory。Python不存在统一Global Scope，
+因此pip结果会明确描述为各个已发现Environment中的Package。Manager缺失、Path受限
+或Command失败时，系统会保留Warning与Partial Result，而不是制造错误的空Inventory。
+
+Runtime / Package采集使用60秒内存缓存，使频繁Socket刷新保持响应，同时维持当前
+版本不持久化的架构。复制与导出摘要是结构化模型的Projection；脱敏导出会移除私人
+Home路径与常见携带Secret的参数。
+
 ## 未来模型
 
 长期模型可能包含：

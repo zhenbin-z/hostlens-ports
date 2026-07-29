@@ -6,6 +6,35 @@
 結果はListener数、実行中のApplication、権限、Storage負荷、OS Versionによって
 変化します。
 
+## バージョン0.5 Reference Run
+
+2026年7月29日に記録：
+
+| 項目 | 結果 |
+| --- | --- |
+| Platform | macOS、Apple Silicon（`arm64`） |
+| Runtime | Node.js `v22.22.2` |
+| 連続Cache Scan | 10 |
+| Runtime Installation | 5 |
+| Package | 34 |
+| Collector Warning | 2 |
+| Evidence不足Relationship | 0 |
+| Cold Scan | 3,034.22 ms |
+| Cache最小値 | 0.01 ms |
+| Cache中央値 | 0.01 ms |
+| Cache p95 | 0.03 ms |
+| Cache最大値 | 0.03 ms |
+
+Cold測定では観測可能なRuntime Installationを発見し、利用可能なPackage Managerへ
+問い合わせます。InventoryはSocketより変化が少ないため、結果を60秒間Memory Cache
+します。利用できないPackage Managerは、成功したObservationを削除せずPartial
+Warningになります。TargetはCold Scan 6秒未満、Cache p95 100 ms未満、すべての
+RelationshipにEvidenceがあることです。本実行はすべてに合格しました。
+
+```bash
+yarn benchmark:runtimes
+```
+
 ## バージョン0.4 Reference Run
 
 2026年7月29日に記録：

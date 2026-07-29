@@ -313,7 +313,7 @@ Completion evidence recorded on July 29, 2026:
 - MCP, LLM, or chat features; and
 - multi-host management.
 
-## Planned: 0.5.0 — Runtimes & Global Packages Inspector
+## Released: 0.5.0 — Runtimes & Global Packages Inspector
 
 Version 0.5 should connect installed developer tooling to what is running:
 
@@ -329,6 +329,31 @@ Version 0.5 should connect installed developer tooling to what is running:
   and
 - remain read-only: no install, update, uninstall, vulnerability verdict, or
   full per-project dependency scan.
+
+Completion evidence recorded on July 29, 2026:
+
+- 70 automated tests pass across runtime/package parsing, relationships,
+  summaries, sanitization, existing collectors, and presentation models;
+- TypeScript validation and the production Electron build pass;
+- a real Mac observation found five distinct Node.js/Python runtimes and 34
+  packages while keeping unavailable package managers as explicit warnings;
+- live English, Japanese, and Simplified Chinese UI checks passed, including
+  environment-specific search results for the same package name;
+- every runtime/package relationship includes evidence, and package summaries
+  can be copied or exported with private paths sanitized; and
+- the runtime benchmark recorded a 3,034.22 ms cold scan and 0.03 ms cached p95,
+  passing the six-second cold and 100 ms cached targets. See
+  [Scanner Benchmarks](BENCHMARKS.md).
+
+### Explicitly out of scope for 0.5
+
+- installing, updating, or uninstalling runtimes and packages;
+- vulnerability, license, or security verdicts;
+- complete per-project dependency and lockfile analysis;
+- persistent inventory history or package alerts;
+- Linux runtime/package parity;
+- MCP, LLM, or chat features; and
+- sending package or machine data over the network.
 
 ## Planned: 0.6.0 — Persistent Changes & Alerts
 
