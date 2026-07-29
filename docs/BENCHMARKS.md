@@ -6,6 +6,33 @@ This document records reproducible scanner checks rather than a marketing
 performance claim. Results vary with the number of listeners, running
 applications, permissions, storage load, and operating-system version.
 
+## Version 0.4 reference run
+
+Recorded on July 29, 2026:
+
+| Item | Result |
+| --- | --- |
+| Platform | macOS, Apple Silicon (`arm64`) |
+| Runtime | Node.js `v22.22.2` |
+| Consecutive scans | 20 |
+| Interfaces in the final scan | 29 |
+| Routes in the final scan | 52 |
+| Socket relations | 30 |
+| Relations missing evidence | 0 |
+| Network minimum | 7.45 ms |
+| Network median | 7.98 ms |
+| Network p95 | 12.13 ms |
+| Network maximum | 14.73 ms |
+
+The network measurement runs the production macOS interface, route, DNS, and
+relationship collector after obtaining the current port snapshot. The
+completion target is a network p95 below one second and evidence on every
+socket relation. This run passed both targets.
+
+```bash
+yarn benchmark:network
+```
+
 ## Version 0.3 reference run
 
 Recorded on July 28, 2026:

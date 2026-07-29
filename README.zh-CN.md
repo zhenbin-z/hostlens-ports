@@ -19,18 +19,24 @@
 HostLens Ports是一款轻量、开源的桌面工具，让你无需记忆`lsof`、`netstat`
 或`ss`命令，也能检查TCP监听端口。它会关联端口对应的进程、完整命令、
 监听地址和网络暴露范围，并通过可搜索的界面展示结果。
-0.3版本还会检查launchd Job和Homebrew Services，包括当前已经停止但仍有配置的
-Service。
+0.4版本增加Host Overview，显示Network Interface、地址、Default Route、
+DNS、可观察的VPN Context、后台服务以及基于证据的Socket-to-Interface关系。
 
 当前版本完全在本地以只读方式运行，不包含LLM、数据库、遥测、账号或云服务。
 
 ![HostLens Ports应用界面](docs/images/hostlens-ports-app.png)
+
+![HostLens Host Overview](docs/images/hostlens-overview-app.jpg)
 
 ![HostLens Services检查界面](docs/images/hostlens-services-app.jpg)
 
 ## 功能
 
 - 实时发现macOS上的TCP监听端口
+- 汇总Current Network、Service、Network-facing Listener与Session Change的
+  Host Overview
+- 在本地采集Interface、IPv4 / IPv6地址、Route、DNS与可观察的VPN Interface
+- 区分Observed Binding与Potential Reachability的Socket-to-Interface关系
 - 查看进程、PID、父进程PID、用户和完整命令
 - 显示可执行文件、工作目录和父进程链证据
 - 识别Vite、Next.js、React Tooling、Nuxt、webpack等开发项目
@@ -147,6 +153,7 @@ yarn typecheck          # 检查TypeScript类型
 yarn test               # 运行扫描、身份、Session和隐私测试
 yarn benchmark:scanner  # 运行20次macOS参考基准测试
 yarn benchmark:services # 测试Port、Service和Relationship性能
+yarn benchmark:network  # 测试macOS Network Context性能
 yarn build              # 创建生产构建
 yarn dist:mac           # 创建未签名的本地.dmg和.zip
 ```
@@ -175,9 +182,16 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 - **0.3.0 — Services & Startup Inspector：** 检查launchd和Homebrew Service，
   保留停止中的配置，统一Status与Startup Behavior，并将Service关联到Process和
   Listening Port。
-- **之后：** 扩展 Unified Host Model，加入 Linux 一等支持、个人与情信体验、
-  持久化 Changes 与 Alerts、只读 MCP、可选 Explain 和 Environment
-  Intelligence，最后才考虑 Supervised Operations。
+- **0.4.0 — Host Overview & Network Context：** Interface、Address、Route、
+  DNS、VPN Context以及Socket到Interface的Relationship，已经实现。
+- **0.5.0 — Runtimes & Global Packages：** 将Node.js / Python Runtime与
+  npm / Yarn / pnpm / pip / pipx Global Package关联到Process和Port。
+- **0.6.0 — Persistent Changes & Alerts：** Local Snapshot、类型化Change、
+  Timeline、Watch Resource、Cooldown和Desktop Notification。
+- **0.7.0 — Ubuntu / RHEL First-class Support：** Linux Collector、systemd、
+  Network、Package、Persistence、Alert和Desktop Packaging。
+- **之后：** 只读MCP、可选Explain、Environment Intelligence，最后才考虑
+  Supervised Operations。
 
 HostLens 在没有 AI 时也必须保持实用。未来 AI 功能只能使用用户明确选择的最少
 结构化数据，并且不能获得无限制 Shell。

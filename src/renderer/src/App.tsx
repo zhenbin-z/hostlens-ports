@@ -15,6 +15,7 @@ import type {
   ProcessOwnerType,
 } from "../../shared/ports";
 import { ServicesView } from "./ServicesView";
+import { HostOverviewView } from "./HostOverviewView";
 import {
   loadLocale,
   localizeWarning,
@@ -24,7 +25,7 @@ import {
 } from "./i18n";
 
 type SortKey = "port-asc" | "port-desc" | "name" | "owner" | "scope";
-type InspectorView = "ports" | "services";
+type InspectorView = "overview" | "ports" | "services";
 type CopyFeedback = "command" | "full-summary" | "sanitized-summary" | "export";
 
 const isPanelMode =
@@ -146,7 +147,7 @@ function listenerForChange(
 export function App(): React.JSX.Element {
   const [locale, setLocale] = useState<Locale>(loadLocale);
   const [hostState, setHostState] = useState<HostLensState>();
-  const [activeView, setActiveView] = useState<InspectorView>("ports");
+  const [activeView, setActiveView] = useState<InspectorView>("overview");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<PortListener>();
   const [loading, setLoading] = useState(true);
@@ -167,6 +168,7 @@ export function App(): React.JSX.Element {
 
   const snapshot = hostState?.snapshot;
   const serviceSnapshot = hostState?.services;
+  const networkSnapshot = hostState?.network;
   const changes = hostState?.changes.events ?? [];
 
   const showFeedback = useCallback((value: CopyFeedback) => {
@@ -382,7 +384,11 @@ export function App(): React.JSX.Element {
         <div className="brand-copy">
           <p className="eyebrow">HOSTLENS</p>
           <h1>
-            {activeView === "ports" ? t("portsView") : t("servicesView")}
+            {activeView === "overview"
+              ? t("hostOverview")
+              : activeView === "ports"
+                ? t("portsView")
+                : t("servicesView")}
           </h1>
         </div>
         <label className="language-picker">
@@ -422,6 +428,13 @@ export function App(): React.JSX.Element {
       <nav className="view-tabs" aria-label="HostLens inspectors">
         <button
           type="button"
+          className={activeView === "overview" ? "active" : undefined}
+          onClick={() => setActiveView("overview")}
+        >
+          {t("overviewView")}
+        </button>
+        <button
+          type="button"
           className={activeView === "ports" ? "active" : undefined}
           onClick={() => setActiveView("ports")}
         >
@@ -443,7 +456,24 @@ export function App(): React.JSX.Element {
         </button>
       </nav>
 
-      {activeView === "ports" ? (
+      {activeView === "overview" ? (
+        <HostOverviewView
+          network={networkSnapshot}
+          listeners={snapshot?.listeners ?? []}
+          services={serviceSnapshot}
+          changes={changes}
+          panelMode={isPanelMode}
+          loading={loading}
+          t={t}
+          onOpenPort={(listener) => {
+            setSelected(listener);
+            setActiveView("ports");
+          }}
+          onOpenService={() => {
+            setActiveView("services");
+          }}
+        />
+      ) : activeView === "ports" ? (
         <>
       <section className="summary" aria-label={t("portSummary")}>
         <div>
@@ -884,22 +914,28 @@ export function App(): React.JSX.Element {
         />
       )}
 
-      {(activeView === "ports"
-        ? snapshot?.warnings[0]
-        : serviceSnapshot?.warnings[0]) ? (
+      {(activeView === "overview"
+        ? networkSnapshot?.warnings[0]
+        : activeView === "ports"
+          ? snapshot?.warnings[0]
+          : serviceSnapshot?.warnings[0]) ? (
         <div
           className="warning-strip"
-          title={(activeView === "ports"
-            ? snapshot?.warnings
-            : serviceSnapshot?.warnings
+          title={(activeView === "overview"
+            ? networkSnapshot?.warnings
+            : activeView === "ports"
+              ? snapshot?.warnings
+              : serviceSnapshot?.warnings
           )?.join("\n")}
         >
           <span>!</span>
           {localizeWarning(
             locale,
-            (activeView === "ports"
-              ? snapshot?.warnings[0]
-              : serviceSnapshot?.warnings[0])!,
+            (activeView === "overview"
+              ? networkSnapshot?.warnings[0]
+              : activeView === "ports"
+                ? snapshot?.warnings[0]
+                : serviceSnapshot?.warnings[0])!,
           )}
         </div>
       ) : null}

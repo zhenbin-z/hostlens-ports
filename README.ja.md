@@ -20,19 +20,28 @@ HostLens Portsは、`lsof`、`netstat`、`ss`などのコマンドを覚えな�
 TCP待受ポートを確認できる軽量なオープンソースのデスクトップツールです。
 ポートとプロセス、コマンド、バインドアドレス、ネットワーク公開範囲を関連付け、
 検索しやすい画面にまとめます。
-0.3ではlaunchd JobとHomebrew Servicesも収集し、現在停止中のConfigured
-Serviceも表示します。
+0.4ではHost Overviewを追加し、Network Interface、Address、Default Route、
+DNS、観測可能なVPN Context、Background Service、Socket-to-Interface
+Relationshipを表示します。
 
 現在のリリースは、ローカル専用かつ読み取り専用です。LLM、データベース、
 テレメトリー、アカウント、クラウドサービスは使用しません。
 
 ![HostLens Ports アプリ](docs/images/hostlens-ports-app.png)
 
+![HostLens Host Overview](docs/images/hostlens-overview-app.jpg)
+
 ![HostLens Services Inspector](docs/images/hostlens-services-app.jpg)
 
 ## 主な機能
 
 - macOS上のTCP待受ポートをリアルタイムに検出
+- Current Network、Service、Network-facing Listener、Session Changeをまとめる
+  Host Overview
+- Interface、IPv4 / IPv6 Address、Route、DNS、観測可能なVPN Interfaceを
+  Localで収集
+- Observed BindingとPotential Reachabilityを区別するSocket-to-Interface
+  Relationship
 - プロセス、PID、親PID、ユーザー、完全なコマンドを表示
 - 実行ファイル、作業ディレクトリ、親プロセスチェーンのEvidence
 - Vite、Next.js、React Tooling、Nuxt、webpackなどのProjectを考慮した名称
@@ -151,6 +160,7 @@ yarn typecheck          # TypeScriptの型チェック
 yarn test               # Scanner、Identity、Session、Privacyのテスト
 yarn benchmark:scanner  # macOSで20回のReference Benchmarkを実行
 yarn benchmark:services # Port、Service、RelationshipをBenchmark
+yarn benchmark:network  # macOS Network ContextをBenchmark
 yarn build              # プロダクションビルドを作成
 yarn dist:mac           # 署名なしのローカル.dmgと.zipを作成
 ```
@@ -180,9 +190,16 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 - **0.3.0 — Services & Startup Inspector：** launchdとHomebrew Serviceを収集し、
   停止中の設定を保持、StatusとStartup Behaviorを正規化し、ServiceをProcessと
   Listening Portへ関連付け
-- **その後：** Unified Host Model、Linux一等対応、個人・情シス向けExperience、
-  永続ChangesとAlerts、読み取り専用MCP、任意のExplain、Environment
-  Intelligenceを進め、その後にSupervised Operationsを検討
+- **0.4.0 — Host Overview & Network Context：** Interface、Address、Route、
+  DNS、VPN Context、SocketとInterfaceのRelationshipを実装済み
+- **0.5.0 — Runtimes & Global Packages：** Node.js / Python Runtimeと
+  npm / Yarn / pnpm / pip / pipx Global PackageをProcess / Portへ関連付け
+- **0.6.0 — Persistent Changes & Alerts：** Local Snapshot、型付きChange、
+  Timeline、Watch Resource、Cooldown、Desktop Notification
+- **0.7.0 — Ubuntu / RHEL First-class Support：** Linux Collector、systemd、
+  Network、Package、Persistence、Alert、Desktop Packaging
+- **その後：** 読み取り専用MCP、任意のExplain、Environment Intelligence、
+  その後にSupervised Operationsを検討
 
 HostLensはAIがなくても有用であり続けます。将来のAI機能は、明示的に選択された
 最小限の構造化データのみを利用し、無制限のShellにはアクセスしません。

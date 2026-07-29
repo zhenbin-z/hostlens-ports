@@ -6,6 +6,10 @@ import type {
   ServiceSnapshot,
 } from "../shared/services.ts";
 import type { PortScanner } from "./scanners/port-scanner.ts";
+import type {
+  NetworkScanner,
+  NetworkSnapshot,
+} from "../shared/network.ts";
 import { SessionMonitor } from "./session-monitor.ts";
 
 function listener(port: number): PortListener {
@@ -71,6 +75,31 @@ class FailingServiceScanner implements ServiceScanner {
   }
 }
 
+class FixtureNetworkScanner implements NetworkScanner {
+  public async scan(_listeners: PortListener[]): Promise<NetworkSnapshot> {
+    return {
+      scannedAt: "2026-07-27T01:00:00Z",
+      platform: "darwin",
+      interfaces: [],
+      routes: [],
+      dnsResolvers: [],
+      vpnConnections: [],
+      socketRelations: [],
+      summary: {
+        dnsServers: [],
+        vpnActive: false,
+      },
+      warnings: [],
+    };
+  }
+}
+
+class FailingNetworkScanner implements NetworkScanner {
+  public async scan(_listeners: PortListener[]): Promise<NetworkSnapshot> {
+    throw new Error("ifconfig unavailable");
+  }
+}
+
 describe("SessionMonitor", () => {
   it("uses the first scan as baseline and accumulates later changes in memory", async () => {
     const first = {
@@ -88,6 +117,7 @@ describe("SessionMonitor", () => {
     const monitor = new SessionMonitor(
       new FixtureScanner([first, second]),
       new FixtureServiceScanner(),
+      new FixtureNetworkScanner(),
       0,
     );
 
@@ -111,6 +141,7 @@ describe("SessionMonitor", () => {
     const monitor = new SessionMonitor(
       new FixtureScanner([snapshot]),
       new FailingServiceScanner(),
+      new FixtureNetworkScanner(),
       0,
     );
 
@@ -119,5 +150,26 @@ describe("SessionMonitor", () => {
     assert.equal(state.snapshot.listeners.length, 1);
     assert.deepEqual(state.services.services, []);
     assert.match(state.services.warnings[0] ?? "", /launchctl unavailable/);
+  });
+
+  it("keeps port and service observations when network inspection fails", async () => {
+    const snapshot = {
+      scannedAt: "2026-07-27T01:00:00Z",
+      platform: "darwin",
+      listeners: [listener(3000)],
+      warnings: [],
+    };
+    const monitor = new SessionMonitor(
+      new FixtureScanner([snapshot]),
+      new FixtureServiceScanner(),
+      new FailingNetworkScanner(),
+      0,
+    );
+
+    const state = await monitor.scan();
+
+    assert.equal(state.snapshot.listeners.length, 1);
+    assert.deepEqual(state.network.interfaces, []);
+    assert.match(state.network.warnings[0] ?? "", /ifconfig unavailable/);
   });
 });

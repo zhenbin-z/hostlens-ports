@@ -6,6 +6,32 @@
 結果はListener数、実行中のApplication、権限、Storage負荷、OS Versionによって
 変化します。
 
+## バージョン0.4 Reference Run
+
+2026年7月29日に記録：
+
+| 項目 | 結果 |
+| --- | --- |
+| Platform | macOS、Apple Silicon（`arm64`） |
+| Runtime | Node.js `v22.22.2` |
+| 連続Scan | 20 |
+| 最終ScanのInterface | 29 |
+| 最終ScanのRoute | 52 |
+| Socket Relation | 30 |
+| Evidence不足Relation | 0 |
+| Network最小値 | 7.45 ms |
+| Network中央値 | 7.98 ms |
+| Network p95 | 12.13 ms |
+| Network最大値 | 14.73 ms |
+
+Current Port Snapshot取得後にProduction macOS Network Collectorと
+Relationship Resolverを実行しています。Completion TargetはNetwork p95
+1秒未満、すべてのSocket RelationにEvidenceがあることです。両方に合格しました。
+
+```bash
+yarn benchmark:network
+```
+
 ## バージョン0.3 Reference Run
 
 2026年7月28日に記録：
