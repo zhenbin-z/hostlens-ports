@@ -193,6 +193,36 @@ observations for the same plist label are merged into one service. Apple jobs
 and transient application runtime jobs remain in the model but are hidden by
 default so the ordinary view prioritizes configured third-party services.
 
+## Version 0.5 runtime and package model
+
+Version 0.5 adds runtime installations and package-manager environments without
+turning HostLens into a package manager:
+
+```text
+Runtime installation
+  └── Package-manager environment
+        └── Package
+              └── Provided executable
+                    └── Process / Service / Socket
+```
+
+`RuntimeInstallation`, `GlobalPackage`, and `RuntimeRelationship` retain stable
+identifiers, observation completeness, unavailable fields, confidence, and
+evidence. A relationship is created only from observable executable or
+installation-path evidence; a matching package name alone is not sufficient.
+
+Node.js managers may expose a conventional global inventory. Python has no
+universal global scope, so pip results are explicitly described as packages in
+each discovered environment. Missing managers, restricted paths, and command
+failures produce warnings and partial results rather than false empty
+inventories.
+
+Runtime/package collection uses a 60-second in-memory cache. This keeps frequent
+socket refreshes responsive while preserving the current release's
+non-persistent architecture. Copy/export summaries are projections of the
+structured model and sanitized exports remove private home-directory paths and
+common secret-bearing arguments.
+
 ## Future model
 
 The long-term model may include:

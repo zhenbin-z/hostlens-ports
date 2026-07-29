@@ -11,6 +11,10 @@ import type {
   NetworkScanner,
   NetworkSnapshot,
 } from "../shared/network.ts";
+import type {
+  RuntimeScanner,
+  RuntimeSnapshot,
+} from "../shared/runtimes.ts";
 import { compareSnapshots } from "../shared/session-changes.ts";
 import type { PortScanner } from "./scanners/port-scanner.ts";
 
@@ -21,6 +25,7 @@ export class SessionMonitor {
   private readonly scanner: PortScanner;
   private readonly serviceScanner: ServiceScanner;
   private readonly networkScanner: NetworkScanner;
+  private readonly runtimeScanner: RuntimeScanner;
   private readonly coalesceScanMs: number;
   private readonly startedAt = new Date().toISOString();
   private previousSnapshot: PortSnapshot | undefined;
@@ -33,11 +38,13 @@ export class SessionMonitor {
     scanner: PortScanner,
     serviceScanner: ServiceScanner,
     networkScanner: NetworkScanner,
+    runtimeScanner: RuntimeScanner,
     coalesceScanMs = DEFAULT_COALESCE_SCAN_MS,
   ) {
     this.scanner = scanner;
     this.serviceScanner = serviceScanner;
     this.networkScanner = networkScanner;
+    this.runtimeScanner = runtimeScanner;
     this.coalesceScanMs = coalesceScanMs;
   }
 
@@ -64,6 +71,7 @@ export class SessionMonitor {
       this.scanServices(snapshot),
       this.scanNetwork(snapshot),
     ]);
+    const runtimes = await this.scanRuntimes(snapshot, services);
     if (this.previousSnapshot) {
       const nextEvents = compareSnapshots(this.previousSnapshot, snapshot);
       if (nextEvents.length > 0) {
@@ -79,12 +87,39 @@ export class SessionMonitor {
       snapshot,
       services,
       network,
+      runtimes,
       changes: {
         startedAt: this.startedAt,
         events: this.events,
       },
     };
     return this.latestState;
+  }
+
+  private async scanRuntimes(
+    snapshot: PortSnapshot,
+    services: ServiceSnapshot,
+  ): Promise<RuntimeSnapshot> {
+    try {
+      return await this.runtimeScanner.scan(
+        snapshot.listeners,
+        services.services,
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unknown runtime scan error";
+
+      return {
+        scannedAt: snapshot.scannedAt,
+        platform: snapshot.platform,
+        runtimes: [],
+        packages: [],
+        relationships: [],
+        warnings: [
+          `Runtime inspection failed without affecting other results: ${message}`,
+        ],
+      };
+    }
   }
 
   private async scanNetwork(snapshot: PortSnapshot): Promise<NetworkSnapshot> {

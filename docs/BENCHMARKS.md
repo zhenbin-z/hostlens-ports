@@ -6,6 +6,36 @@ This document records reproducible scanner checks rather than a marketing
 performance claim. Results vary with the number of listeners, running
 applications, permissions, storage load, and operating-system version.
 
+## Version 0.5 reference run
+
+Recorded on July 29, 2026:
+
+| Item | Result |
+| --- | --- |
+| Platform | macOS, Apple Silicon (`arm64`) |
+| Runtime | Node.js `v22.22.2` |
+| Consecutive cached scans | 10 |
+| Runtime installations | 5 |
+| Packages | 34 |
+| Collector warnings | 2 |
+| Relationships missing evidence | 0 |
+| Cold scan | 3,034.22 ms |
+| Cached minimum | 0.01 ms |
+| Cached median | 0.01 ms |
+| Cached p95 | 0.03 ms |
+| Cached maximum | 0.03 ms |
+
+The cold measurement discovers observable runtime installations and queries
+available package managers. Results are then cached in memory for 60 seconds
+because this inventory changes much less frequently than sockets. Unavailable
+package managers produce partial warnings instead of deleting successful
+observations. The targets are a cold scan below six seconds, cached p95 below
+100 ms, and evidence on every relationship. This run passed all targets.
+
+```bash
+yarn benchmark:runtimes
+```
+
 ## Version 0.4 reference run
 
 Recorded on July 29, 2026:

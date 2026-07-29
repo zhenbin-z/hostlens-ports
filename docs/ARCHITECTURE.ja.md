@@ -184,6 +184,34 @@ RelationshipはEvidence付きIdentifierで表現します。同じPlist Labelを
 Runtime JobはModel内に保持しますが、通常の画面ではConfigured Third-party Serviceを
 優先するためDefaultで非表示にします。
 
+## バージョン0.5のRuntime / Package Model
+
+0.5ではHostLensをPackage Managerに変えることなく、Runtime Installationと
+Package Manager Environmentを追加します。
+
+```text
+Runtime installation
+  └── Package-manager environment
+        └── Package
+              └── Provided executable
+                    └── Process / Service / Socket
+```
+
+`RuntimeInstallation`、`GlobalPackage`、`RuntimeRelationship`は安定したID、
+Observationの完全性、利用できないField、Confidence、Evidenceを保持します。
+Relationshipは観測可能なExecutableまたはInstall Path Evidenceがある場合だけ
+作成し、Package Nameの一致だけでは推論しません。
+
+Node.js Managerは一般的なGlobal Inventoryを提供できます。Pythonには共通の
+Global Scopeがないため、pipの結果は各発見Environment内のPackageとして明示します。
+Manager不足、Path制限、Command失敗は偽のEmpty Inventoryにせず、WarningとPartial
+Resultとして保持します。
+
+Runtime / Package Collectorは60秒のMemory Cacheを利用します。これにより頻繁な
+Socket Refreshを軽くしながら、現Versionの非永続Architectureを維持します。
+Copy / Export Summaryは構造化ModelからのProjectionであり、Sanitized Exportでは
+Private Home Pathと一般的なSecret付きArgumentを除去します。
+
 ## 将来のモデル
 
 長期的には次のオブジェクトを含む可能性があります。

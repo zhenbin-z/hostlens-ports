@@ -289,7 +289,7 @@ Fieldが存在するだけでは完了とみなしません。
 - MCP、LLM、Chat
 - Multi-host Management
 
-## 計画：0.5.0 — Runtimes & Global Packages Inspector
+## リリース済み：0.5.0 — Runtimes & Global Packages Inspector
 
 0.5はInstalled Developer ToolingとRunning Stateを関連付けます。
 
@@ -301,6 +301,29 @@ Fieldが存在するだけでは完了とみなしません。
 - Search、Filter、Summary、Export、英語 / 日本語 / 簡体字中国語UI
 - Install、Update、Uninstall、Vulnerability Verdict、Project全Dependency Scanは
   行わない
+
+2026年7月29日に記録したCompletion Evidence：
+
+- Runtime / Package Parse、Relationship、Summary、Sanitization、既存Collector、
+  Presentation Modelを含む70件の自動Testが成功
+- TypeScript ValidationとProduction Electron Buildが成功
+- 実機Macで5つのNode.js / Python Runtimeと34 Packageを検出し、利用できない
+  Package Managerは明示的なWarningとして保持
+- 英語、日本語、簡体字中国語UIを実機確認し、同名PackageのEnvironment別検索も確認
+- すべてのRuntime / Package RelationshipにEvidenceがあり、Package Summaryは
+  CopyまたはPrivate PathをSanitizeしてExport可能
+- Runtime BenchmarkはCold Scan 3,034.22 ms、Cache p95 0.03 msで、Cold 6秒未満、
+  Cache p95 100 ms未満のTargetに合格。[Scanner Benchmark](BENCHMARKS.ja.md)参照
+
+### 0.5で明示的に対象外
+
+- Runtime / PackageのInstall、Update、Uninstall
+- Vulnerability、License、Security Verdict
+- Project単位の完全なDependency / Lockfile解析
+- Inventoryの永続履歴またはPackage Alert
+- Linux Runtime / Package Parity
+- MCP、LLM、Chat機能
+- PackageまたはMachine DataのNetwork送信
 
 ## 計画：0.6.0 — Persistent Changes & Alerts
 
