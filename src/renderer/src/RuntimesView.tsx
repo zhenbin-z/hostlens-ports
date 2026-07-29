@@ -12,6 +12,12 @@ import {
   type RuntimeSummaryLabels,
 } from "../../shared/runtime-summary";
 import type { Locale, MessageKey } from "./i18n";
+import {
+  availablePackageManagers,
+  packageMatchesRuntimeFilter,
+  packageRuntimeKind,
+  type RuntimeFilter,
+} from "./runtime-filter-model";
 
 type Translator = (
   key: MessageKey,
@@ -33,12 +39,6 @@ interface RuntimesViewProps {
 
 function runtimeLabel(kind: RuntimeKind, t: Translator): string {
   return kind === "node" ? t("nodeRuntime") : t("pythonRuntime");
-}
-
-function packageRuntimeKind(
-  manager: PackageManagerKind,
-): RuntimeKind {
-  return manager === "pip" || manager === "pipx" ? "python" : "node";
 }
 
 function summaryLabels(t: Translator): RuntimeSummaryLabels {
@@ -72,25 +72,24 @@ export function RuntimesView({
 }: RuntimesViewProps): React.JSX.Element {
   const [query, setQuery] = useState("");
   const [manager, setManager] = useState<PackageManagerKind | "all">("all");
-  const [runtimeKind, setRuntimeKind] = useState<RuntimeKind | "all">("all");
+  const [runtimeFilter, setRuntimeFilter] = useState<RuntimeFilter>("all");
   const [sort, setSort] = useState<PackageSort>("name");
   const [selectedId, setSelectedId] = useState<string>();
   const [summaryFeedback, setSummaryFeedback] = useState<SummaryFeedback>();
   const runtimes = snapshot?.runtimes ?? [];
   const packages = snapshot?.packages ?? [];
   const managers = [...new Set(packages.map((pkg) => pkg.manager))];
+  const managerOptions = useMemo(
+    () => availablePackageManagers(packages, runtimeFilter),
+    [packages, runtimeFilter],
+  );
 
   const filteredPackages = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase(locale);
     return packages
       .filter((pkg) => {
         if (manager !== "all" && pkg.manager !== manager) return false;
-        if (
-          runtimeKind !== "all" &&
-          packageRuntimeKind(pkg.manager) !== runtimeKind
-        ) {
-          return false;
-        }
+        if (!packageMatchesRuntimeFilter(pkg, runtimeFilter)) return false;
         if (!normalizedQuery) return true;
         return [
           pkg.name,
@@ -116,7 +115,12 @@ export function RuntimesView({
         }
         return left.name.localeCompare(right.name, locale);
       });
-  }, [locale, manager, packages, query, runtimeKind, sort]);
+  }, [locale, manager, packages, query, runtimeFilter, sort]);
+
+  useEffect(() => {
+    if (manager === "all" || managerOptions.includes(manager)) return;
+    setManager("all");
+  }, [manager, managerOptions]);
 
   useEffect(() => {
     if (panelMode) return;
@@ -219,6 +223,37 @@ export function RuntimesView({
       {!panelMode ? (
         <section className="filter-bar" aria-label={t("packageFiltersAndSorting")}>
           <label>
+            <span>{t("runtimeKind")}</span>
+            <select
+              value={runtimeFilter}
+              onChange={(event) =>
+                setRuntimeFilter(event.target.value as RuntimeFilter)
+              }
+            >
+              <option value="all">{t("allRuntimes")}</option>
+              {(["node", "python"] as const).map((kind) => (
+                <optgroup key={kind} label={runtimeLabel(kind, t)}>
+                  <option value={`kind:${kind}`}>
+                    {t("allRuntimeVersions", {
+                      runtime: runtimeLabel(kind, t),
+                    })}
+                  </option>
+                  {runtimes
+                    .filter((runtime) => runtime.kind === kind)
+                    .map((runtime) => (
+                      <option
+                        key={runtime.id}
+                        value={`runtime:${runtime.id}`}
+                      >
+                        {runtimeLabel(runtime.kind, t)} {runtime.version} ·{" "}
+                        {runtime.source}
+                      </option>
+                    ))}
+                </optgroup>
+              ))}
+            </select>
+          </label>
+          <label>
             <span>{t("manager")}</span>
             <select
               value={manager}
@@ -227,24 +262,11 @@ export function RuntimesView({
               }
             >
               <option value="all">{t("allPackageManagers")}</option>
-              <option value="npm">npm</option>
-              <option value="yarn">Yarn</option>
-              <option value="pnpm">pnpm</option>
-              <option value="pip">pip</option>
-              <option value="pipx">pipx</option>
-            </select>
-          </label>
-          <label>
-            <span>{t("runtimeKind")}</span>
-            <select
-              value={runtimeKind}
-              onChange={(event) =>
-                setRuntimeKind(event.target.value as RuntimeKind | "all")
-              }
-            >
-              <option value="all">{t("allRuntimes")}</option>
-              <option value="node">{t("nodeRuntime")}</option>
-              <option value="python">{t("pythonRuntime")}</option>
+              {managerOptions.map((managerOption) => (
+                <option key={managerOption} value={managerOption}>
+                  {managerOption === "yarn" ? "Yarn" : managerOption}
+                </option>
+              ))}
             </select>
           </label>
           <label>
@@ -268,7 +290,7 @@ export function RuntimesView({
           {filteredPackages.length === 0 && !loading ? (
             <div className="empty-state">
               <strong>
-                {query.trim() || manager !== "all" || runtimeKind !== "all"
+                {query.trim() || manager !== "all" || runtimeFilter !== "all"
                   ? t("noMatchingPackages")
                   : t("noPackagesObserved")}
               </strong>

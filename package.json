@@ -1,6 +1,6 @@
 {
   "name": "hostlens-ports",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "private": true,
   "description": "A lightweight desktop inspector for listening ports, processes, and startup services.",
   "author": {
