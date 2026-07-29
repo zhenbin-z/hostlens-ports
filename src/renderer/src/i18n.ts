@@ -242,6 +242,40 @@ const english = {
     "Network context inspection failed, but port and service results are still available.",
   networkComponentWarning:
     "{component} inspection is unavailable; network context may be partial.",
+  runtimesView: "Runtimes",
+  runtimeSummary: "Runtime and package summary",
+  installedRuntimes: "Runtimes",
+  observedPackages: "Packages",
+  packageManagers: "Package managers",
+  runtimeInventory: "Runtime inventory",
+  installedPackages: "Installed packages",
+  searchPackagesPlaceholder: "Search package, version, manager, or path",
+  searchPackages: "Search packages",
+  packageFiltersAndSorting: "Package filters and sorting",
+  allPackageManagers: "All package managers",
+  packageName: "Package name",
+  packageManagerThenName: "Manager, then name",
+  runtimeKind: "Runtime",
+  allRuntimes: "All runtimes",
+  nodeRuntime: "Node.js",
+  pythonRuntime: "Python",
+  version: "Version",
+  source: "Source",
+  environment: "Environment",
+  managerExecutable: "Package manager executable",
+  packagePath: "Install path",
+  providedExecutables: "Provided executables",
+  relatedHostActivity: "Related host activity",
+  noRelatedHostActivity:
+    "No running listener or configured service could be related with high confidence.",
+  selectedPackageDetails: "Selected package details",
+  selectPackage: "Select a package to inspect its environment and evidence.",
+  noMatchingPackages: "No matching packages",
+  noPackagesObserved: "No packages were observed",
+  packageInventoryNote:
+    "Python entries describe packages in each discovered environment; Python has no universal global scope.",
+  runtimeInspectionWarning:
+    "Runtime inspection is partial, but port, service, and network results are still available.",
 } as const;
 
 type MessageKey = keyof typeof english;
@@ -490,6 +524,40 @@ const japanese: Messages = {
     "ネットワークコンテキストの取得に失敗しましたが、ポートとサービスの結果は利用できます。",
   networkComponentWarning:
     "{component}を取得できないため、ネットワークコンテキストは一部のみです。",
+  runtimesView: "ランタイム",
+  runtimeSummary: "ランタイムとパッケージの概要",
+  installedRuntimes: "ランタイム",
+  observedPackages: "パッケージ",
+  packageManagers: "パッケージマネージャー",
+  runtimeInventory: "ランタイム一覧",
+  installedPackages: "インストール済みパッケージ",
+  searchPackagesPlaceholder: "パッケージ、バージョン、Manager、Pathを検索",
+  searchPackages: "パッケージを検索",
+  packageFiltersAndSorting: "パッケージの絞り込みと並べ替え",
+  allPackageManagers: "すべてのパッケージマネージャー",
+  packageName: "パッケージ名",
+  packageManagerThenName: "Manager、名前の順",
+  runtimeKind: "ランタイム",
+  allRuntimes: "すべてのランタイム",
+  nodeRuntime: "Node.js",
+  pythonRuntime: "Python",
+  version: "バージョン",
+  source: "取得元",
+  environment: "環境",
+  managerExecutable: "パッケージマネージャー実行ファイル",
+  packagePath: "インストール先",
+  providedExecutables: "提供する実行ファイル",
+  relatedHostActivity: "関連するホスト上の動作",
+  noRelatedHostActivity:
+    "高い信頼度で関連付けられる待受ポートまたは設定済みサービスはありません。",
+  selectedPackageDetails: "選択したパッケージの詳細",
+  selectPackage: "パッケージを選択すると、環境と根拠を確認できます。",
+  noMatchingPackages: "一致するパッケージはありません",
+  noPackagesObserved: "パッケージは観測されませんでした",
+  packageInventoryNote:
+    "Pythonには共通のGlobal Scopeがないため、各検出環境のパッケージとして表示します。",
+  runtimeInspectionWarning:
+    "ランタイムの確認は一部のみですが、ポート、サービス、ネットワークの結果は利用できます。",
 };
 
 const simplifiedChinese: Messages = {
@@ -717,6 +785,39 @@ const simplifiedChinese: Messages = {
     "网络上下文采集失败，但端口和服务结果仍然可用。",
   networkComponentWarning:
     "无法采集{component}；网络上下文可能不完整。",
+  runtimesView: "运行时",
+  runtimeSummary: "运行时与软件包概览",
+  installedRuntimes: "运行时",
+  observedPackages: "软件包",
+  packageManagers: "包管理器",
+  runtimeInventory: "运行时清单",
+  installedPackages: "已安装软件包",
+  searchPackagesPlaceholder: "搜索软件包、版本、包管理器或路径",
+  searchPackages: "搜索软件包",
+  packageFiltersAndSorting: "软件包筛选与排序",
+  allPackageManagers: "全部包管理器",
+  packageName: "软件包名称",
+  packageManagerThenName: "包管理器、名称",
+  runtimeKind: "运行时",
+  allRuntimes: "全部运行时",
+  nodeRuntime: "Node.js",
+  pythonRuntime: "Python",
+  version: "版本",
+  source: "来源",
+  environment: "环境",
+  managerExecutable: "包管理器可执行文件",
+  packagePath: "安装路径",
+  providedExecutables: "提供的可执行文件",
+  relatedHostActivity: "相关主机活动",
+  noRelatedHostActivity: "没有可高可信关联的监听端口或已配置服务。",
+  selectedPackageDetails: "所选软件包详情",
+  selectPackage: "选择软件包以查看其环境与证据。",
+  noMatchingPackages: "没有匹配的软件包",
+  noPackagesObserved: "未观测到软件包",
+  packageInventoryNote:
+    "Python不存在统一的全局范围，因此这里显示各个已发现环境中的软件包。",
+  runtimeInspectionWarning:
+    "运行时检查结果不完整，但端口、服务和网络结果仍然可用。",
 };
 
 const messages: Record<Locale, Messages> = {
@@ -784,6 +885,15 @@ export function localizeWarning(locale: Locale, warning: string): string {
     )
   ) {
     return translate(locale, "networkInspectionWarning");
+  }
+
+  if (
+    warning.startsWith(
+      "Runtime inspection failed without affecting other results:",
+    ) ||
+    warning.includes(" package inventory ")
+  ) {
+    return translate(locale, "runtimeInspectionWarning");
   }
 
   const networkComponentMatch = warning.match(

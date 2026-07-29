@@ -25,6 +25,7 @@ import { relatePackagesToHost } from "./runtime-relations.ts";
 const execFileAsync = promisify(execFile);
 const MAX_BUFFER_BYTES = 16 * 1024 * 1024;
 const COMMAND_TIMEOUT_MS = 8_000;
+const INVENTORY_CACHE_MS = 60_000;
 
 interface CommandObservation {
   stdout: string;
@@ -33,6 +34,13 @@ interface CommandObservation {
 
 export interface RuntimeCommandRunner {
   run(executable: string, args: string[], label: string): Promise<CommandObservation>;
+}
+
+interface RuntimeInventoryCache {
+  expiresAt: number;
+  runtimes: RuntimeInstallation[];
+  packages: GlobalPackage[];
+  warnings: string[];
 }
 
 class DefaultRuntimeCommandRunner implements RuntimeCommandRunner {
@@ -117,7 +125,8 @@ async function discoverExecutables(names: string[]): Promise<string[]> {
     .filter(
       (directory) =>
         Boolean(directory) &&
-        !directory.includes("/.cache/codex-runtimes/"),
+        !directory.includes("/.cache/codex-runtimes/") &&
+        !/\/(?:yarn|npm)-{2}[^/]+$/.test(directory),
     );
   const managerDirectories = await versionManagerBinDirectories();
   return executableFiles(
@@ -196,6 +205,7 @@ function bindPackagesToRuntimes(
 
 export class MacOsRuntimeScanner implements RuntimeScanner {
   private readonly runner: RuntimeCommandRunner;
+  private inventoryCache: RuntimeInventoryCache | undefined;
 
   public constructor(runner: RuntimeCommandRunner = new DefaultRuntimeCommandRunner()) {
     this.runner = runner;
@@ -206,6 +216,30 @@ export class MacOsRuntimeScanner implements RuntimeScanner {
     services: ServiceDefinition[],
   ): Promise<RuntimeSnapshot> {
     const collectedAt = new Date().toISOString();
+    const inventory = await this.inspectInventory(collectedAt);
+
+    return {
+      scannedAt: collectedAt,
+      platform: "darwin",
+      runtimes: inventory.runtimes,
+      packages: inventory.packages,
+      relationships: relatePackagesToHost(
+        inventory.packages,
+        listeners,
+        services,
+        collectedAt,
+      ),
+      warnings: inventory.warnings,
+    };
+  }
+
+  private async inspectInventory(
+    collectedAt: string,
+  ): Promise<RuntimeInventoryCache> {
+    if (this.inventoryCache && this.inventoryCache.expiresAt > Date.now()) {
+      return this.inventoryCache;
+    }
+
     const [nodeExecutables, pythonExecutables, managerExecutables] =
       await Promise.all([
         discoverExecutables(["node"]),
@@ -254,18 +288,12 @@ export class MacOsRuntimeScanner implements RuntimeScanner {
     const packages = packageResults.flat();
     bindPackagesToRuntimes(packages, runtimes);
 
-    return {
-      scannedAt: collectedAt,
-      platform: "darwin",
+    this.inventoryCache = {
+      expiresAt: Date.now() + INVENTORY_CACHE_MS,
       runtimes,
       packages,
-      relationships: relatePackagesToHost(
-        packages,
-        listeners,
-        services,
-        collectedAt,
-      ),
       warnings,
     };
+    return this.inventoryCache;
   }
 }
