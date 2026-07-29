@@ -4,7 +4,7 @@ import type { RuntimeSnapshot } from "./runtimes.ts";
 import type { ServiceSnapshot } from "./services.ts";
 
 export const HOST_SNAPSHOT_SCHEMA_VERSION = 1;
-export const HISTORY_STORAGE_VERSION = 1;
+export const HISTORY_STORAGE_VERSION = 2;
 
 export type ChangeResourceKind =
   | "port"
@@ -56,7 +56,7 @@ export interface HistorySettings {
 }
 
 export interface HistoryState {
-  storageVersion: typeof HISTORY_STORAGE_VERSION;
+  storageVersion: number;
   events: ChangeEvent[];
   preferences: ResourcePreferenceRecord[];
   settings: HistorySettings;

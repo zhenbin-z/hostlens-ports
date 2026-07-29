@@ -67,20 +67,28 @@ function project(snapshot: HostObservationSnapshot): ResourceProjection[] {
     };
   });
 
-  const services: ResourceProjection[] = snapshot.services.services.map(
-    (service) => ({
+  const services: ResourceProjection[] = snapshot.services.services
+    .filter(
+      (service) =>
+        service.ownership === "third-party" &&
+        (Boolean(service.plistPath) ||
+          Boolean(service.homebrewName) ||
+          Boolean(service.program)),
+    )
+    .map((service) => ({
       kind: "service",
       id: service.id,
       key: resourceKey("service", service.id),
       label: service.displayName,
       value: record(service),
       evidenceCount: service.evidence.length,
-    }),
-  );
+    }));
 
   const networkValue = {
-    interfaces: snapshot.network.interfaces,
-    routes: snapshot.network.routes,
+    interfaces: snapshot.network.interfaces.filter(
+      (item) => item.status === "up",
+    ),
+    routes: snapshot.network.routes.filter((item) => item.isDefault),
     dnsResolvers: snapshot.network.dnsResolvers,
     vpnConnections: snapshot.network.vpnConnections,
     summary: snapshot.network.summary,

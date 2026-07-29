@@ -65,6 +65,7 @@ function snapshot(
           label: "postgres",
           displayName: "PostgreSQL",
           manager: "homebrew",
+          homebrewName: "postgresql@17",
           kind: "user-agent",
           scope: "user",
           ownership: "third-party",
@@ -163,5 +164,30 @@ describe("persistent host changes", () => {
       ["removed", "added"],
     );
     assert.ok(events.every(({ resourceKind }) => resourceKind === "port"));
+  });
+
+  it("ignores transient application services and non-default route churn", () => {
+    const before = snapshot();
+    const after = structuredClone(before);
+    before.services.services[0]!.ownership = "application";
+    after.services.services[0]!.ownership = "application";
+    after.services.services[0]!.status = "stopped";
+    before.network.routes.push({
+      id: "route:one",
+      family: "ipv4",
+      destination: "192.168.1.0/24",
+      isDefault: false,
+      confidence: "high",
+      evidence: [],
+    });
+    after.network.routes.push({
+      id: "route:two",
+      family: "ipv4",
+      destination: "10.0.0.0/8",
+      isDefault: false,
+      confidence: "high",
+      evidence: [],
+    });
+    assert.deepEqual(compareHostObservations(before, after), []);
   });
 });

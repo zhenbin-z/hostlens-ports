@@ -283,6 +283,49 @@ const english = {
   runtimePackageObservation: "Runtime package observation",
   packageInventoryDisclaimer:
     "Point-in-time local inventory only. This is not a vulnerability or security verdict.",
+  changesView: "Changes",
+  persistentChangesSummary: "Persistent changes summary",
+  storedChanges: "Stored changes",
+  last24Hours: "Last 24 hours",
+  watchedResources: "Watched resources",
+  desktopAlerts: "Desktop alerts",
+  desktopAlertsDescription:
+    "Notify for new network-facing ports and watched-resource changes.",
+  retention: "Retention",
+  daysCount: "{count} days",
+  clearHistory: "Clear history",
+  clearHistoryConfirmation:
+    "Clear the local change timeline? Watch/ignore preferences and settings will be kept.",
+  searchChanges: "Search changes or resources",
+  changeType: "Change type",
+  resourceType: "Resource type",
+  allChanges: "All changes",
+  allResources: "All resources",
+  showIgnored: "Show ignored",
+  persistentAdded: "Added",
+  persistentRemoved: "Removed",
+  persistentChanged: "Changed",
+  changeResourcePort: "Port",
+  changeResourceService: "Service",
+  changeResourceNetwork: "Network",
+  changeResourceRuntime: "Runtime",
+  changeResourcePackage: "Package",
+  noPersistentChanges: "No persistent changes yet",
+  historyBaselineDescription:
+    "HostLens keeps the current observation as a local baseline and records later differences.",
+  watched: "Watched",
+  ignored: "Ignored",
+  watchResource: "Watch resource",
+  stopWatching: "Stop watching",
+  ignoreResource: "Ignore resource",
+  stopIgnoring: "Stop ignoring",
+  detectedAt: "Detected at",
+  evidenceItems: "{count} evidence items",
+  persistentChangedFields: "Changed fields",
+  resourceAddedOrRemoved:
+    "The resource was added or removed, so there are no field-level differences.",
+  historyEvidenceDisclaimer:
+    "Changes describe local observations and evidence. They are not a security verdict.",
 } as const;
 
 type MessageKey = keyof typeof english;
@@ -572,6 +615,49 @@ const japanese: Messages = {
   runtimePackageObservation: "Runtime Packageの観測",
   packageInventoryDisclaimer:
     "これは一時点のLocal Inventoryであり、脆弱性またはSecurity Verdictではありません。",
+  changesView: "変更履歴",
+  persistentChangesSummary: "永続変更のSummary",
+  storedChanges: "保存された変更",
+  last24Hours: "過去24時間",
+  watchedResources: "Watch中のResource",
+  desktopAlerts: "Desktop Alert",
+  desktopAlertsDescription:
+    "新しいNetwork-facing PortとWatch中Resourceの変更を通知します。",
+  retention: "保存期間",
+  daysCount: "{count}日",
+  clearHistory: "履歴を消去",
+  clearHistoryConfirmation:
+    "Local Change Timelineを消去しますか？Watch / Ignore設定とその他の設定は保持されます。",
+  searchChanges: "変更またはResourceを検索",
+  changeType: "変更種別",
+  resourceType: "Resource種別",
+  allChanges: "すべての変更",
+  allResources: "すべてのResource",
+  showIgnored: "Ignore項目を表示",
+  persistentAdded: "追加",
+  persistentRemoved: "削除",
+  persistentChanged: "変更",
+  changeResourcePort: "Port",
+  changeResourceService: "Service",
+  changeResourceNetwork: "Network",
+  changeResourceRuntime: "Runtime",
+  changeResourcePackage: "Package",
+  noPersistentChanges: "永続変更はまだありません",
+  historyBaselineDescription:
+    "HostLensは現在のObservationをLocal Baselineとして保持し、その後の差分を記録します。",
+  watched: "Watch中",
+  ignored: "Ignore",
+  watchResource: "ResourceをWatch",
+  stopWatching: "Watchを解除",
+  ignoreResource: "ResourceをIgnore",
+  stopIgnoring: "Ignoreを解除",
+  detectedAt: "検出日時",
+  evidenceItems: "Evidence {count}件",
+  persistentChangedFields: "変更Field",
+  resourceAddedOrRemoved:
+    "Resource全体の追加または削除のため、Field単位の差分はありません。",
+  historyEvidenceDisclaimer:
+    "変更はLocal ObservationとEvidenceを説明するもので、Security Verdictではありません。",
 };
 
 const simplifiedChinese: Messages = {
@@ -839,6 +925,49 @@ const simplifiedChinese: Messages = {
   runtimePackageObservation: "运行时软件包观测",
   packageInventoryDisclaimer:
     "这只是当前时间点的本地清单，不是漏洞或安全裁决。",
+  changesView: "变化",
+  persistentChangesSummary: "持久变化摘要",
+  storedChanges: "已保存变化",
+  last24Hours: "过去24小时",
+  watchedResources: "关注的资源",
+  desktopAlerts: "桌面提醒",
+  desktopAlertsDescription:
+    "针对新增Network-facing Port和已关注资源的变化发送提醒。",
+  retention: "保留时间",
+  daysCount: "{count}天",
+  clearHistory: "清除历史",
+  clearHistoryConfirmation:
+    "清除本地变化时间线？Watch / Ignore偏好与其他设置会保留。",
+  searchChanges: "搜索变化或资源",
+  changeType: "变化类型",
+  resourceType: "资源类型",
+  allChanges: "全部变化",
+  allResources: "全部资源",
+  showIgnored: "显示已忽略项",
+  persistentAdded: "新增",
+  persistentRemoved: "移除",
+  persistentChanged: "变化",
+  changeResourcePort: "端口",
+  changeResourceService: "服务",
+  changeResourceNetwork: "网络",
+  changeResourceRuntime: "运行时",
+  changeResourcePackage: "软件包",
+  noPersistentChanges: "还没有持久变化",
+  historyBaselineDescription:
+    "HostLens会把当前观测作为本地Baseline，并记录之后出现的差异。",
+  watched: "已关注",
+  ignored: "已忽略",
+  watchResource: "关注资源",
+  stopWatching: "取消关注",
+  ignoreResource: "忽略资源",
+  stopIgnoring: "取消忽略",
+  detectedAt: "发现时间",
+  evidenceItems: "{count}条Evidence",
+  persistentChangedFields: "变化字段",
+  resourceAddedOrRemoved:
+    "该资源整体被新增或移除，因此没有字段级差异。",
+  historyEvidenceDisclaimer:
+    "变化描述本地观测与Evidence，不构成安全裁决。",
 };
 
 const messages: Record<Locale, Messages> = {

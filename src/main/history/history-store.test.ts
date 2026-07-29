@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, it } from "node:test";
 import type { HostObservationSnapshot } from "../../shared/history.ts";
+import type { PortListener } from "../../shared/ports.ts";
 import { HistoryStore } from "./history-store.ts";
 
 const directories: string[] = [];
@@ -51,6 +52,39 @@ function createStore(): { path: string; store: HistoryStore } {
   directories.push(directory);
   const path = join(directory, "history.sqlite");
   return { path, store: new HistoryStore(path) };
+}
+
+function listener(
+  port: number,
+  exposure: PortListener["exposure"] = "network",
+): PortListener {
+  return {
+    id: `tcp:0.0.0.0:${port}:100`,
+    protocol: "tcp",
+    address: "0.0.0.0",
+    port,
+    pid: 100,
+    processName: "test-server",
+    portType: "service",
+    parentChain: [],
+    observationStatus: "complete",
+    unavailableFields: [],
+    evidence: [],
+    identity: {
+      displayName: "Test server",
+      kind: "development",
+      confidence: "high",
+      evidence: [],
+    },
+    launchSource: {
+      kind: "manual",
+      label: "Manual process",
+      automatic: "no",
+      confidence: "high",
+      evidence: [],
+    },
+    exposure,
+  };
 }
 
 afterEach(() => {
@@ -112,6 +146,50 @@ describe("HistoryStore", () => {
     const cleared = store.clearHistory();
     assert.equal(cleared.events.length, 0);
     assert.equal(cleared.settings.retentionDays, 7);
+    store.close();
+  });
+
+  it("alerts once for a newly network-facing port within its cooldown", () => {
+    const { store } = createStore();
+    store.record(emptySnapshot("2026-07-29T05:00:00.000Z"));
+
+    const added = emptySnapshot("2026-07-29T05:01:00.000Z");
+    added.ports.listeners = [listener(62000)];
+    const firstAlert = store.record(added);
+    assert.deepEqual(
+      firstAlert.pendingAlerts.map(({ ruleId }) => ruleId),
+      ["new-network-port"],
+    );
+
+    const removed = emptySnapshot("2026-07-29T05:02:00.000Z");
+    store.record(removed);
+    const readded = emptySnapshot("2026-07-29T05:03:00.000Z");
+    readded.ports.listeners = [listener(62000)];
+    assert.equal(store.record(readded).pendingAlerts.length, 0);
+    store.close();
+  });
+
+  it("alerts for watched resources and suppresses ignored resources", () => {
+    const { store } = createStore();
+    const baseline = emptySnapshot("2026-07-29T05:00:00.000Z");
+    baseline.ports.listeners = [listener(62001, "local")];
+    store.record(baseline);
+
+    const resourceKey = "port:tcp:0.0.0.0:62001";
+    store.update({ resourceKey, preference: "watched" });
+    const watchedChange = emptySnapshot("2026-07-29T05:01:00.000Z");
+    watchedChange.ports.listeners = [listener(62001, "network")];
+    assert.deepEqual(
+      store
+        .record(watchedChange)
+        .pendingAlerts.map(({ ruleId }) => ruleId),
+      ["watched-resource-change"],
+    );
+
+    store.update({ resourceKey, preference: "ignored" });
+    const ignoredChange = emptySnapshot("2026-07-29T05:02:00.000Z");
+    ignoredChange.ports.listeners = [listener(62001, "local")];
+    assert.equal(store.record(ignoredChange).pendingAlerts.length, 0);
     store.close();
   });
 });

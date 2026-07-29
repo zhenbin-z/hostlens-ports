@@ -386,6 +386,31 @@ function showPendingAlerts(
   state: Awaited<ReturnType<SessionMonitor["scan"]>>,
 ): void {
   if (!Notification.isSupported()) return;
+  const locale = app.getLocale().toLowerCase();
+  const notificationText =
+    locale.startsWith("ja")
+      ? {
+          newPort: "ネットワーク向けポートを検出",
+          watched: "監視中のリソースが変更されました",
+          added: "追加",
+          removed: "終了",
+          changed: "変更",
+        }
+      : locale.startsWith("zh")
+        ? {
+            newPort: "发现面向网络的新端口",
+            watched: "监视中的资源发生变化",
+            added: "新增",
+            removed: "关闭",
+            changed: "变化",
+          }
+        : {
+            newPort: "New network-facing port",
+            watched: "Watched resource changed",
+            added: "Added",
+            removed: "Closed",
+            changed: "Changed",
+          };
   const events = new Map(
     state.history.events.map((event) => [event.id, event]),
   );
@@ -395,9 +420,9 @@ function showPendingAlerts(
     const notification = new Notification({
       title:
         candidate.ruleId === "new-network-port"
-          ? "New network-facing port"
-          : "Watched resource changed",
-      body: `${event.label} · ${event.kind}`,
+          ? notificationText.newPort
+          : notificationText.watched,
+      body: `${event.label} · ${notificationText[event.kind]}`,
       silent: false,
     });
     notification.on("click", showMainWindow);

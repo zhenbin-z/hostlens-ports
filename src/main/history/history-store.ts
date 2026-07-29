@@ -244,6 +244,14 @@ export class HistoryStore {
         PRAGMA user_version = 1;
       `);
     }
+    if (version < 2) {
+      this.database.exec(`
+        DELETE FROM change_events;
+        DELETE FROM host_snapshots;
+        DELETE FROM alert_deliveries;
+        PRAGMA user_version = 2;
+      `);
+    }
   }
 
   private latestSnapshot(): HostObservationSnapshot | undefined {
