@@ -342,7 +342,7 @@ AlertはSecurity Verdictを作るのではなく、Evidenceと変化を説明し
 一時的なmacOS Application JobとDefault以外のRoute変動はPersistent Projection
 から除外し、Timelineが長期的なHost Stateを優先するようにしています。
 
-## 計画：0.7.0 — Ubuntu / RHEL First-class Support
+## リリース済み：0.7.0 — Ubuntu / RHEL First-class Support
 
 Linuxは同じHost概念とPlatform固有Evidenceを利用します。
 
@@ -356,6 +356,21 @@ Linuxは同じHost概念とPlatform固有Evidenceを利用します。
 - Command、権限、Optional Toolが利用できない場合もPartial Resultを保持
 
 Headless Agent、Multi-host、Service Mutation、無制限Shellは後期課題です。
+
+2026年7月29日に記録した完了Evidence：
+
+- Linux Adapterは`ss`でTCP Listenerを取得し、権限制限のあるSocketを失わず
+  Processを補完し、既存のIdentity / Relationship Resolutionを再利用
+- systemdはLoaded UnitとConfigured Unit File、正規化されたStatus /
+  Startup、Unit Evidence、Process、Listening Portを収集
+- iproute2 FixtureはInterface、IPv4 / IPv6 Route、DNS、VPN形式Interface、
+  Socket Relationship、読み取り専用firewalld State / Zoneを網羅
+- Shared Runtime CollectorはLinuxのNode.js / Pythonとnpm、Yarn、pnpm、
+  pip、pipx Inventoryに対応
+- Persistent Change、Alert、Export、英語・日本語・簡体字中国語UIを
+  macOS / Linuxで共有
+- CIはmacOS / Ubuntuを検証し、Linux PackagingはAppImage、deb、rpmを生成
+- Packaging前に91件の自動テストと両TypeScript Projectが成功
 
 ## 個人・中小企業向けExperience
 

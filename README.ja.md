@@ -3,10 +3,10 @@
 
   # HostLens Ports
 
-  **Macで待受中のポートと、それを開いたプロセスをひと目で確認。**
+  **MacまたはLinux Hostで待受中のポートと、それを開いたプロセスを確認。**
 
   [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-1f7040.svg)](LICENSE)
-  ![Platform: macOS](https://img.shields.io/badge/platform-macOS-lightgrey.svg)
+  ![Platform: macOS + Linux](https://img.shields.io/badge/platform-macOS%20%2B%20Linux-lightgrey.svg)
   ![Built with Electron](https://img.shields.io/badge/Electron-React%20%2B%20TypeScript-47848f.svg)
 </div>
 
@@ -20,9 +20,9 @@ HostLens Portsは、`lsof`、`netstat`、`ss`などのコマンドを覚えな�
 TCP待受ポートを確認できる軽量なオープンソースのデスクトップツールです。
 ポートとプロセス、コマンド、バインドアドレス、ネットワーク公開範囲を関連付け、
 検索しやすい画面にまとめます。
-0.6ではPort、設定済みThird-party Service、Network Context、Runtime、
-Package向けの限定Local Change Timelineを追加し、Watch / Ignore設定と
-Cooldown付きDesktop Notificationを提供します。
+0.7ではUbuntuとRed Hat Enterprise LinuxをFirst-class Desktop Targetとし、
+`ss` / Process、systemd、iproute2 Network Context、読み取り専用firewalld
+Observation、Node / Python Package Inventoryに対応します。
 
 現在のリリースは、ローカル専用かつ読み取り専用です。軽量SQLite Historyは
 Host内に留まり、LLM、テレメトリー、アカウント、クラウドサービスは使用しません。
@@ -39,7 +39,7 @@ Host内に留まり、LLM、テレメトリー、アカウント、クラウド�
 
 ## 主な機能
 
-- macOS上のTCP待受ポートをリアルタイムに検出
+- macOS、Ubuntu、RHEL上のTCP待受ポートをリアルタイムに検出
 - Current Network、Service、Network-facing Listener、Session Changeをまとめる
   Host Overview
 - Interface、IPv4 / IPv6 Address、Route、DNS、観測可能なVPN Interfaceを
@@ -51,7 +51,7 @@ Host内に留まり、LLM、テレメトリー、アカウント、クラウド�
 - Vite、Next.js、React Tooling、Nuxt、webpackなどのProjectを考慮した名称
 - Package Script、launchd、Homebrew Services、Docker、Native App、
   手動起動のLaunch Source識別
-- launchdとHomebrew Servicesのための独立したServices View
+- launchd、Homebrew Services、systemdのための独立したServices View
 - Running、Loaded、Stopped、Failed、Disabled、UnknownのService状態
 - Automatic、On-demand、Disabled、UnknownのStartup Behavior
 - ServiceからProcess、Listening PortへのRelationship
@@ -78,7 +78,8 @@ Host内に留まり、LLM、テレメトリー、アカウント、クラウド�
 - Point-in-time Disclaimer付きの完全版・Sanitized版Copy / Export
 - 完全表示・Copy可能なCommandと明示的なPartial Observation
 - 管理者権限を要求しない読み取り専用動作
-- 将来のLinux対応に向けたプラットフォーム抽象化
+- Linux Desktop向け`.AppImage`、`.deb`、`.rpm` Packaging
+- Linux ToolやProcess Ownerが取得できない場合もPartial Resultを保持
 
 <p align="center">
   <img src="docs/images/hostlens-ports-quick-view.png"
@@ -102,7 +103,7 @@ Printer、Router、Wi-Fi、Shared ServiceをLocal-firstで理解できる環境�
 
 ### 必要環境
 
-- macOS
+- macOS 13+、Ubuntu 22.04+ / 24.04、またはRHEL 9
 - Node.js 22以降
 - Yarn Classic 1.22
 
@@ -161,8 +162,12 @@ HostLensは広い権限を要求せず、不足する情報を「不明」とし
 | プラットフォーム | 状況 |
 | --- | --- |
 | macOS | 対応済み：`lsof`と`ps`によるライブスキャン |
-| Ubuntu | 対応予定 |
-| Red Hat Enterprise Linux | 対応予定 |
+| Ubuntu | 対応済み：`ss`、Process、systemd、iproute2、Package |
+| Red Hat Enterprise Linux | 対応済み：`ss`、Process、systemd、iproute2、firewalld |
+
+LinuxのTray表示はDesktop Environmentに依存します。GNOMEで
+StatusNotifier / AppIndicator Extensionがない場合も、通常のApp Windowは
+利用できます。
 
 ## 開発コマンド
 
@@ -210,7 +215,8 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 - **0.6.0 — Persistent Changes & Alerts：** Local Snapshot、型付きChange、
   限定Timeline、Watch / Ignore、Cooldown、Desktop Notificationを実装済み
 - **0.7.0 — Ubuntu / RHEL First-class Support：** Linux Collector、systemd、
-  Network、Package、Persistence、Alert、Desktop Packaging
+  Network、firewalld Observation、Package、Persistence、Alert、Desktop
+  Packagingを実装済み
 - **その後：** 読み取り専用MCP、任意のExplain、Environment Intelligence、
   その後にSupervised Operationsを検討
 

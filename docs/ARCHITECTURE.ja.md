@@ -236,6 +236,31 @@ SchemaはVersion管理されMigration Test済みです。Retentionを設定で�
 SettingはElectronのLocal User-data Directoryに留まり、UploadやAccount作成は
 ありません。AlertはTyped Evidenceから生成し、Security Verdictにはしません。
 
+## バージョン0.7のLinux Adapter
+
+0.7はShared Host Modelを維持し、Platform Collectorだけを置き換えます。
+
+```text
+macOS                         Linux
+lsof / ps                     ss / ps / procfs
+launchd / Homebrew            systemd
+networksetup / route          iproute2 / resolv.conf
+Firewall Assertionなし        読み取り専用firewalld Observation
+            ↓
+      Shared HostSnapshot
+```
+
+`ss`がPIDを公開できない場合もLinux Socketは有効なPartial Observationとして
+残ります。Systemd DiscoveryはLoaded UnitとConfigured Unit Fileを統合し、
+Propertyを一定数ずつ取得します。Network AdapterはInterface、Route、DNS、
+VPN形式Tunnel Interface、firewalld State / Zoneを記録しますが、PortがAllowed
+またはReachableとは判断しません。Runtime / Package Discoveryは同じUnix
+Inventory Pipelineを共有しつつPlatformを保持します。
+
+Renderer、Persistence、Change Engine、Alert、Export、3言語Dictionaryは両Platform
+で同じNormalized Typeを利用します。Linux Desktop PackagingによってRendererへ
+Command実行権限を与えることはありません。
+
 ## 将来のモデル
 
 長期的には次のオブジェクトを含む可能性があります。
