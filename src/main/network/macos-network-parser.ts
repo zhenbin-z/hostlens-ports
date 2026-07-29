@@ -221,7 +221,7 @@ export function parseRoutes(
       id: `route:${family}:${destination}:${interfaceName}`,
       family,
       destination,
-      gateway: gateway === "link#0" ? undefined : gateway,
+      gateway: gateway.startsWith("link#") ? undefined : gateway,
       interfaceName,
       isDefault: destination === "default",
       confidence: "high",
@@ -292,7 +292,9 @@ export function inferVpnConnections(
       (networkInterface) =>
         networkInterface.kind === "vpn" &&
         networkInterface.status === "up" &&
-        networkInterface.addresses.length > 0,
+        networkInterface.addresses.some(
+          (address) => address.scope === "network",
+        ),
     )
     .map((networkInterface) => ({
       id: `vpn:${networkInterface.name}`,
@@ -341,14 +343,14 @@ export function relateSocketsToInterfaces(
 
     if (isWildcard(address)) {
       candidates = interfaces.filter(
-        (item) => item.status === "up" && item.addresses.length > 0,
+        (item) =>
+          item.status === "up" &&
+          item.addresses.some((candidate) => candidate.scope === "network"),
       );
       kind = "potential";
-      reachability = candidates.some((item) => item.kind !== "loopback")
-        ? "potential"
-        : "local";
+      reachability = candidates.length > 0 ? "potential" : "unknown";
       reason =
-        "Wildcard binding may accept traffic on each active interface; reachability was not actively tested.";
+        "Wildcard binding may accept traffic on each active network interface; reachability was not actively tested.";
       confidence = "high";
     } else if (isLoopback(address)) {
       candidates = interfaces.filter((item) => item.kind === "loopback");

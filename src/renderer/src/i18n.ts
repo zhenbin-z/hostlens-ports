@@ -200,6 +200,48 @@ const english = {
   appleSystem: "Apple system",
   applicationRuntime: "App runtime",
   thirdParty: "Third-party",
+  hostOverview: "Host overview",
+  overviewView: "Overview",
+  currentNetwork: "Current network",
+  activeInterfaces: "Active interfaces",
+  backgroundServices: "Background services",
+  potentiallyReachable: "Potentially reachable",
+  sessionChangesShort: "Session changes",
+  vpnObserved: "VPN interface observed",
+  noVpnObserved: "No VPN interface observed",
+  defaultRouteObserved: "Default route observed",
+  defaultRouteUnavailable: "Default route unavailable",
+  addressUnavailable: "Address unavailable",
+  notObserved: "Not observed",
+  reachabilityDisclaimer:
+    "Potential reachability is inferred from bind addresses and active interfaces. HostLens has not tested the firewall, LAN, or internet path.",
+  networkContext: "Network context",
+  interfacesAndAddresses: "Interfaces and addresses",
+  socketContext: "Socket context",
+  networkFacingListeners: "Network-facing listeners",
+  startupContext: "Startup context",
+  observationBoundaries: "Observation boundaries",
+  whatHostLensKnows: "What HostLens knows",
+  defaultGateway: "Default gateway",
+  dnsServers: "DNS servers",
+  noInterfacesObserved: "No active interface addresses were observed.",
+  noPotentialListeners: "No potentially network-reachable listeners were observed.",
+  noBackgroundServices: "No third-party background services were observed.",
+  notActivelyTested: "not actively tested",
+  boundObserved: "Bound: directly observed from the listening socket",
+  potentialInferred: "Potential: inferred from the socket and interface relationship",
+  activeTestNotPerformed: "Actively tested: not performed in this release",
+  interfaceKind_ethernet: "Ethernet",
+  interfaceKind_wifi: "Wi-Fi",
+  interfaceKind_loopback: "Loopback",
+  interfaceKind_vpn: "VPN / tunnel",
+  interfaceKind_bridge: "Bridge",
+  interfaceKind_virtual: "Virtual",
+  interfaceKind_unknown: "Unknown",
+  networkInspectionWarning:
+    "Network context inspection failed, but port and service results are still available.",
+  networkComponentWarning:
+    "{component} inspection is unavailable; network context may be partial.",
 } as const;
 
 type MessageKey = keyof typeof english;
@@ -406,6 +448,48 @@ const japanese: Messages = {
   appleSystem: "Apple System",
   applicationRuntime: "App Runtime",
   thirdParty: "サードパーティ",
+  hostOverview: "ホスト概要",
+  overviewView: "概要",
+  currentNetwork: "現在のネットワーク",
+  activeInterfaces: "有効なインターフェース",
+  backgroundServices: "バックグラウンドサービス",
+  potentiallyReachable: "到達可能性あり",
+  sessionChangesShort: "セッション変更",
+  vpnObserved: "VPNインターフェースを観測",
+  noVpnObserved: "VPNインターフェースは未観測",
+  defaultRouteObserved: "デフォルトルートを観測",
+  defaultRouteUnavailable: "デフォルトルートを取得不可",
+  addressUnavailable: "アドレスを取得不可",
+  notObserved: "未観測",
+  reachabilityDisclaimer:
+    "到達可能性は待受アドレスと有効なインターフェースから推定しています。ファイアウォール、LAN、インターネット経路はテストしていません。",
+  networkContext: "ネットワークコンテキスト",
+  interfacesAndAddresses: "インターフェースとアドレス",
+  socketContext: "ソケットコンテキスト",
+  networkFacingListeners: "ネットワーク向け待受",
+  startupContext: "起動コンテキスト",
+  observationBoundaries: "観測範囲",
+  whatHostLensKnows: "HostLensが把握していること",
+  defaultGateway: "デフォルトゲートウェイ",
+  dnsServers: "DNSサーバー",
+  noInterfacesObserved: "有効なインターフェースアドレスは観測されませんでした。",
+  noPotentialListeners: "ネットワーク到達の可能性がある待受は観測されませんでした。",
+  noBackgroundServices: "サードパーティのバックグラウンドサービスは未観測です。",
+  notActivelyTested: "能動テスト未実施",
+  boundObserved: "Bound：待受ソケットから直接観測",
+  potentialInferred: "Potential：ソケットとインターフェースの関係から推定",
+  activeTestNotPerformed: "Actively tested：このリリースでは未実施",
+  interfaceKind_ethernet: "Ethernet",
+  interfaceKind_wifi: "Wi-Fi",
+  interfaceKind_loopback: "ループバック",
+  interfaceKind_vpn: "VPN / トンネル",
+  interfaceKind_bridge: "ブリッジ",
+  interfaceKind_virtual: "仮想",
+  interfaceKind_unknown: "不明",
+  networkInspectionWarning:
+    "ネットワークコンテキストの取得に失敗しましたが、ポートとサービスの結果は利用できます。",
+  networkComponentWarning:
+    "{component}を取得できないため、ネットワークコンテキストは一部のみです。",
 };
 
 const simplifiedChinese: Messages = {
@@ -591,6 +675,48 @@ const simplifiedChinese: Messages = {
   appleSystem: "Apple系统",
   applicationRuntime: "应用运行任务",
   thirdParty: "第三方",
+  hostOverview: "主机概览",
+  overviewView: "概览",
+  currentNetwork: "当前网络",
+  activeInterfaces: "活动网络接口",
+  backgroundServices: "后台服务",
+  potentiallyReachable: "可能可达",
+  sessionChangesShort: "本次运行变化",
+  vpnObserved: "已观察到VPN接口",
+  noVpnObserved: "未观察到VPN接口",
+  defaultRouteObserved: "已观察到默认路由",
+  defaultRouteUnavailable: "无法取得默认路由",
+  addressUnavailable: "无法取得地址",
+  notObserved: "未观察到",
+  reachabilityDisclaimer:
+    "可能可达是根据监听地址与活动网卡推断的；HostLens尚未测试防火墙、局域网或互联网路径。",
+  networkContext: "网络上下文",
+  interfacesAndAddresses: "网络接口与地址",
+  socketContext: "套接字上下文",
+  networkFacingListeners: "面向网络的监听端口",
+  startupContext: "启动上下文",
+  observationBoundaries: "观察边界",
+  whatHostLensKnows: "HostLens知道什么",
+  defaultGateway: "默认网关",
+  dnsServers: "DNS服务器",
+  noInterfacesObserved: "没有观察到活动网络接口地址。",
+  noPotentialListeners: "没有观察到可能从网络访问的监听端口。",
+  noBackgroundServices: "没有观察到第三方后台服务。",
+  notActivelyTested: "未主动测试",
+  boundObserved: "Bound：从监听套接字直接观察",
+  potentialInferred: "Potential：根据套接字与网卡关系推断",
+  activeTestNotPerformed: "Actively tested：此版本未执行",
+  interfaceKind_ethernet: "以太网",
+  interfaceKind_wifi: "Wi-Fi",
+  interfaceKind_loopback: "回环",
+  interfaceKind_vpn: "VPN / 隧道",
+  interfaceKind_bridge: "网桥",
+  interfaceKind_virtual: "虚拟",
+  interfaceKind_unknown: "未知",
+  networkInspectionWarning:
+    "网络上下文采集失败，但端口和服务结果仍然可用。",
+  networkComponentWarning:
+    "无法采集{component}；网络上下文可能不完整。",
 };
 
 const messages: Record<Locale, Messages> = {
@@ -650,6 +776,23 @@ export function localizeWarning(locale: Locale, warning: string): string {
     )
   ) {
     return translate(locale, "serviceInspectionWarning");
+  }
+
+  if (
+    warning.startsWith(
+      "Network inspection failed without affecting port results:",
+    )
+  ) {
+    return translate(locale, "networkInspectionWarning");
+  }
+
+  const networkComponentMatch = warning.match(
+    /^(.+) inspection was unavailable:/,
+  );
+  if (networkComponentMatch) {
+    return translate(locale, "networkComponentWarning", {
+      component: networkComponentMatch[1]!,
+    });
   }
 
   const locationMatch = warning.match(/^Could not inspect (.+)\.$/);

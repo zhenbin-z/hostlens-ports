@@ -30,6 +30,7 @@ en0: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
 \tinet 192.168.10.25 netmask 0xffffff00 broadcast 192.168.10.255
 utun5: flags=8051<UP,POINTOPOINT,RUNNING,MULTICAST> mtu 1380
 \tinet6 fe80::abcd%utun5 prefixlen 64 scopeid 0x16
+\tinet 10.8.0.2 netmask 0xffffffff
 `;
 
 function listener(
@@ -171,6 +172,10 @@ resolver #2
     assert.equal(relations[1]?.kind, "bound");
     assert.equal(relations[1]?.reachability, "potential");
     assert.equal(relations[2]?.kind, "potential");
+    assert.deepEqual(relations[2]?.interfaceIds, [
+      "interface:en0",
+      "interface:utun5",
+    ]);
     assert.match(relations[2]?.reason ?? "", /not actively tested/);
   });
 });
