@@ -20,11 +20,15 @@ HostLens Ports is a lightweight, open-source desktop utility for inspecting
 TCP listening ports without memorizing `lsof`, `netstat`, or `ss` commands.
 It connects each port to its owning process, command, bind address, and
 network exposure, then presents the result in a searchable interface.
+Version 0.3 also inventories launchd jobs and Homebrew Services, including
+configured services that are currently stopped.
 
 The current release is intentionally local and read-only. It has no LLM,
 database, telemetry, account, or cloud service.
 
 ![HostLens Ports application](docs/images/hostlens-ports-app.png)
+
+![HostLens Services inspector](docs/images/hostlens-services-app.jpg)
 
 ## Features
 
@@ -35,6 +39,16 @@ database, telemetry, account, or cloud service.
   other common development servers
 - Launch-source attribution for package scripts, launchd, Homebrew Services,
   Docker, native applications, and manually started processes
+- First-class Services view for launchd and Homebrew Services
+- Running, Loaded, Stopped, Failed, Disabled, and Unknown service states
+- Automatic, On-demand, Disabled, and Unknown startup behavior
+- Service-to-process and service-to-listening-port relationships
+- Configured-but-stopped service discovery from LaunchAgent and LaunchDaemon
+  plist locations
+- Apple system jobs and transient application jobs retained but hidden by
+  default
+- Service search, manager/status/startup/scope filters, and deterministic
+  sorting
 - Confidence and inspectable evidence for inferred identities
 - In-memory New, Changed, and Closed listener detection for the current session
 - Search by port, process, project, address, or command
@@ -145,13 +159,15 @@ The scanner is behind a platform-neutral interface so Linux can use `ss`,
 src/
 ├── main/
 │   ├── index.ts                 Electron windows, tray, and IPC
-│   └── scanners/                Platform scanners and process identity
+│   ├── scanners/                Port scanners and process identity
+│   └── services/                Service collectors and relationships
 ├── preload/
 │   └── index.ts                 Restricted renderer bridge
 ├── renderer/
 │   └── src/                     React interface
 └── shared/
-    └── ports.ts                 Shared typed data model
+    ├── ports.ts                 Port and host snapshot types
+    └── services.ts              Service and startup types
 ```
 
 ## Development commands
@@ -161,6 +177,7 @@ yarn dev                # Start Electron in development mode
 yarn typecheck          # Check main, preload, and renderer TypeScript
 yarn test               # Run scanner, identity, session, and privacy tests
 yarn benchmark:scanner  # Run the 20-scan macOS reference benchmark
+yarn benchmark:services # Benchmark ports, services, and relationships
 yarn build              # Create a production application build
 yarn dist:mac           # Create unsigned local .dmg and .zip artifacts
 ```
@@ -193,6 +210,9 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
   identify projects and launch sources, attach evidence and confidence, show
   in-memory New / Changed / Closed states, and provide friendly and technical
   views plus a shareable current-state summary.
+- **0.3.0 — Services & Startup Inspector:** inventory launchd and Homebrew
+  services, retain stopped configuration, normalize status and startup
+  behavior, and connect services to processes and listening ports.
 - **Later:** expand the unified host model, add first-class Linux support,
   personal and small-business IT experiences, persistent changes and alerts,
   read-only MCP, optional Explain, environment intelligence, and only then

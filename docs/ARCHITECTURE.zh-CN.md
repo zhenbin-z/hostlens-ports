@@ -159,6 +159,26 @@ Evidence 必须保持为不同概念。
 `Service`、`FirewallPolicy`、`ScheduledJob`、`Package` 等对象，只在真正
 实现对应 Collector 和 UI 时加入。
 
+## 0.3版本的Service Model
+
+0.3已经同时实现Collector和独立UI，因此正式加入`Service`。Service不会被推测为
+与Process、Socket或Launch Source相同的对象。
+
+```text
+Configured Plist ─┐
+launchctl State ──┼─→ Service ─→ Direct / Descendant Process ─→ Socket
+Homebrew State ───┘
+```
+
+每个Service保留Manager、Label、Kind、Scope、Ownership、统一后的Status、Startup
+Behavior、Program、Arguments、Plist Path、PID、Exit Status、Observation完整度、
+Confidence和Evidence。Collector失败或权限不足时，系统会保留Partial Object，而
+不会删除已经确认的配置。
+
+Relationship使用带Evidence的Identifier表示。同一Plist Label对应的Homebrew和
+launchd Observation会合并为一个Service。Apple Job和临时Application Runtime Job
+仍保留在Model中，但默认隐藏，让普通视图优先显示Configured Third-party Service。
+
 ## 未来模型
 
 长期模型可能包含：

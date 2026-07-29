@@ -126,6 +126,7 @@ export interface SessionChanges {
 
 export interface HostLensState {
   snapshot: PortSnapshot;
+  services: import("./services.ts").ServiceSnapshot;
   changes: SessionChanges;
 }
 

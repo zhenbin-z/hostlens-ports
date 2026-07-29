@@ -226,6 +226,54 @@ h1 {
   stroke-width: 1.8;
 }
 
+.view-tabs {
+  display: flex;
+  gap: 6px;
+  margin: -3px 20px 14px;
+  padding: 4px;
+  border: 1px solid rgb(34 61 42 / 8%);
+  border-radius: 11px;
+  background: rgb(255 255 255 / 45%);
+}
+
+.view-tabs button {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 31px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #6f7d72;
+  font-size: 10px;
+  font-weight: 720;
+  cursor: pointer;
+}
+
+.view-tabs button:hover {
+  color: #245d35;
+}
+
+.view-tabs button.active {
+  background: #fff;
+  color: #1c6538;
+  box-shadow: 0 3px 9px rgb(35 67 43 / 8%);
+}
+
+.view-tabs span {
+  display: inline-grid;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  place-items: center;
+  border-radius: 99px;
+  background: rgb(43 94 57 / 8%);
+  font-size: 8px;
+}
+
 .summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -452,6 +500,49 @@ h1 {
   white-space: nowrap;
 }
 
+.service-filter-bar {
+  align-items: center;
+}
+
+.service-filter-bar .checkbox-filter {
+  min-width: 138px;
+  flex: 0 0 auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding-top: 13px;
+  color: #68766c;
+  font-size: 9px;
+}
+
+.service-filter-bar .checkbox-filter input,
+.panel-apple-toggle input {
+  accent-color: #1d7040;
+}
+
+.service-filter-bar .checkbox-filter span {
+  padding: 0;
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.panel-apple-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: #78857b;
+  font-size: 9px;
+}
+
+.panel-service-toggles {
+  display: flex;
+  gap: 12px;
+  margin: -4px 20px 10px;
+}
+
 .workspace {
   display: flex;
   min-height: 0;
@@ -526,6 +617,114 @@ h1 {
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+.service-row {
+  grid-template-columns: 88px minmax(0, 1fr) 18px;
+}
+
+.service-status {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 9px;
+  border-radius: 10px;
+  background: #edf2ed;
+  color: #59665c;
+}
+
+.service-status > span {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 99px;
+  background: currentColor;
+  box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.service-status strong {
+  overflow: hidden;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.service-status.running {
+  background: #e1f2e5;
+  color: #25703d;
+}
+
+.service-status.loaded {
+  background: #e7eef7;
+  color: #35648e;
+}
+
+.service-status.failed {
+  background: #fbe5df;
+  color: #aa442f;
+}
+
+.service-status.disabled {
+  background: #eee9f4;
+  color: #705387;
+}
+
+.service-status.unknown {
+  background: #fff0ce;
+  color: #8b6517;
+}
+
+.relationship-section {
+  margin-top: 10px;
+  padding: 11px;
+  border: 1px solid rgb(34 61 42 / 8%);
+  border-radius: 11px;
+  background: rgb(255 255 255 / 48%);
+}
+
+.related-port-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 6px;
+}
+
+.related-port-list button {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 7px;
+  padding: 8px;
+  border: 1px solid rgb(35 68 44 / 9%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 65%);
+  text-align: left;
+  cursor: pointer;
+}
+
+.related-port-list button:hover {
+  border-color: rgb(29 112 64 / 24%);
+  color: #1d7040;
+}
+
+.related-port-list strong {
+  font-size: 9px;
+}
+
+.related-port-list span {
+  overflow: hidden;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.related-port-list small {
+  grid-column: 1 / -1;
+  color: #78857b;
+  font-size: 8px;
+}
+
+.service-processes li {
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .port-number.network {
@@ -1168,6 +1367,12 @@ footer {
   padding: 22px 24px 16px;
 }
 
+.full-app .view-tabs {
+  width: 260px;
+  margin-right: 24px;
+  margin-left: 24px;
+}
+
 .full-app .summary {
   padding-right: 24px;
   padding-left: 24px;
@@ -1233,6 +1438,8 @@ footer {
   }
 
   .summary div,
+  .view-tabs,
+  .view-tabs button.active,
   .change-strip,
   .change-list button,
   .search,
@@ -1254,6 +1461,31 @@ footer {
   .panel-actions .primary-action {
     border-color: #4caa6e;
     background: #367e50;
+  }
+
+  .service-status {
+    background: rgb(255 255 255 / 6%);
+  }
+
+  .service-status.running {
+    background: rgb(65 128 79 / 22%);
+    color: #93d4a1;
+  }
+
+  .service-status.loaded {
+    background: rgb(60 102 145 / 24%);
+    color: #a8c9e6;
+  }
+
+  .service-status.failed {
+    background: rgb(154 69 49 / 25%);
+    color: #eba28f;
+  }
+
+  .relationship-section,
+  .related-port-list button {
+    border-color: rgb(255 255 255 / 9%);
+    background: rgb(255 255 255 / 5%);
   }
 
   .search input {

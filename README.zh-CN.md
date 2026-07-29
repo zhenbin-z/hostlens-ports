@@ -19,10 +19,14 @@
 HostLens Ports是一款轻量、开源的桌面工具，让你无需记忆`lsof`、`netstat`
 或`ss`命令，也能检查TCP监听端口。它会关联端口对应的进程、完整命令、
 监听地址和网络暴露范围，并通过可搜索的界面展示结果。
+0.3版本还会检查launchd Job和Homebrew Services，包括当前已经停止但仍有配置的
+Service。
 
 当前版本完全在本地以只读方式运行，不包含LLM、数据库、遥测、账号或云服务。
 
 ![HostLens Ports应用界面](docs/images/hostlens-ports-app.png)
+
+![HostLens Services检查界面](docs/images/hostlens-services-app.jpg)
 
 ## 功能
 
@@ -32,6 +36,13 @@ HostLens Ports是一款轻量、开源的桌面工具，让你无需记忆`lsof`
 - 识别Vite、Next.js、React Tooling、Nuxt、webpack等开发项目
 - 识别Package Script、launchd、Homebrew Services、Docker、原生应用
   与手动启动等来源
+- 为launchd和Homebrew Services提供独立的Services视图
+- 显示Running、Loaded、Stopped、Failed、Disabled和Unknown状态
+- 显示Automatic、On-demand、Disabled和Unknown启动方式
+- 建立Service到Process及Listening Port的关联
+- 从LaunchAgent / LaunchDaemon Plist发现已经配置但未运行的Service
+- 保留Apple系统任务和临时Application Job，但默认隐藏
+- 按Service搜索，并按Manager、Status、Startup和Scope筛选及稳定排序
 - 为推断出的身份提供可信度和可检查的证据
 - 在本次运行期间检测内存中的新增、变化和关闭状态
 - 按端口、进程、项目、地址或命令搜索
@@ -135,6 +146,7 @@ yarn dev                # 以开发模式启动Electron
 yarn typecheck          # 检查TypeScript类型
 yarn test               # 运行扫描、身份、Session和隐私测试
 yarn benchmark:scanner  # 运行20次macOS参考基准测试
+yarn benchmark:services # 测试Port、Service和Relationship性能
 yarn build              # 创建生产构建
 yarn dist:mac           # 创建未签名的本地.dmg和.zip
 ```
@@ -160,6 +172,9 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 - **0.2.0 — Host Identity and Session Awareness：** 提升 Scanner 可靠性，
   识别 Project 与启动来源，附带 Evidence 与 Confidence，显示内存中的 New /
   Changed / Closed，并提供 Friendly / Technical View 与可共享Current-state Summary。
+- **0.3.0 — Services & Startup Inspector：** 检查launchd和Homebrew Service，
+  保留停止中的配置，统一Status与Startup Behavior，并将Service关联到Process和
+  Listening Port。
 - **之后：** 扩展 Unified Host Model，加入 Linux 一等支持、个人与情信体验、
   持久化 Changes 与 Alerts、只读 MCP、可选 Explain 和 Environment
   Intelligence，最后才考虑 Supervised Operations。

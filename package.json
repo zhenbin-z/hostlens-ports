@@ -1,8 +1,8 @@
 {
   "name": "hostlens-ports",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
-  "description": "A lightweight desktop viewer for listening ports and their processes.",
+  "description": "A lightweight desktop inspector for listening ports, processes, and startup services.",
   "author": "Zhenbin Zhang",
   "license": "Apache-2.0",
   "repository": {
@@ -20,10 +20,11 @@
     "dev": "electron-vite dev",
     "build": "yarn typecheck && electron-vite build",
     "benchmark:scanner": "node scripts/benchmark-scanner.ts 20",
+    "benchmark:services": "node scripts/benchmark-services.ts 20",
     "dist:mac": "yarn build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg zip",
     "postinstall": "node node_modules/electron/install.js",
     "preview": "electron-vite preview",
-    "test": "node --test src/main/*.test.ts src/main/scanners/*.test.ts src/renderer/src/*.test.ts src/shared/*.test.ts",
+    "test": "node --test src/main/*.test.ts src/main/scanners/*.test.ts src/main/services/*.test.ts src/renderer/src/*.test.ts src/shared/*.test.ts",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json"
   },
   "dependencies": {

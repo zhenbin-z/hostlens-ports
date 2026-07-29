@@ -14,6 +14,7 @@ import type {
   PortType,
   ProcessOwnerType,
 } from "../../shared/ports";
+import { ServicesView } from "./ServicesView";
 import {
   loadLocale,
   localizeWarning,
@@ -23,6 +24,7 @@ import {
 } from "./i18n";
 
 type SortKey = "port-asc" | "port-desc" | "name" | "owner" | "scope";
+type InspectorView = "ports" | "services";
 type CopyFeedback = "command" | "full-summary" | "sanitized-summary" | "export";
 
 const isPanelMode =
@@ -144,6 +146,7 @@ function listenerForChange(
 export function App(): React.JSX.Element {
   const [locale, setLocale] = useState<Locale>(loadLocale);
   const [hostState, setHostState] = useState<HostLensState>();
+  const [activeView, setActiveView] = useState<InspectorView>("ports");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<PortListener>();
   const [loading, setLoading] = useState(true);
@@ -163,6 +166,7 @@ export function App(): React.JSX.Element {
   );
 
   const snapshot = hostState?.snapshot;
+  const serviceSnapshot = hostState?.services;
   const changes = hostState?.changes.events ?? [];
 
   const showFeedback = useCallback((value: CopyFeedback) => {
@@ -377,7 +381,9 @@ export function App(): React.JSX.Element {
         </div>
         <div className="brand-copy">
           <p className="eyebrow">HOSTLENS</p>
-          <h1>Ports</h1>
+          <h1>
+            {activeView === "ports" ? t("portsView") : t("servicesView")}
+          </h1>
         </div>
         <label className="language-picker">
           <span className="visually-hidden">{t("language")}</span>
@@ -413,6 +419,32 @@ export function App(): React.JSX.Element {
         </button>
       </header>
 
+      <nav className="view-tabs" aria-label="HostLens inspectors">
+        <button
+          type="button"
+          className={activeView === "ports" ? "active" : undefined}
+          onClick={() => setActiveView("ports")}
+        >
+          {t("portsView")}
+          <span>{snapshot?.listeners.length ?? 0}</span>
+        </button>
+        <button
+          type="button"
+          className={activeView === "services" ? "active" : undefined}
+          onClick={() => setActiveView("services")}
+        >
+          {t("servicesView")}
+          <span>
+            {serviceSnapshot?.services.filter(
+              ({ ownership }) =>
+                ownership !== "apple" && ownership !== "application",
+            ).length ?? 0}
+          </span>
+        </button>
+      </nav>
+
+      {activeView === "ports" ? (
+        <>
       <section className="summary" aria-label={t("portSummary")}>
         <div>
           <strong>{snapshot?.listeners.length ?? "—"}</strong>
@@ -836,11 +868,39 @@ export function App(): React.JSX.Element {
           </section>
         ) : null}
       </div>
+        </>
+      ) : (
+        <ServicesView
+          snapshot={serviceSnapshot}
+          listeners={snapshot?.listeners ?? []}
+          locale={locale}
+          loading={loading}
+          panelMode={isPanelMode}
+          t={t}
+          onOpenPort={(listener) => {
+            setSelected(listener);
+            setActiveView("ports");
+          }}
+        />
+      )}
 
-      {snapshot?.warnings[0] ? (
-        <div className="warning-strip" title={snapshot.warnings.join("\n")}>
+      {(activeView === "ports"
+        ? snapshot?.warnings[0]
+        : serviceSnapshot?.warnings[0]) ? (
+        <div
+          className="warning-strip"
+          title={(activeView === "ports"
+            ? snapshot?.warnings
+            : serviceSnapshot?.warnings
+          )?.join("\n")}
+        >
           <span>!</span>
-          {localizeWarning(locale, snapshot.warnings[0])}
+          {localizeWarning(
+            locale,
+            (activeView === "ports"
+              ? snapshot?.warnings[0]
+              : serviceSnapshot?.warnings[0])!,
+          )}
         </div>
       ) : null}
 
