@@ -20,12 +20,13 @@ HostLens Ports is a lightweight, open-source desktop utility for inspecting
 TCP listening ports without memorizing `lsof`, `netstat`, or `ss` commands.
 It connects each port to its owning process, command, bind address, and
 network exposure, then presents the result in a searchable interface.
-Version 0.5 adds a Runtimes inspector for Node.js and Python installations,
-npm/Yarn/pnpm/pip/pipx package inventories, installation environments, and
-evidence-backed relationships to running host activity.
+Version 0.6 adds a bounded local change timeline for ports, configured
+third-party services, network context, runtimes, and packages, with Watch /
+Ignore preferences and cooldown-controlled desktop notifications.
 
-The current release is intentionally local and read-only. It has no LLM,
-database, telemetry, account, or cloud service.
+The current release is intentionally local and read-only. Its lightweight
+SQLite history stays on the host; it has no LLM, telemetry, account, or cloud
+service.
 
 ![HostLens Ports application](docs/images/hostlens-ports-app.png)
 
@@ -34,6 +35,8 @@ database, telemetry, account, or cloud service.
 ![HostLens Services inspector](docs/images/hostlens-services-app.jpg)
 
 ![HostLens Runtimes inspector](docs/images/hostlens-runtimes-app.jpg)
+
+![HostLens Changes inspector](docs/images/hostlens-changes-app.jpg)
 
 ## Features
 
@@ -68,6 +71,10 @@ database, telemetry, account, or cloud service.
   high-confidence relationships to listeners and services
 - Confidence and inspectable evidence for inferred identities
 - In-memory New, Changed, and Closed listener detection for the current session
+- Persistent, typed Added / Changed / Removed events in a bounded local
+  timeline
+- Watch / Ignore preferences, retention controls, notification cooldowns, and
+  desktop alerts for new network-facing ports or watched-resource changes
 - Search by port, process, project, address, or command
 - Filter by port range, process owner, and bind scope
 - Sort by port, process name, owner, or scope
@@ -240,8 +247,9 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
   addresses, routes, DNS, VPN context, and socket-to-interface relationships.
 - **0.5.0 — Runtimes & Global Packages:** released with Node.js/Python
   runtimes and npm/Yarn/pnpm/pip/pipx packages related to host activity.
-- **0.6.0 — Persistent Changes & Alerts:** local snapshots, typed changes,
-  timeline, watched resources, cooldowns, and desktop notifications.
+- **0.6.0 — Persistent Changes & Alerts:** released with local snapshots, typed
+  changes, a bounded timeline, Watch / Ignore preferences, cooldowns, and
+  desktop notifications.
 - **0.7.0 — Ubuntu / RHEL First-class Support:** Linux collectors, systemd,
   networking, packages, persistence, alerts, and desktop packaging.
 - **Later:** read-only MCP, optional Explain, environment intelligence, and

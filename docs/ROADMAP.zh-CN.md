@@ -318,9 +318,9 @@ Technical Evidence 可以引用同一个 Object。
 - MCP、LLM或Chat功能；
 - 通过网络发送Package或Machine Data。
 
-## 计划：0.6.0 — Persistent Changes & Alerts
+## 已发布：0.6.0 — Persistent Changes & Alerts
 
-Normalized Identity稳定后：
+0.6让跨应用重启的Host Change也可以被Review：
 
 - 持久化带版本的轻量Local Snapshot；
 - 为Port、Service、Network Context及Runtime / Package Inventory生成类型化
@@ -328,10 +328,12 @@ Normalized Identity稳定后：
 - 提供带Retention Control的有限Timeline；
 - 允许Watch或Ignore Resource；
 - 提供基于Evidence的Alert Rule、Cooldown与Desktop Notification；
-- 提供可Review的Current-state和Change Summary；
+- 每个Event都保留可检查的Structured Evidence；
 - 使用带Migration测试的Local Database，不增加Telemetry。
 
 Alert应该解释Evidence与变化，而不是制造安全裁决。
+持久化Projection会排除短暂的macOS Application Job和非默认Route波动，
+让Timeline优先呈现较稳定的Host State。
 
 ## 计划：0.7.0 — Ubuntu / RHEL First-class Support
 

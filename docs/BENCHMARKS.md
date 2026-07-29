@@ -6,6 +6,30 @@ This document records reproducible scanner checks rather than a marketing
 performance claim. Results vary with the number of listeners, running
 applications, permissions, storage load, and operating-system version.
 
+## Version 0.6 local history reference run
+
+Recorded on July 29, 2026:
+
+| Item | Result |
+| --- | --- |
+| Platform | macOS, Apple Silicon (`arm64`) |
+| Runtime | Node.js `v22.22.2` |
+| Generated snapshot changes | 250 |
+| Stored typed events | 500 |
+| Record median | 0.97 ms |
+| Record p95 | 1.86 ms |
+| Record maximum | 5.81 ms |
+| Read 500-event timeline | 1.43 ms |
+
+The benchmark replaces one listener per observation, producing one Removed and
+one Added event for each of 250 changes. The targets are record p95 and timeline
+read below 25 ms with all expected events retained. This run passed all
+targets.
+
+```bash
+yarn benchmark:history
+```
+
 ## Version 0.5 reference run
 
 Recorded on July 29, 2026:

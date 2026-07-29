@@ -218,10 +218,35 @@ failures produce warnings and partial results rather than false empty
 inventories.
 
 Runtime/package collection uses a 60-second in-memory cache. This keeps frequent
-socket refreshes responsive while preserving the current release's
-non-persistent architecture. Copy/export summaries are projections of the
+socket refreshes responsive. Copy/export summaries are projections of the
 structured model and sanitized exports remove private home-directory paths and
 common secret-bearing arguments.
+
+## Version 0.6 persistent change model
+
+Version 0.6 adds a local SQLite store behind the same normalized host model:
+
+```text
+HostObservationSnapshot
+  → deterministic projection
+  → typed ChangeEvent
+  → bounded local timeline
+  → Watch / Ignore preference
+  → cooldown-controlled desktop notification
+```
+
+The first observation is a baseline. Later observations are compared after
+volatile collection timestamps and evidence timestamps are removed. Port
+identity is socket-based; configured third-party services, active interfaces,
+default routes, DNS/VPN context, runtimes, and packages form the other
+persistent resources. Transient application jobs and non-default route churn
+are intentionally excluded.
+
+The schema is versioned and migration-tested. Retention is configurable, with
+hard limits of 1,000 events and 500 snapshots. Raw observations, preferences,
+alert deliveries, and settings remain under Electron's local user-data
+directory. HostLens does not upload them or create an account. Alerts are
+derived from typed evidence and never represented as security verdicts.
 
 ## Future model
 

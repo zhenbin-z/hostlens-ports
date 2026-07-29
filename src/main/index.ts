@@ -450,7 +450,7 @@ app.whenReady().then(() => {
 
   configureApplicationMenu();
   historyStore = new HistoryStore(
-    join(app.getPath("userData"), "history-v1.sqlite"),
+    join(app.getPath("userData"), "hostlens-history.sqlite"),
   );
   sessionMonitor = new SessionMonitor(
     scanner,
