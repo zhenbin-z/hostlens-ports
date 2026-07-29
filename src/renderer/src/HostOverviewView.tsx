@@ -167,6 +167,17 @@ export function HostOverviewView({
                 {network?.summary.dnsServers.join(", ") || t("unavailable")}
               </dd>
             </div>
+            {network?.firewall ? (
+              <div>
+                <dt>{t("firewall")}</dt>
+                <dd>
+                  {t(`firewalld_${network.firewall.status}`)}
+                  {network.firewall.activeZones.length > 0
+                    ? ` · ${t("activeFirewallZones")}: ${network.firewall.activeZones.join(", ")}`
+                    : ""}
+                </dd>
+              </div>
+            ) : null}
           </dl>
         </section>
 

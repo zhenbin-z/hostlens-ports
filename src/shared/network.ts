@@ -27,6 +27,7 @@ export type NetworkObservationField =
   | "route"
   | "dns"
   | "vpn"
+  | "firewall"
   | "socketRelation";
 
 export interface NetworkEvidence {
@@ -111,6 +112,14 @@ export interface HostNetworkSummary {
   vpnActive: boolean;
 }
 
+export interface FirewallObservation {
+  manager: "firewalld";
+  status: "running" | "stopped" | "unavailable" | "unknown";
+  activeZones: string[];
+  confidence: ObservationConfidence;
+  evidence: NetworkEvidence[];
+}
+
 export interface NetworkSnapshot {
   scannedAt: string;
   platform: string;
@@ -119,6 +128,7 @@ export interface NetworkSnapshot {
   dnsResolvers: DnsResolver[];
   vpnConnections: VpnConnection[];
   socketRelations: SocketInterfaceRelation[];
+  firewall?: FirewallObservation;
   summary: HostNetworkSummary;
   warnings: string[];
 }

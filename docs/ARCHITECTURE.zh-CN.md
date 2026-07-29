@@ -227,6 +227,29 @@ Schema具有版本并经过Migration测试。Retention可配置，同时硬性�
 本地User-data目录中，不上传，也不要求账号。Alert由Typed Evidence产生，不表示
 Security Verdict。
 
+## 0.7版本的Linux Adapter
+
+0.7保留共享Host Model，只替换平台采集器：
+
+```text
+macOS                         Linux
+lsof / ps                     ss / ps / procfs
+launchd / Homebrew            systemd
+networksetup / route          iproute2 / resolv.conf
+不做Firewall判断              只读firewalld Observation
+            ↓
+      Shared HostSnapshot
+```
+
+当`ss`无法显示PID时，Linux Socket仍作为有效的Partial Observation保留。
+Systemd Discovery合并Loaded Unit与Configured Unit File，再分批读取Property。
+Network Adapter记录Interface、Route、DNS、VPN形式Tunnel Interface以及
+firewalld State / Zone，但不会声称Port已经被允许或可以到达。Runtime / Package
+Discovery共享同一Unix Inventory Pipeline，同时保留来源平台。
+
+Renderer、Persistence、Change Engine、Alert、Export及三语Dictionary在两个平台上
+消费相同的Normalized Type。Linux Desktop Packaging不会向Renderer开放命令执行权。
+
 ## 未来模型
 
 长期模型可能包含：

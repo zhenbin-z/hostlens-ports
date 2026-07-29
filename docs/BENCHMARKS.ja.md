@@ -6,6 +6,27 @@
 結果はListener数、実行中のApplication、権限、Storage負荷、OS Versionによって
 変化します。
 
+## バージョン0.7 Cross-platform Validation
+
+2026年7月29日に記録：
+
+| 項目 | 結果 |
+| --- | --- |
+| TypeScript Project | 2件成功 |
+| 自動テスト | 91件成功 |
+| Linux Socket Fixture | Ubuntu / RHEL形式`ss`、PIDあり・なし |
+| Linux Service Fixture | systemd Loaded / Configured、Running / Failed / Static |
+| Linux Network Fixture | iproute2 IPv4 / IPv6、DNS、VPN形式Interface、firewalld Zone |
+| Runtime / Package Path | macOS / Linux Scanner選択を検証 |
+| CI Target | macOS 14、Ubuntu 24.04 |
+| Linux Package | AppImage、deb、rpm Workflow |
+
+Sanitized済みLinux FixtureはPartial Observationを検証します。GitHub CIは
+macOS / Ubuntuで同じType Check、Test、Production Buildを実行し、Linux Packaging
+Jobは3種類のDesktop Artifactを生成します。RHELはTest済みiproute2 / systemd
+Parserを共有し、rpm Artifactを提供します。すべてのDistributionやDesktop
+Extensionを検証したという意味ではありません。
+
 ## バージョン0.6 Local History Reference Run
 
 2026年7月29日に記録：

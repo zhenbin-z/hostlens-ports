@@ -5,6 +5,26 @@
 本文记录可重复执行的扫描器检查结果，而不是营销性质的性能承诺。监听端口数量、
 正在运行的应用、权限、存储负载和操作系统版本都会影响实际结果。
 
+## 0.7版本跨平台验证
+
+记录于2026年7月29日：
+
+| 项目 | 结果 |
+| --- | --- |
+| TypeScript项目 | 2项通过 |
+| 自动化测试 | 91项通过 |
+| Linux Socket Fixture | Ubuntu / RHEL形式`ss`，包含有PID及无PID |
+| Linux Service Fixture | systemd Loaded / Configured、Running / Failed / Static |
+| Linux Network Fixture | iproute2 IPv4 / IPv6、DNS、VPN形式Interface、firewalld Zone |
+| Runtime / Package路径 | 验证macOS / Linux Scanner选择 |
+| CI目标 | macOS 14、Ubuntu 24.04 |
+| Linux安装包 | AppImage、deb、rpm Workflow |
+
+已脱敏的Linux Fixture覆盖Partial Observation。GitHub CI在macOS与Ubuntu上运行
+相同的Type Check、Test及Production Build；Linux Packaging Job额外生成三种Desktop
+Artifact。RHEL复用已经测试的iproute2与systemd Parser，并提供rpm Artifact。
+这不表示所有Distribution及Desktop Extension均已测试。
+
 ## 0.6版本本地历史参考测试
 
 记录于2026年7月29日：

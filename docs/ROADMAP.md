@@ -372,7 +372,7 @@ Alerts should explain evidence and change, not manufacture security verdicts.
 Transient macOS application jobs and non-default route churn are excluded from
 the persistent projection so the timeline prioritizes durable host state.
 
-## Planned: 0.7.0 — Ubuntu / RHEL First-class Support
+## Released: 0.7.0 — Ubuntu / RHEL First-class Support
 
 Linux should use the same host concepts with platform-specific evidence.
 
@@ -390,6 +390,23 @@ Linux should use the same host concepts with platform-specific evidence.
 
 Headless agents, multi-host management, service mutation, and unrestricted
 shell access remain later concerns.
+
+Completion evidence recorded on July 29, 2026:
+
+- Linux adapters inspect TCP listeners with `ss`, enrich processes without
+  discarding permission-limited sockets, and reuse deterministic identity and
+  relationship resolution;
+- systemd inventory covers loaded and configured unit files, normalized
+  status/startup behavior, unit evidence, processes, and listening ports;
+- iproute2 fixtures cover interfaces, IPv4/IPv6 routes, DNS, VPN-style
+  interfaces, socket relationships, and read-only firewalld state/zones;
+- the shared runtime collector supports Linux Node.js/Python installations and
+  npm, Yarn, pnpm, pip, and pipx inventories;
+- persistent changes, alerts, exports, and the English/Japanese/Simplified
+  Chinese UI remain shared across macOS and Linux;
+- CI validates macOS and Ubuntu while Linux packaging produces AppImage, deb,
+  and rpm artifacts; and
+- 91 automated tests and both TypeScript projects pass before packaging.
 
 ## Personal and small-business experiences
 

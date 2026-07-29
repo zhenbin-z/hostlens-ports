@@ -335,7 +335,7 @@ Alert应该解释Evidence与变化，而不是制造安全裁决。
 持久化Projection会排除短暂的macOS Application Job和非默认Route波动，
 让Timeline优先呈现较稳定的Host State。
 
-## 计划：0.7.0 — Ubuntu / RHEL First-class Support
+## 已发布：0.7.0 — Ubuntu / RHEL First-class Support
 
 Linux使用同一套Host概念，同时保留平台专用Evidence。
 
@@ -349,6 +349,20 @@ Linux使用同一套Host概念，同时保留平台专用Evidence。
 - Command、权限或Optional Tool不可用时仍保留Partial Result。
 
 Headless Agent、Multi-host、Service Mutation与无限制Shell属于后续问题。
+
+2026年7月29日记录的完成证据：
+
+- Linux Adapter通过`ss`检查TCP Listener，在权限受限时仍保留Socket并补充
+  Process信息，同时复用确定性的Identity与Relationship Resolution；
+- systemd清单覆盖已加载及已配置Unit File、统一Status / Startup、Unit
+  Evidence、Process与Listening Port；
+- iproute2 Fixture覆盖Interface、IPv4 / IPv6 Route、DNS、VPN形式Interface、
+  Socket Relationship以及只读firewalld状态与Zone；
+- 共享Runtime Collector支持Linux Node.js / Python以及npm、Yarn、pnpm、
+  pip与pipx清单；
+- macOS与Linux共享Persistent Change、Alert、Export及英/日/简中UI；
+- CI验证macOS与Ubuntu，Linux Packaging生成AppImage、deb和rpm；
+- Packaging前91项自动化测试与两套TypeScript检查全部通过。
 
 ## 个人与中小企业体验
 

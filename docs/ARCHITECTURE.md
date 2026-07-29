@@ -248,6 +248,32 @@ alert deliveries, and settings remain under Electron's local user-data
 directory. HostLens does not upload them or create an account. Alerts are
 derived from typed evidence and never represented as security verdicts.
 
+## Version 0.7 Linux adapters
+
+Version 0.7 keeps the shared host model and replaces only platform collectors:
+
+```text
+macOS                         Linux
+lsof / ps                     ss / ps / procfs
+launchd / Homebrew            systemd
+networksetup / route          iproute2 / resolv.conf
+no firewall assertion         read-only firewalld observation
+            ↓
+      Shared HostSnapshot
+```
+
+Linux sockets remain valid partial observations when `ss` cannot reveal a PID.
+Systemd discovery combines loaded units with configured unit files, then reads
+properties in bounded chunks. The network adapter records interfaces, routes,
+DNS, VPN-style tunnel interfaces, and firewalld state/zones without claiming a
+port is allowed or reachable. Runtime/package discovery shares the same Unix
+inventory pipeline while preserving the source platform.
+
+The renderer, persistence, change engine, alerts, exports, and three locale
+dictionaries consume the same normalized types on both platforms. Linux
+desktop packaging is an outer delivery concern and does not give the renderer
+command execution access.
+
 ## Future model
 
 The long-term model may include:

@@ -3,10 +3,10 @@
 
   # HostLens Ports
 
-  **See what is listening on your Mac — and which process opened it.**
+  **See what is listening on your Mac or Linux host — and which process opened it.**
 
   [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-1f7040.svg)](LICENSE)
-  ![Platform: macOS](https://img.shields.io/badge/platform-macOS-lightgrey.svg)
+  ![Platform: macOS + Linux](https://img.shields.io/badge/platform-macOS%20%2B%20Linux-lightgrey.svg)
   ![Built with Electron](https://img.shields.io/badge/Electron-React%20%2B%20TypeScript-47848f.svg)
 </div>
 
@@ -20,9 +20,9 @@ HostLens Ports is a lightweight, open-source desktop utility for inspecting
 TCP listening ports without memorizing `lsof`, `netstat`, or `ss` commands.
 It connects each port to its owning process, command, bind address, and
 network exposure, then presents the result in a searchable interface.
-Version 0.6 adds a bounded local change timeline for ports, configured
-third-party services, network context, runtimes, and packages, with Watch /
-Ignore preferences and cooldown-controlled desktop notifications.
+Version 0.7 makes Ubuntu and Red Hat Enterprise Linux first-class desktop
+targets with `ss`/process inspection, systemd services, iproute2 network
+context, read-only firewalld observations, and Node/Python package inventory.
 
 The current release is intentionally local and read-only. Its lightweight
 SQLite history stays on the host; it has no LLM, telemetry, account, or cloud
@@ -40,7 +40,7 @@ service.
 
 ## Features
 
-- Live TCP listener discovery on macOS
+- Live TCP listener discovery on macOS, Ubuntu, and RHEL
 - Host Overview for current network, services, exposed listeners, and session
   changes
 - Local collection of interfaces, IPv4/IPv6 addresses, routes, DNS, and
@@ -53,7 +53,7 @@ service.
   other common development servers
 - Launch-source attribution for package scripts, launchd, Homebrew Services,
   Docker, native applications, and manually started processes
-- First-class Services view for launchd and Homebrew Services
+- First-class Services view for launchd, Homebrew Services, and systemd
 - Running, Loaded, Stopped, Failed, Disabled, and Unknown service states
 - Automatic, On-demand, Disabled, and Unknown startup behavior
 - Service-to-process and service-to-listening-port relationships
@@ -85,7 +85,8 @@ service.
 - Full and sanitized copy/export summaries with point-in-time disclaimers
 - Copyable, fully visible commands and explicit partial-observation states
 - Read-only operation with no administrator helper
-- Platform scanner abstraction prepared for future Linux support
+- Native `.AppImage`, `.deb`, and `.rpm` packaging for Linux desktops
+- Graceful partial results when Linux tools or process ownership are unavailable
 
 <p align="center">
   <img src="docs/images/hostlens-ports-quick-view.png"
@@ -111,7 +112,7 @@ routers, Wi-Fi, and shared services.
 
 ### Requirements
 
-- macOS
+- macOS 13+, Ubuntu 22.04+/24.04, or RHEL 9
 - Node.js 22 or later
 - Yarn Classic 1.22
 
@@ -171,11 +172,12 @@ rather than requesting broad access.
 | Platform | Status |
 | --- | --- |
 | macOS | Supported: live `lsof` and `ps` scanner |
-| Ubuntu | Planned |
-| Red Hat Enterprise Linux | Planned |
+| Ubuntu | Supported: `ss`, process, systemd, iproute2, packages |
+| Red Hat Enterprise Linux | Supported: `ss`, process, systemd, iproute2, firewalld |
 
-The scanner is behind a platform-neutral interface so Linux can use `ss`,
-`/proc`, and `systemd` without changing the renderer.
+Linux tray availability depends on the desktop environment. The full
+application window remains available on GNOME even when a
+StatusNotifier/AppIndicator extension is not installed.
 
 ## Project structure
 
@@ -210,6 +212,7 @@ yarn benchmark:network  # Benchmark macOS network context collection
 yarn benchmark:runtimes # Benchmark runtime/package cold and cached scans
 yarn build              # Create a production application build
 yarn dist:mac           # Create unsigned local .dmg and .zip artifacts
+yarn dist:linux         # Create .AppImage, .deb, and .rpm artifacts
 ```
 
 `yarn dist:mac` intentionally disables automatic certificate discovery.
@@ -250,8 +253,9 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 - **0.6.0 — Persistent Changes & Alerts:** released with local snapshots, typed
   changes, a bounded timeline, Watch / Ignore preferences, cooldowns, and
   desktop notifications.
-- **0.7.0 — Ubuntu / RHEL First-class Support:** Linux collectors, systemd,
-  networking, packages, persistence, alerts, and desktop packaging.
+- **0.7.0 — Ubuntu / RHEL First-class Support:** released with Linux
+  collectors, systemd, networking, firewalld observations, packages,
+  persistence, alerts, and desktop packaging.
 - **Later:** read-only MCP, optional Explain, environment intelligence, and
   only then supervised operations.
 

@@ -3,10 +3,10 @@
 
   # HostLens Ports
 
-  **查看Mac正在监听的端口，以及打开它们的进程。**
+  **查看Mac或Linux主机正在监听的端口，以及打开它们的进程。**
 
   [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-1f7040.svg)](LICENSE)
-  ![Platform: macOS](https://img.shields.io/badge/platform-macOS-lightgrey.svg)
+  ![Platform: macOS + Linux](https://img.shields.io/badge/platform-macOS%20%2B%20Linux-lightgrey.svg)
   ![Built with Electron](https://img.shields.io/badge/Electron-React%20%2B%20TypeScript-47848f.svg)
 </div>
 
@@ -19,8 +19,8 @@
 HostLens Ports是一款轻量、开源的桌面工具，让你无需记忆`lsof`、`netstat`
 或`ss`命令，也能检查TCP监听端口。它会关联端口对应的进程、完整命令、
 监听地址和网络暴露范围，并通过可搜索的界面展示结果。
-0.6版本增加有限的本地变化时间线，覆盖端口、已配置第三方服务、网络环境、
-运行时与软件包，并提供Watch / Ignore偏好和带冷却时间的桌面提醒。
+0.7将Ubuntu和Red Hat Enterprise Linux作为一等桌面目标，支持`ss`与进程、
+systemd服务、iproute2网络上下文、只读firewalld观察，以及Node/Python软件包清单。
 
 当前版本完全在本地以只读方式运行。轻量SQLite历史数据只保留在主机中，
 不包含LLM、遥测、账号或云服务。
@@ -37,7 +37,7 @@ HostLens Ports是一款轻量、开源的桌面工具，让你无需记忆`lsof`
 
 ## 功能
 
-- 实时发现macOS上的TCP监听端口
+- 实时发现macOS、Ubuntu和RHEL上的TCP监听端口
 - 汇总Current Network、Service、Network-facing Listener与Session Change的
   Host Overview
 - 在本地采集Interface、IPv4 / IPv6地址、Route、DNS与可观察的VPN Interface
@@ -47,7 +47,7 @@ HostLens Ports是一款轻量、开源的桌面工具，让你无需记忆`lsof`
 - 识别Vite、Next.js、React Tooling、Nuxt、webpack等开发项目
 - 识别Package Script、launchd、Homebrew Services、Docker、原生应用
   与手动启动等来源
-- 为launchd和Homebrew Services提供独立的Services视图
+- 为launchd、Homebrew Services和systemd提供独立的Services视图
 - 显示Running、Loaded、Stopped、Failed、Disabled和Unknown状态
 - 显示Automatic、On-demand、Disabled和Unknown启动方式
 - 建立Service到Process及Listening Port的关联
@@ -74,7 +74,8 @@ HostLens Ports是一款轻量、开源的桌面工具，让你无需记忆`lsof`
 - 带时间点声明的完整及脱敏复制/导出摘要
 - 完整显示并可复制命令，同时明确显示信息不完整的观测
 - 只读运行，不需要管理员辅助程序
-- 为未来Linux支持预留平台扫描器抽象
+- 为Linux桌面提供`.AppImage`、`.deb`和`.rpm`安装包
+- Linux工具或进程所有者不可用时仍保留部分结果
 
 <p align="center">
   <img src="docs/images/hostlens-ports-quick-view.png"
@@ -98,7 +99,7 @@ Server、NAS、Printer、Router、Wi-Fi 和 Shared Service 组成的环境。
 
 ### 环境要求
 
-- macOS
+- macOS 13+、Ubuntu 22.04+/24.04或RHEL 9
 - Node.js 22或更高版本
 - Yarn Classic 1.22
 
@@ -155,8 +156,11 @@ HostLens Ports：
 | 平台 | 状态 |
 | --- | --- |
 | macOS | 已支持：使用`lsof`和`ps`实时扫描 |
-| Ubuntu | 计划支持 |
-| Red Hat Enterprise Linux | 计划支持 |
+| Ubuntu | 已支持：`ss`、进程、systemd、iproute2、软件包 |
+| Red Hat Enterprise Linux | 已支持：`ss`、进程、systemd、iproute2、firewalld |
+
+Linux托盘是否显示取决于桌面环境。即使GNOME没有安装
+StatusNotifier/AppIndicator扩展，也可以使用完整应用窗口。
 
 ## 开发命令
 
@@ -202,8 +206,9 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
   npm / Yarn / pnpm / pip / pipx Package与Host Activity的关联。
 - **0.6.0 — Persistent Changes & Alerts：** Local Snapshot、类型化Change、
   有限Timeline、Watch / Ignore、Cooldown和Desktop Notification，已经实现。
-- **0.7.0 — Ubuntu / RHEL First-class Support：** Linux Collector、systemd、
-  Network、Package、Persistence、Alert和Desktop Packaging。
+- **0.7.0 — Ubuntu / RHEL First-class Support：** 已发布Linux Collector、
+  systemd、Network、firewalld Observation、Package、Persistence、Alert和
+  Desktop Packaging。
 - **之后：** 只读MCP、可选Explain、Environment Intelligence，最后才考虑
   Supervised Operations。
 

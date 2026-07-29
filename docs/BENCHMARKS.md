@@ -6,6 +6,28 @@ This document records reproducible scanner checks rather than a marketing
 performance claim. Results vary with the number of listeners, running
 applications, permissions, storage load, and operating-system version.
 
+## Version 0.7 cross-platform validation
+
+Recorded on July 29, 2026:
+
+| Item | Result |
+| --- | --- |
+| TypeScript projects | 2 passed |
+| Automated tests | 91 passed |
+| Linux socket fixtures | Ubuntu/RHEL-style `ss`, with and without PID data |
+| Linux service fixtures | systemd loaded/configured, running/failed/static units |
+| Linux network fixtures | iproute2 IPv4/IPv6, DNS, VPN-style interface, firewalld zones |
+| Runtime/package paths | macOS and Linux scanner selection verified |
+| CI targets | macOS 14, Ubuntu 24.04 |
+| Linux packages | AppImage, deb, rpm workflow |
+
+The sanitized Linux fixtures cover partial-observation behavior. GitHub CI
+executes the same type-check, test, and production build on macOS and Ubuntu;
+the Linux packaging job builds all three desktop artifacts. RHEL shares the
+tested iproute2 and systemd parsers and receives an rpm artifact. This is
+compatibility validation, not a claim that every distribution or desktop
+extension has been tested.
+
 ## Version 0.6 local history reference run
 
 Recorded on July 29, 2026:

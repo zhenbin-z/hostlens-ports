@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [master, "develop/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - run: yarn typecheck
+      - run: yarn test
+      - run: yarn build
+
+  package-linux:
+    name: Package Linux desktop artifacts
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+      - run: sudo apt-get update
+      - run: sudo apt-get install --yes rpm
+      - run: yarn install --frozen-lockfile
+      - run: yarn dist:linux
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hostlens-ports-linux
+          path: |
+            release/*.AppImage
+            release/*.deb
+            release/*.rpm
+          if-no-files-found: error
