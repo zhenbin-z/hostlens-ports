@@ -355,9 +355,9 @@ Completion evidence recorded on July 29, 2026:
 - MCP, LLM, or chat features; and
 - sending package or machine data over the network.
 
-## Planned: 0.6.0 — Persistent Changes & Alerts
+## Released: 0.6.0 — Persistent Changes & Alerts
 
-Once normalized identities are stable:
+Version 0.6 makes host changes reviewable across application restarts:
 
 - persist lightweight, versioned local snapshots;
 - create typed `ChangeEvent` records for ports, services, network context, and
@@ -365,10 +365,12 @@ Once normalized identities are stable:
 - provide a bounded timeline with retention controls;
 - let users watch or ignore resources;
 - support evidence-backed alert rules, cooldowns, and desktop notifications;
-- provide reviewable current-state and change summaries; and
+- keep each event tied to inspectable structured evidence; and
 - keep the database local with tested migrations and no telemetry.
 
 Alerts should explain evidence and change, not manufacture security verdicts.
+Transient macOS application jobs and non-default route churn are excluded from
+the persistent projection so the timeline prioritizes durable host state.
 
 ## Planned: 0.7.0 — Ubuntu / RHEL First-class Support
 

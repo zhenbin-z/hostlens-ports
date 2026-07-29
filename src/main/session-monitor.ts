@@ -15,17 +15,32 @@ import type {
   RuntimeScanner,
   RuntimeSnapshot,
 } from "../shared/runtimes.ts";
+import {
+  HOST_SNAPSHOT_SCHEMA_VERSION,
+  emptyHistoryState,
+  type HistoryState,
+  type HistoryUpdate,
+  type HostObservationSnapshot,
+} from "../shared/history.ts";
 import { compareSnapshots } from "../shared/session-changes.ts";
 import type { PortScanner } from "./scanners/port-scanner.ts";
 
 const MAX_SESSION_EVENTS = 100;
 const DEFAULT_COALESCE_SCAN_MS = 750;
 
+export interface HistoryPersistence {
+  record(snapshot: HostObservationSnapshot): HistoryState;
+  readState(): HistoryState;
+  update(update: HistoryUpdate): HistoryState;
+  clearHistory(): HistoryState;
+}
+
 export class SessionMonitor {
   private readonly scanner: PortScanner;
   private readonly serviceScanner: ServiceScanner;
   private readonly networkScanner: NetworkScanner;
   private readonly runtimeScanner: RuntimeScanner;
+  private readonly historyPersistence: HistoryPersistence | undefined;
   private readonly coalesceScanMs: number;
   private readonly startedAt = new Date().toISOString();
   private previousSnapshot: PortSnapshot | undefined;
@@ -40,12 +55,22 @@ export class SessionMonitor {
     networkScanner: NetworkScanner,
     runtimeScanner: RuntimeScanner,
     coalesceScanMs = DEFAULT_COALESCE_SCAN_MS,
+    historyPersistence?: HistoryPersistence,
   ) {
     this.scanner = scanner;
     this.serviceScanner = serviceScanner;
     this.networkScanner = networkScanner;
     this.runtimeScanner = runtimeScanner;
     this.coalesceScanMs = coalesceScanMs;
+    this.historyPersistence = historyPersistence;
+  }
+
+  public updateHistory(update: HistoryUpdate): HistoryState {
+    return this.historyPersistence?.update(update) ?? emptyHistoryState();
+  }
+
+  public clearHistory(): HistoryState {
+    return this.historyPersistence?.clearHistory() ?? emptyHistoryState();
   }
 
   public scan(): Promise<HostLensState> {
@@ -83,6 +108,17 @@ export class SessionMonitor {
     }
 
     this.previousSnapshot = snapshot;
+    const observation: HostObservationSnapshot = {
+      schemaVersion: HOST_SNAPSHOT_SCHEMA_VERSION,
+      observedAt: snapshot.scannedAt,
+      ports: snapshot,
+      services,
+      network,
+      runtimes,
+    };
+    const history =
+      this.historyPersistence?.record(observation) ?? emptyHistoryState();
+
     this.latestState = {
       snapshot,
       services,
@@ -92,6 +128,7 @@ export class SessionMonitor {
         startedAt: this.startedAt,
         events: this.events,
       },
+      history,
     };
     return this.latestState;
   }

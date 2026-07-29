@@ -17,6 +17,8 @@ import type {
 import { ServicesView } from "./ServicesView";
 import { HostOverviewView } from "./HostOverviewView";
 import { RuntimesView } from "./RuntimesView";
+import { ChangesView } from "./ChangesView";
+import { emptyHistoryState, type HistoryUpdate } from "../../shared/history";
 import {
   loadLocale,
   localizeWarning,
@@ -26,7 +28,12 @@ import {
 } from "./i18n";
 
 type SortKey = "port-asc" | "port-desc" | "name" | "owner" | "scope";
-type InspectorView = "overview" | "ports" | "services" | "runtimes";
+type InspectorView =
+  | "overview"
+  | "ports"
+  | "services"
+  | "runtimes"
+  | "changes";
 type CopyFeedback = "command" | "full-summary" | "sanitized-summary" | "export";
 
 const isPanelMode =
@@ -171,6 +178,7 @@ export function App(): React.JSX.Element {
   const serviceSnapshot = hostState?.services;
   const networkSnapshot = hostState?.network;
   const runtimeSnapshot = hostState?.runtimes;
+  const history = hostState?.history ?? emptyHistoryState();
   const changes = hostState?.changes.events ?? [];
 
   const showFeedback = useCallback((value: CopyFeedback) => {
@@ -375,6 +383,20 @@ export function App(): React.JSX.Element {
     [showFeedback, t],
   );
 
+  const updateHistory = useCallback(async (update: HistoryUpdate) => {
+    const nextHistory = await window.hostLens.updateHistory(update);
+    setHostState((current) =>
+      current ? { ...current, history: nextHistory } : current,
+    );
+  }, []);
+
+  const clearHistory = useCallback(async () => {
+    const nextHistory = await window.hostLens.clearHistory();
+    setHostState((current) =>
+      current ? { ...current, history: nextHistory } : current,
+    );
+  }, []);
+
   return (
     <main className={`panel ${isPanelMode ? "quick-view" : "full-app"}`}>
       <header className="header">
@@ -392,7 +414,9 @@ export function App(): React.JSX.Element {
                 ? t("portsView")
                 : activeView === "services"
                   ? t("servicesView")
-                  : t("runtimesView")}
+                  : activeView === "runtimes"
+                    ? t("runtimesView")
+                    : t("changesView")}
           </h1>
         </div>
         <label className="language-picker">
@@ -466,9 +490,27 @@ export function App(): React.JSX.Element {
           {t("runtimesView")}
           <span>{runtimeSnapshot?.runtimes.length ?? 0}</span>
         </button>
+        {!isPanelMode ? (
+          <button
+            type="button"
+            className={activeView === "changes" ? "active" : undefined}
+            onClick={() => setActiveView("changes")}
+          >
+            {t("changesView")}
+            <span>{history.events.length}</span>
+          </button>
+        ) : null}
       </nav>
 
-      {activeView === "overview" ? (
+      {activeView === "changes" ? (
+        <ChangesView
+          history={history}
+          locale={locale}
+          t={t}
+          onUpdate={updateHistory}
+          onClear={clearHistory}
+        />
+      ) : activeView === "overview" ? (
         <HostOverviewView
           network={networkSnapshot}
           listeners={snapshot?.listeners ?? []}

@@ -19,10 +19,11 @@
 HostLens Ports是一款轻量、开源的桌面工具，让你无需记忆`lsof`、`netstat`
 或`ss`命令，也能检查TCP监听端口。它会关联端口对应的进程、完整命令、
 监听地址和网络暴露范围，并通过可搜索的界面展示结果。
-0.5版本增加Runtimes检查界面，显示Node.js / Python安装、npm / Yarn /
-pnpm / pip / pipx软件包清单、安装环境，以及与主机运行活动的证据关联。
+0.6版本增加有限的本地变化时间线，覆盖端口、已配置第三方服务、网络环境、
+运行时与软件包，并提供Watch / Ignore偏好和带冷却时间的桌面提醒。
 
-当前版本完全在本地以只读方式运行，不包含LLM、数据库、遥测、账号或云服务。
+当前版本完全在本地以只读方式运行。轻量SQLite历史数据只保留在主机中，
+不包含LLM、遥测、账号或云服务。
 
 ![HostLens Ports应用界面](docs/images/hostlens-ports-app.png)
 
@@ -31,6 +32,8 @@ pnpm / pip / pipx软件包清单、安装环境，以及与主机运行活动的
 ![HostLens Services检查界面](docs/images/hostlens-services-app.jpg)
 
 ![HostLens Runtimes检查界面](docs/images/hostlens-runtimes-app.jpg)
+
+![HostLens Changes检查界面](docs/images/hostlens-changes-app.jpg)
 
 ## 功能
 
@@ -58,6 +61,9 @@ pnpm / pip / pipx软件包清单、安装环境，以及与主机运行活动的
   Service的高可信关联
 - 为推断出的身份提供可信度和可检查的证据
 - 在本次运行期间检测内存中的新增、变化和关闭状态
+- 以类型化Added / Changed / Removed Event保存的有限本地Timeline
+- Watch / Ignore、Retention、Notification Cooldown，以及针对新增
+  Network-facing Port或已关注资源的Desktop Alert
 - 按端口、进程、项目、地址或命令搜索
 - 按端口范围、进程类别和监听范围筛选
 - 按端口、进程名称、进程类别或监听范围排序
@@ -195,7 +201,7 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 - **0.5.0 — Runtimes & Global Packages：** 已实现Node.js / Python Runtime、
   npm / Yarn / pnpm / pip / pipx Package与Host Activity的关联。
 - **0.6.0 — Persistent Changes & Alerts：** Local Snapshot、类型化Change、
-  Timeline、Watch Resource、Cooldown和Desktop Notification。
+  有限Timeline、Watch / Ignore、Cooldown和Desktop Notification，已经实现。
 - **0.7.0 — Ubuntu / RHEL First-class Support：** Linux Collector、systemd、
   Network、Package、Persistence、Alert和Desktop Packaging。
 - **之后：** 只读MCP、可选Explain、Environment Intelligence，最后才考虑

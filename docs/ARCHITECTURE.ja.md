@@ -208,9 +208,33 @@ Manager不足、Path制限、Command失敗は偽のEmpty Inventoryにせず、Wa
 Resultとして保持します。
 
 Runtime / Package Collectorは60秒のMemory Cacheを利用します。これにより頻繁な
-Socket Refreshを軽くしながら、現Versionの非永続Architectureを維持します。
+Socket Refreshを軽く保ちます。
 Copy / Export Summaryは構造化ModelからのProjectionであり、Sanitized Exportでは
 Private Home Pathと一般的なSecret付きArgumentを除去します。
+
+## バージョン0.6のPersistent Change Model
+
+0.6では同じNormalized Host Modelの背後にLocal SQLite Storeを追加します。
+
+```text
+HostObservationSnapshot
+  → Deterministic Projection
+  → Typed ChangeEvent
+  → Bounded Local Timeline
+  → Watch / Ignore Preference
+  → Cooldown付きDesktop Notification
+```
+
+最初のObservationをBaselineとし、その後はCollection TimestampとEvidence Timestamp
+を除いて比較します。PortはSocket Identity、その他はConfigured Third-party
+Service、Active Interface、Default Route、DNS / VPN Context、Runtime、Packageを
+Persistent Resourceとします。一時的なApplication JobとDefault以外のRoute変動は
+意図的に除外します。
+
+SchemaはVersion管理されMigration Test済みです。Retentionを設定でき、上限は
+1,000 Eventと500 Snapshotです。Observation、Preference、Alert Delivery、
+SettingはElectronのLocal User-data Directoryに留まり、UploadやAccount作成は
+ありません。AlertはTyped Evidenceから生成し、Security Verdictにはしません。
 
 ## 将来のモデル
 

@@ -200,9 +200,32 @@ Node.js Manager可能提供传统Global Inventory。Python不存在统一Global 
 因此pip结果会明确描述为各个已发现Environment中的Package。Manager缺失、Path受限
 或Command失败时，系统会保留Warning与Partial Result，而不是制造错误的空Inventory。
 
-Runtime / Package采集使用60秒内存缓存，使频繁Socket刷新保持响应，同时维持当前
-版本不持久化的架构。复制与导出摘要是结构化模型的Projection；脱敏导出会移除私人
+Runtime / Package采集使用60秒内存缓存，使频繁Socket刷新保持响应。
+复制与导出摘要是结构化模型的Projection；脱敏导出会移除私人
 Home路径与常见携带Secret的参数。
+
+## 0.6版本的Persistent Change模型
+
+0.6在同一套Normalized Host Model之后加入本地SQLite Store：
+
+```text
+HostObservationSnapshot
+  → Deterministic Projection
+  → Typed ChangeEvent
+  → Bounded Local Timeline
+  → Watch / Ignore Preference
+  → 带Cooldown的Desktop Notification
+```
+
+第一次Observation作为Baseline，后续比较会剔除Collection Timestamp和Evidence
+Timestamp等易变值。Port使用Socket Identity；Configured Third-party Service、
+Active Interface、Default Route、DNS / VPN Context、Runtime及Package构成其他
+Persistent Resource。临时Application Job和非默认Route波动会被主动排除。
+
+Schema具有版本并经过Migration测试。Retention可配置，同时硬性限制为1,000个Event和
+500个Snapshot。Observation、Preference、Alert Delivery与Setting只保存在Electron
+本地User-data目录中，不上传，也不要求账号。Alert由Typed Evidence产生，不表示
+Security Verdict。
 
 ## 未来模型
 

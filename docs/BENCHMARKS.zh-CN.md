@@ -5,6 +5,29 @@
 本文记录可重复执行的扫描器检查结果，而不是营销性质的性能承诺。监听端口数量、
 正在运行的应用、权限、存储负载和操作系统版本都会影响实际结果。
 
+## 0.6版本本地历史参考测试
+
+记录于2026年7月29日：
+
+| 项目 | 结果 |
+| --- | --- |
+| 平台 | macOS，Apple Silicon（`arm64`） |
+| Runtime | Node.js `v22.22.2` |
+| 生成的Snapshot Change | 250 |
+| 保存的Typed Event | 500 |
+| Record中位数 | 0.97 ms |
+| Record p95 | 1.86 ms |
+| Record最大值 | 5.81 ms |
+| 读取500个Event的Timeline | 1.43 ms |
+
+每次Observation替换一个Listener，因此250次Change会分别产生一条Removed与Added
+Event。目标是Record p95与Timeline读取低于25 ms，并完整保留所有预期Event。
+本次测试通过全部目标。
+
+```bash
+yarn benchmark:history
+```
+
 ## 0.5版本参考测试
 
 记录于2026年7月29日：

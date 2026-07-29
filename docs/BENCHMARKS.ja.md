@@ -6,6 +6,29 @@
 結果はListener数、実行中のApplication、権限、Storage負荷、OS Versionによって
 変化します。
 
+## バージョン0.6 Local History Reference Run
+
+2026年7月29日に記録：
+
+| 項目 | 結果 |
+| --- | --- |
+| Platform | macOS、Apple Silicon（`arm64`） |
+| Runtime | Node.js `v22.22.2` |
+| 生成したSnapshot Change | 250 |
+| 保存されたTyped Event | 500 |
+| Record Median | 0.97 ms |
+| Record p95 | 1.86 ms |
+| Record Maximum | 5.81 ms |
+| 500 Event Timeline Read | 1.43 ms |
+
+各Observationで一つのListenerを入れ替え、250 ChangeからRemoved / Addedを
+各一件ずつ生成します。TargetはRecord p95とTimeline Readが25 ms未満で、全Eventが
+保持されることです。このRunは全Targetを満たしました。
+
+```bash
+yarn benchmark:history
+```
+
 ## バージョン0.5 Reference Run
 
 2026年7月29日に記録：

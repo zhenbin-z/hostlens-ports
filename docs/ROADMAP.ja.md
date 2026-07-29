@@ -325,9 +325,9 @@ Fieldが存在するだけでは完了とみなしません。
 - MCP、LLM、Chat機能
 - PackageまたはMachine DataのNetwork送信
 
-## 計画：0.6.0 — Persistent Changes & Alerts
+## リリース済み：0.6.0 — Persistent Changes & Alerts
 
-Normalized Identityが安定した後：
+0.6ではApp再起動をまたぐHost ChangeをReview可能にしました：
 
 - Version付きの軽量Local Snapshotを永続化
 - Port、Service、Network Context、Runtime / Package Inventory向けの型付き
@@ -335,10 +335,12 @@ Normalized Identityが安定した後：
 - Retention Control付きの限定Timeline
 - ResourceのWatch / Ignore
 - Evidence付きAlert Rule、Cooldown、Desktop Notification
-- Review可能なCurrent-state / Change Summary
+- 各Eventに確認可能なStructured Evidenceを保持
 - Tested Migrationを持つLocal Database、Telemetryなし
 
 AlertはSecurity Verdictを作るのではなく、Evidenceと変化を説明します。
+一時的なmacOS Application JobとDefault以外のRoute変動はPersistent Projection
+から除外し、Timelineが長期的なHost Stateを優先するようにしています。
 
 ## 計画：0.7.0 — Ubuntu / RHEL First-class Support
 

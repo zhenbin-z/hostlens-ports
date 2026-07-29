@@ -20,12 +20,12 @@ HostLens Portsは、`lsof`、`netstat`、`ss`などのコマンドを覚えな�
 TCP待受ポートを確認できる軽量なオープンソースのデスクトップツールです。
 ポートとプロセス、コマンド、バインドアドレス、ネットワーク公開範囲を関連付け、
 検索しやすい画面にまとめます。
-0.5ではRuntimes Inspectorを追加し、Node.js / PythonのInstallation、
-npm / Yarn / pnpm / pip / pipxのPackage Inventory、Environment、
-実行中のHost ActivityとのEvidence付きRelationshipを表示します。
+0.6ではPort、設定済みThird-party Service、Network Context、Runtime、
+Package向けの限定Local Change Timelineを追加し、Watch / Ignore設定と
+Cooldown付きDesktop Notificationを提供します。
 
-現在のリリースは、ローカル専用かつ読み取り専用です。LLM、データベース、
-テレメトリー、アカウント、クラウドサービスは使用しません。
+現在のリリースは、ローカル専用かつ読み取り専用です。軽量SQLite Historyは
+Host内に留まり、LLM、テレメトリー、アカウント、クラウドサービスは使用しません。
 
 ![HostLens Ports アプリ](docs/images/hostlens-ports-app.png)
 
@@ -34,6 +34,8 @@ npm / Yarn / pnpm / pip / pipxのPackage Inventory、Environment、
 ![HostLens Services Inspector](docs/images/hostlens-services-app.jpg)
 
 ![HostLens Runtimes Inspector](docs/images/hostlens-runtimes-app.jpg)
+
+![HostLens Changes Inspector](docs/images/hostlens-changes-app.jpg)
 
 ## 主な機能
 
@@ -63,6 +65,9 @@ npm / Yarn / pnpm / pip / pipxのPackage Inventory、Environment、
   Serviceとの高ConfidenceなRelationship
 - 推論したIdentityごとのConfidenceと確認可能なEvidence
 - 現在のSession内におけるNew / Changed / Closedのメモリ内検出
+- Added / Changed / Removedを型付きEventとして保存する限定Local Timeline
+- Watch / Ignore、Retention、Notification Cooldown、新しいNetwork-facing
+  PortまたはWatch中Resource向けDesktop Alert
 - ポート、プロセス、プロジェクト、アドレス、コマンドで検索
 - ポート範囲、プロセス所有元、公開範囲で絞り込み
 - ポート、プロセス名、所有元、公開範囲で並べ替え
@@ -203,7 +208,7 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 - **0.5.0 — Runtimes & Global Packages：** Node.js / Python Runtimeと
   npm / Yarn / pnpm / pip / pipx PackageのHost Activityへの関連付けを実装済み
 - **0.6.0 — Persistent Changes & Alerts：** Local Snapshot、型付きChange、
-  Timeline、Watch Resource、Cooldown、Desktop Notification
+  限定Timeline、Watch / Ignore、Cooldown、Desktop Notificationを実装済み
 - **0.7.0 — Ubuntu / RHEL First-class Support：** Linux Collector、systemd、
   Network、Package、Persistence、Alert、Desktop Packaging
 - **その後：** 読み取り専用MCP、任意のExplain、Environment Intelligence、
