@@ -10,6 +10,10 @@ import type {
   NetworkScanner,
   NetworkSnapshot,
 } from "../shared/network.ts";
+import type {
+  RuntimeScanner,
+  RuntimeSnapshot,
+} from "../shared/runtimes.ts";
 import { SessionMonitor } from "./session-monitor.ts";
 
 function listener(port: number): PortListener {
@@ -100,6 +104,25 @@ class FailingNetworkScanner implements NetworkScanner {
   }
 }
 
+class FixtureRuntimeScanner implements RuntimeScanner {
+  public async scan(): Promise<RuntimeSnapshot> {
+    return {
+      scannedAt: "2026-07-27T01:00:00Z",
+      platform: "darwin",
+      runtimes: [],
+      packages: [],
+      relationships: [],
+      warnings: [],
+    };
+  }
+}
+
+class FailingRuntimeScanner implements RuntimeScanner {
+  public async scan(): Promise<RuntimeSnapshot> {
+    throw new Error("package manager unavailable");
+  }
+}
+
 describe("SessionMonitor", () => {
   it("uses the first scan as baseline and accumulates later changes in memory", async () => {
     const first = {
@@ -118,6 +141,7 @@ describe("SessionMonitor", () => {
       new FixtureScanner([first, second]),
       new FixtureServiceScanner(),
       new FixtureNetworkScanner(),
+      new FixtureRuntimeScanner(),
       0,
     );
 
@@ -142,6 +166,7 @@ describe("SessionMonitor", () => {
       new FixtureScanner([snapshot]),
       new FailingServiceScanner(),
       new FixtureNetworkScanner(),
+      new FixtureRuntimeScanner(),
       0,
     );
 
@@ -163,6 +188,7 @@ describe("SessionMonitor", () => {
       new FixtureScanner([snapshot]),
       new FixtureServiceScanner(),
       new FailingNetworkScanner(),
+      new FixtureRuntimeScanner(),
       0,
     );
 
@@ -171,5 +197,30 @@ describe("SessionMonitor", () => {
     assert.equal(state.snapshot.listeners.length, 1);
     assert.deepEqual(state.network.interfaces, []);
     assert.match(state.network.warnings[0] ?? "", /ifconfig unavailable/);
+  });
+
+  it("keeps port, service, and network observations when runtime inspection fails", async () => {
+    const snapshot = {
+      scannedAt: "2026-07-27T01:00:00Z",
+      platform: "darwin",
+      listeners: [listener(3000)],
+      warnings: [],
+    };
+    const monitor = new SessionMonitor(
+      new FixtureScanner([snapshot]),
+      new FixtureServiceScanner(),
+      new FixtureNetworkScanner(),
+      new FailingRuntimeScanner(),
+      0,
+    );
+
+    const state = await monitor.scan();
+
+    assert.equal(state.snapshot.listeners.length, 1);
+    assert.deepEqual(state.runtimes.runtimes, []);
+    assert.match(
+      state.runtimes.warnings[0] ?? "",
+      /package manager unavailable/,
+    );
   });
 });

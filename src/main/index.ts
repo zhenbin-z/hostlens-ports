@@ -14,6 +14,7 @@ import { join } from "node:path";
 import { createPortScanner } from "./scanners";
 import { createServiceScanner } from "./services/index.ts";
 import { createNetworkScanner } from "./network/index.ts";
+import { createRuntimeScanner } from "./runtimes/index.ts";
 import { SessionMonitor } from "./session-monitor.ts";
 
 const PANEL_WIDTH = 540;
@@ -29,10 +30,12 @@ app.setName("HostLens Ports");
 const scanner = createPortScanner();
 const serviceScanner = createServiceScanner();
 const networkScanner = createNetworkScanner();
+const runtimeScanner = createRuntimeScanner();
 const sessionMonitor = new SessionMonitor(
   scanner,
   serviceScanner,
   networkScanner,
+  runtimeScanner,
 );
 
 function createTrayIcon(): Electron.NativeImage {
