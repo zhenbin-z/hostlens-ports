@@ -276,6 +276,13 @@ const english = {
     "Python entries describe packages in each discovered environment; Python has no universal global scope.",
   runtimeInspectionWarning:
     "Runtime inspection is partial, but port, service, and network results are still available.",
+  copyPackageSummary: "Copy package summary",
+  exportPackageSummary: "Export sanitized summary",
+  packageSummaryCopied: "Package summary copied",
+  packageSummaryExported: "Package summary exported",
+  runtimePackageObservation: "Runtime package observation",
+  packageInventoryDisclaimer:
+    "Point-in-time local inventory only. This is not a vulnerability or security verdict.",
 } as const;
 
 type MessageKey = keyof typeof english;
@@ -558,6 +565,13 @@ const japanese: Messages = {
     "Pythonには共通のGlobal Scopeがないため、各検出環境のパッケージとして表示します。",
   runtimeInspectionWarning:
     "ランタイムの確認は一部のみですが、ポート、サービス、ネットワークの結果は利用できます。",
+  copyPackageSummary: "Package Summaryをコピー",
+  exportPackageSummary: "Sanitized SummaryをExport",
+  packageSummaryCopied: "Package Summaryをコピーしました",
+  packageSummaryExported: "Package SummaryをExportしました",
+  runtimePackageObservation: "Runtime Packageの観測",
+  packageInventoryDisclaimer:
+    "これは一時点のLocal Inventoryであり、脆弱性またはSecurity Verdictではありません。",
 };
 
 const simplifiedChinese: Messages = {
@@ -818,6 +832,13 @@ const simplifiedChinese: Messages = {
     "Python不存在统一的全局范围，因此这里显示各个已发现环境中的软件包。",
   runtimeInspectionWarning:
     "运行时检查结果不完整，但端口、服务和网络结果仍然可用。",
+  copyPackageSummary: "复制软件包摘要",
+  exportPackageSummary: "导出脱敏摘要",
+  packageSummaryCopied: "已复制软件包摘要",
+  packageSummaryExported: "已导出软件包摘要",
+  runtimePackageObservation: "运行时软件包观测",
+  packageInventoryDisclaimer:
+    "这只是当前时间点的本地清单，不是漏洞或安全裁决。",
 };
 
 const messages: Record<Locale, Messages> = {

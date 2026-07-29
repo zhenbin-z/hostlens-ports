@@ -7,6 +7,10 @@ import type {
   RuntimeSnapshot,
 } from "../../shared/runtimes";
 import type { ServiceDefinition } from "../../shared/services";
+import {
+  createRuntimePackageSummary,
+  type RuntimeSummaryLabels,
+} from "../../shared/runtime-summary";
 import type { Locale, MessageKey } from "./i18n";
 
 type Translator = (
@@ -14,6 +18,7 @@ type Translator = (
   values?: Record<string, string | number>,
 ) => string;
 type PackageSort = "name" | "manager";
+type SummaryFeedback = "copy" | "export";
 
 interface RuntimesViewProps {
   snapshot: RuntimeSnapshot | undefined;
@@ -36,6 +41,25 @@ function packageRuntimeKind(
   return manager === "pip" || manager === "pipx" ? "python" : "node";
 }
 
+function summaryLabels(t: Translator): RuntimeSummaryLabels {
+  return {
+    title: `HostLens Ports · ${t("runtimePackageObservation")}`,
+    packageName: t("packageName"),
+    version: t("version"),
+    manager: t("manager"),
+    runtime: t("runtimeKind"),
+    managerExecutable: t("managerExecutable"),
+    environment: t("environment"),
+    installPath: t("packagePath"),
+    executables: t("providedExecutables"),
+    observation: t("observation"),
+    collectedAt: t("collectedAt"),
+    evidence: t("evidence"),
+    unknown: t("unknown"),
+    disclaimer: t("packageInventoryDisclaimer"),
+  };
+}
+
 export function RuntimesView({
   snapshot,
   listeners,
@@ -51,6 +75,7 @@ export function RuntimesView({
   const [runtimeKind, setRuntimeKind] = useState<RuntimeKind | "all">("all");
   const [sort, setSort] = useState<PackageSort>("name");
   const [selectedId, setSelectedId] = useState<string>();
+  const [summaryFeedback, setSummaryFeedback] = useState<SummaryFeedback>();
   const runtimes = snapshot?.runtimes ?? [];
   const packages = snapshot?.packages ?? [];
   const managers = [...new Set(packages.map((pkg) => pkg.manager))];
@@ -113,6 +138,34 @@ export function RuntimesView({
         ({ packageId }) => packageId === selected.id,
       )
     : [];
+
+  useEffect(() => {
+    if (!summaryFeedback) return;
+    const timer = window.setTimeout(() => setSummaryFeedback(undefined), 1_800);
+    return () => window.clearTimeout(timer);
+  }, [summaryFeedback]);
+
+  const copySummary = async (): Promise<void> => {
+    if (!selected || !snapshot) return;
+    await window.hostLens.copyText(
+      createRuntimePackageSummary(selected, selectedRuntime, snapshot, {
+        labels: summaryLabels(t),
+      }),
+    );
+    setSummaryFeedback("copy");
+  };
+
+  const exportSummary = async (): Promise<void> => {
+    if (!selected || !snapshot) return;
+    const saved = await window.hostLens.exportText(
+      `hostlens-package-${selected.name.replace(/[^a-z0-9._-]+/gi, "-")}.txt`,
+      createRuntimePackageSummary(selected, selectedRuntime, snapshot, {
+        sanitized: true,
+        labels: summaryLabels(t),
+      }),
+    );
+    if (saved) setSummaryFeedback("export");
+  };
 
   return (
     <>
@@ -291,6 +344,19 @@ export function RuntimesView({
                 </dd>
               </div>
             </dl>
+
+            <div className="summary-actions">
+              <button type="button" onClick={() => void copySummary()}>
+                {summaryFeedback === "copy"
+                  ? t("packageSummaryCopied")
+                  : t("copyPackageSummary")}
+              </button>
+              <button type="button" onClick={() => void exportSummary()}>
+                {summaryFeedback === "export"
+                  ? t("packageSummaryExported")
+                  : t("exportPackageSummary")}
+              </button>
+            </div>
 
             <div className="detail-paths">
               <div>

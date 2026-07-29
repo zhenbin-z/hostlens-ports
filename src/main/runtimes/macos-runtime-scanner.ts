@@ -24,7 +24,7 @@ import { relatePackagesToHost } from "./runtime-relations.ts";
 
 const execFileAsync = promisify(execFile);
 const MAX_BUFFER_BYTES = 16 * 1024 * 1024;
-const COMMAND_TIMEOUT_MS = 8_000;
+const COMMAND_TIMEOUT_MS = 3_000;
 const INVENTORY_CACHE_MS = 60_000;
 
 interface CommandObservation {
