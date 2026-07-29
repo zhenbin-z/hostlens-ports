@@ -25,7 +25,7 @@
     "dist:mac": "yarn build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg zip",
     "postinstall": "node node_modules/electron/install.js",
     "preview": "electron-vite preview",
-    "test": "node --test src/main/*.test.ts src/main/network/*.test.ts src/main/scanners/*.test.ts src/main/services/*.test.ts src/renderer/src/*.test.ts src/shared/*.test.ts",
+    "test": "node --test src/main/*.test.ts src/main/network/*.test.ts src/main/runtimes/*.test.ts src/main/scanners/*.test.ts src/main/services/*.test.ts src/renderer/src/*.test.ts src/shared/*.test.ts",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json"
   },
   "dependencies": {
