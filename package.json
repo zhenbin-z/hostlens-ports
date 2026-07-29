@@ -3,7 +3,11 @@
   "version": "0.7.0",
   "private": true,
   "description": "A lightweight desktop inspector for listening ports, processes, and startup services.",
-  "author": "Zhenbin Zhang",
+  "author": {
+    "name": "Zhenbin Zhang",
+    "email": "zhenbin-z@users.noreply.github.com"
+  },
+  "desktopName": "HostLens Ports",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -25,7 +29,7 @@
     "benchmark:runtimes": "node scripts/benchmark-runtimes.ts 10",
     "benchmark:history": "node scripts/benchmark-history.ts 250",
     "dist:mac": "yarn build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg zip",
-    "dist:linux": "yarn build && electron-builder --linux AppImage deb rpm",
+    "dist:linux": "yarn build && electron-builder --linux AppImage deb rpm --publish never",
     "postinstall": "node node_modules/electron/install.js",
     "preview": "electron-vite preview",
     "test": "node --test src/main/*.test.ts src/main/history/*.test.ts src/main/network/*.test.ts src/main/runtimes/*.test.ts src/main/scanners/*.test.ts src/main/services/*.test.ts src/renderer/src/*.test.ts src/shared/*.test.ts",
@@ -67,6 +71,8 @@
     "linux": {
       "category": "System;Network",
       "icon": "build/icon.png",
+      "maintainer": "Zhenbin Zhang <zhenbin-z@users.noreply.github.com>",
+      "syncDesktopName": true,
       "target": [
         "AppImage",
         "deb",
