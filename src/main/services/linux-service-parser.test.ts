@@ -1,8 +1,22 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { parseSystemdUnits } from "./linux-service-parser.ts";
+import {
+  parseSystemdUnitNames,
+  parseSystemdUnits,
+} from "./linux-service-parser.ts";
 
 describe("parseSystemdUnits", () => {
+  it("collects unique service names from list-units and list-unit-files output", () => {
+    assert.deepEqual(
+      parseSystemdUnitNames(`sshd.service loaded active running OpenSSH
+dbus.socket loaded active running D-Bus socket
+sshd.service enabled enabled
+postgresql.service disabled enabled
+`),
+      ["postgresql.service", "sshd.service"],
+    );
+  });
+
   it("normalizes running enabled and failed disabled units", () => {
     const services = parseSystemdUnits(
       `Id=sshd.service
@@ -55,6 +69,6 @@ UnitFileState=static
     );
     assert.equal(service?.status, "stopped");
     assert.equal(service?.startup, "on-demand");
-    assert.equal(service?.observationStatus, "complete");
+    assert.equal(service?.observationStatus, "partial");
   });
 });

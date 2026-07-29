@@ -1,5 +1,6 @@
 import type {
   DnsResolver,
+  FirewallObservation,
   NetworkAddress,
   NetworkAddressScope,
   NetworkEvidence,
@@ -8,6 +9,56 @@ import type {
   NetworkRoute,
   VpnConnection,
 } from "../../shared/network.ts";
+
+export function parseFirewalldObservation(
+  stateOutput: string,
+  zonesOutput: string,
+  collectedAt: string,
+  available = true,
+): FirewallObservation {
+  if (!available) {
+    return {
+      manager: "firewalld",
+      status: "unavailable",
+      activeZones: [],
+      confidence: "high",
+      evidence: [
+        evidence(
+          collectedAt,
+          "firewall-cmd availability",
+          "firewall-cmd was not found in a known system path",
+          ["firewall"],
+        ),
+      ],
+    };
+  }
+  const normalizedState = stateOutput.trim().toLowerCase();
+  const status =
+    normalizedState === "running"
+      ? "running"
+      : normalizedState.includes("not running")
+        ? "stopped"
+        : "unknown";
+  const activeZones = zonesOutput
+    .split(/\r?\n/)
+    .filter((line) => line.trim() && !/^\s/.test(line))
+    .map((line) => line.trim().split(/\s+/, 1)[0]!)
+    .filter(Boolean);
+  return {
+    manager: "firewalld",
+    status,
+    activeZones: [...new Set(activeZones)],
+    confidence: "high",
+    evidence: [
+      evidence(
+        collectedAt,
+        "firewall-cmd",
+        `state=${normalizedState || "unknown"}; zones=${activeZones.join(",") || "none observed"}`,
+        ["firewall"],
+      ),
+    ],
+  };
+}
 
 interface IpAddressRecord {
   ifname?: string;

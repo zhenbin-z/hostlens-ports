@@ -9,6 +9,7 @@ import type { PortListener } from "../../shared/ports.ts";
 import { relateSocketsToInterfaces } from "./macos-network-parser.ts";
 import {
   inferLinuxVpnConnections,
+  parseFirewalldObservation,
   parseIpAddressJson,
   parseIpRouteJson,
   parseResolvConf,
@@ -16,6 +17,7 @@ import {
 
 const execFileAsync = promisify(execFile);
 const IP_PATHS = ["/usr/sbin/ip", "/usr/bin/ip", "/sbin/ip"];
+const FIREWALL_CMD_PATHS = ["/usr/bin/firewall-cmd", "/bin/firewall-cmd"];
 const MAX_BUFFER_BYTES = 8 * 1024 * 1024;
 
 async function findIp(): Promise<string | undefined> {
@@ -25,6 +27,18 @@ async function findIp(): Promise<string | undefined> {
       return path;
     } catch {
       // Keep checking iproute2 locations used by Ubuntu and RHEL.
+    }
+  }
+  return undefined;
+}
+
+async function firstAvailable(paths: string[]): Promise<string | undefined> {
+  for (const path of paths) {
+    try {
+      await access(path);
+      return path;
+    } catch {
+      // Keep checking known system paths.
     }
   }
   return undefined;
@@ -60,7 +74,8 @@ export class LinuxNetworkScanner implements NetworkScanner {
         "The Linux ip utility is unavailable. Install the iproute/iproute2 package.",
       );
     }
-    const [addresses, ipv4Routes, ipv6Routes, resolvConf] = await Promise.all([
+    const firewallCmd = await firstAvailable(FIREWALL_CMD_PATHS);
+    const [addresses, ipv4Routes, ipv6Routes, resolvConf, firewallState] = await Promise.all([
       observe(ip, ["-j", "address", "show"], "Network interface"),
       observe(ip, ["-j", "-4", "route", "show"], "IPv4 route"),
       observe(ip, ["-j", "-6", "route", "show"], "IPv6 route"),
@@ -74,7 +89,14 @@ export class LinuxNetworkScanner implements NetworkScanner {
             cause instanceof Error ? cause.message : "unknown error"
           }`,
         })),
+      firewallCmd
+        ? observe(firewallCmd, ["--state"], "firewalld state")
+        : Promise.resolve({ stdout: "", warning: undefined }),
     ]);
+    const firewallZones =
+      firewallCmd && firewallState.stdout.trim().toLowerCase() === "running"
+        ? await observe(firewallCmd, ["--get-active-zones"], "firewalld zones")
+        : { stdout: "", warning: undefined };
 
     const interfaces = parseIpAddressJson(addresses.stdout, collectedAt);
     const routes = [
@@ -107,6 +129,12 @@ export class LinuxNetworkScanner implements NetworkScanner {
       dnsResolvers,
       vpnConnections,
       socketRelations,
+      firewall: parseFirewalldObservation(
+        firewallState.stdout || (firewallState.warning?.includes("not running") ? "not running" : ""),
+        firewallZones.stdout,
+        collectedAt,
+        Boolean(firewallCmd),
+      ),
       summary: {
         defaultInterfaceName: defaultRoute?.interfaceName,
         defaultGateway: defaultRoute?.gateway,
@@ -121,6 +149,7 @@ export class LinuxNetworkScanner implements NetworkScanner {
         ipv4Routes.warning,
         ipv6Routes.warning,
         resolvConf.warning,
+        firewallZones.warning,
       ].filter((warning): warning is string => Boolean(warning)),
     };
   }

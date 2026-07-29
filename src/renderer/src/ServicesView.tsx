@@ -501,7 +501,9 @@ export function ServicesView({
                   </code>
                 </div>
                 <div>
-                  <span>{t("plistPath")}</span>
+                  <span>
+                    {selected.manager === "systemd" ? t("unitFile") : t("plistPath")}
+                  </span>
                   <code>{selected.plistPath ?? t("unavailable")}</code>
                 </div>
               </div>

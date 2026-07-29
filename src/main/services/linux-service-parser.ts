@@ -7,6 +7,17 @@ import type {
 
 type UnitProperties = Record<string, string>;
 
+export function parseSystemdUnitNames(output: string): string[] {
+  return [
+    ...new Set(
+      output
+        .split(/\r?\n/)
+        .map((line) => line.trim().split(/\s+/, 1)[0])
+        .filter((unit): unit is string => Boolean(unit?.endsWith(".service"))),
+    ),
+  ].sort();
+}
+
 function statusFor(properties: UnitProperties): ServiceStatus {
   if (properties.ActiveState === "failed") return "failed";
   if (properties.ActiveState === "active") return "running";
@@ -99,7 +110,7 @@ export function parseSystemdUnits(
       relatedProcessIds: [],
       relatedProcesses: [],
       relatedListenerIds: [],
-      observationStatus: fragmentPath ? "complete" : "partial",
+      observationStatus: program && fragmentPath ? "complete" : "partial",
       unavailableFields: [
         ...(!program ? (["program"] as const) : []),
         ...(!fragmentPath ? (["plistPath"] as const) : []),

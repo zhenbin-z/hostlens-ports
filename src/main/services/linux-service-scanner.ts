@@ -12,12 +12,16 @@ import {
   parsePsProcessTable,
 } from "../scanners/macos-parser.ts";
 import { relateServicesToListeners } from "./service-relations.ts";
-import { parseSystemdUnits } from "./linux-service-parser.ts";
+import {
+  parseSystemdUnitNames,
+  parseSystemdUnits,
+} from "./linux-service-parser.ts";
 
 const execFileAsync = promisify(execFile);
 const SYSTEMCTL_PATHS = ["/usr/bin/systemctl", "/bin/systemctl"];
 const PS_PATHS = ["/usr/bin/ps", "/bin/ps"];
 const MAX_BUFFER_BYTES = 16 * 1024 * 1024;
+const SYSTEMD_UNIT_CHUNK_SIZE = 100;
 
 async function firstAvailable(paths: string[]): Promise<string | undefined> {
   for (const path of paths) {
@@ -47,22 +51,62 @@ export class LinuxServiceScanner implements ServiceScanner {
 
     let services = [];
     try {
-      const { stdout } = await execFileAsync(
-        systemctl,
-        [
-          "show",
-          "--all",
-          "--type=service",
-          "--no-pager",
-          "--property=Id,Description,LoadState,ActiveState,SubState,MainPID,ExecStart,FragmentPath,UnitFileState",
-        ],
-        {
-          encoding: "utf8",
-          maxBuffer: MAX_BUFFER_BYTES,
-          timeout: 10_000,
-        },
+      const [loadedUnits, unitFiles] = await Promise.all([
+        execFileAsync(
+          systemctl,
+          [
+            "list-units",
+            "--type=service",
+            "--all",
+            "--no-legend",
+            "--no-pager",
+            "--plain",
+          ],
+          {
+            encoding: "utf8",
+            maxBuffer: MAX_BUFFER_BYTES,
+            timeout: 10_000,
+          },
+        ),
+        execFileAsync(
+          systemctl,
+          [
+            "list-unit-files",
+            "--type=service",
+            "--no-legend",
+            "--no-pager",
+            "--plain",
+          ],
+          {
+            encoding: "utf8",
+            maxBuffer: MAX_BUFFER_BYTES,
+            timeout: 10_000,
+          },
+        ),
+      ]);
+      const unitNames = parseSystemdUnitNames(
+        `${loadedUnits.stdout}\n${unitFiles.stdout}`,
       );
-      services = parseSystemdUnits(stdout, collectedAt);
+      const detailBlocks: string[] = [];
+      for (let offset = 0; offset < unitNames.length; offset += SYSTEMD_UNIT_CHUNK_SIZE) {
+        const chunk = unitNames.slice(offset, offset + SYSTEMD_UNIT_CHUNK_SIZE);
+        const { stdout } = await execFileAsync(
+          systemctl,
+          [
+            "show",
+            "--no-pager",
+            "--property=Id,Description,LoadState,ActiveState,SubState,MainPID,ExecStart,FragmentPath,UnitFileState",
+            ...chunk,
+          ],
+          {
+            encoding: "utf8",
+            maxBuffer: MAX_BUFFER_BYTES,
+            timeout: 10_000,
+          },
+        );
+        detailBlocks.push(stdout);
+      }
+      services = parseSystemdUnits(detailBlocks.join("\n"), collectedAt);
     } catch (cause) {
       const partial = cause as { stdout?: string; message?: string };
       services = parseSystemdUnits(partial.stdout ?? "", collectedAt);

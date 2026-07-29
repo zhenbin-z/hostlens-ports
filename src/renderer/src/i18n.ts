@@ -159,7 +159,7 @@ const english = {
   noMatchingServices: "No matching services",
   noConfiguredServices: "No configured services detected",
   serviceCheckAgain:
-    "HostLens checks launchd configuration and Homebrew Services locally.",
+    "HostLens checks configured services and startup state locally.",
   selectedServiceDetails: "Selected service details",
   selectService: "Select a service to inspect its startup configuration and relationships.",
   serviceKind: "Service kind",
@@ -169,6 +169,7 @@ const english = {
   program: "Program",
   arguments: "Arguments",
   plistPath: "Property list",
+  unitFile: "Unit file",
   label: "Label",
   lastExitStatus: "Last exit status",
   relatedProcesses: "Related processes",
@@ -186,7 +187,7 @@ const english = {
   serviceFailedExplanation:
     "{name} reported a non-zero last exit status and needs review.",
   serviceDisabledExplanation:
-    "{name} is configured but disabled in launchd.",
+    "{name} is configured but disabled in its service manager.",
   serviceUnknownExplanation:
     "HostLens found {name}, but available evidence is insufficient to determine its state.",
   startupAutomaticExplanation:
@@ -225,6 +226,12 @@ const english = {
   whatHostLensKnows: "What HostLens knows",
   defaultGateway: "Default gateway",
   dnsServers: "DNS servers",
+  firewall: "Firewall",
+  firewalld_running: "firewalld running",
+  firewalld_stopped: "firewalld stopped",
+  firewalld_unavailable: "firewalld unavailable",
+  firewalld_unknown: "firewalld state unknown",
+  activeFirewallZones: "Active zones",
   noInterfacesObserved: "No active interface addresses were observed.",
   noPotentialListeners: "No potentially network-reachable listeners were observed.",
   noBackgroundServices: "No third-party background services were observed.",
@@ -491,7 +498,7 @@ const japanese: Messages = {
   noMatchingServices: "一致するサービスはありません",
   noConfiguredServices: "設定済みサービスは見つかりませんでした",
   serviceCheckAgain:
-    "HostLensはlaunchd設定とHomebrew Servicesをローカルで確認します。",
+    "HostLensは設定済みサービスと起動状態をローカルで確認します。",
   selectedServiceDetails: "選択したサービスの詳細",
   selectService:
     "サービスを選択すると、起動設定と関連するProcess / Portを確認できます。",
@@ -502,6 +509,7 @@ const japanese: Messages = {
   program: "Program",
   arguments: "引数",
   plistPath: "Property List",
+  unitFile: "Unit File",
   label: "Label",
   lastExitStatus: "最終終了Status",
   relatedProcesses: "関連Process",
@@ -519,7 +527,7 @@ const japanese: Messages = {
   serviceFailedExplanation:
     "{name}は0以外の最終終了Statusを報告しており、確認が必要です。",
   serviceDisabledExplanation:
-    "{name}は設定されていますが、launchdで無効化されています。",
+    "{name}は設定されていますが、Service Managerで無効化されています。",
   serviceUnknownExplanation:
     "HostLensは{name}を発見しましたが、状態を判断できるEvidenceが不足しています。",
   startupAutomaticExplanation:
@@ -558,6 +566,12 @@ const japanese: Messages = {
   whatHostLensKnows: "HostLensが把握していること",
   defaultGateway: "デフォルトゲートウェイ",
   dnsServers: "DNSサーバー",
+  firewall: "ファイアウォール",
+  firewalld_running: "firewalld実行中",
+  firewalld_stopped: "firewalld停止中",
+  firewalld_unavailable: "firewalld利用不可",
+  firewalld_unknown: "firewalld状態不明",
+  activeFirewallZones: "有効なゾーン",
   noInterfacesObserved: "有効なインターフェースアドレスは観測されませんでした。",
   noPotentialListeners: "ネットワーク到達の可能性がある待受は観測されませんでした。",
   noBackgroundServices: "サードパーティのバックグラウンドサービスは未観測です。",
@@ -813,7 +827,7 @@ const simplifiedChinese: Messages = {
   statusThenName: "先按状态，再按名称",
   noMatchingServices: "没有匹配的服务",
   noConfiguredServices: "未检测到已配置的服务",
-  serviceCheckAgain: "HostLens会在本地检查launchd配置和Homebrew Services。",
+  serviceCheckAgain: "HostLens会在本地检查已配置服务及其启动状态。",
   selectedServiceDetails: "所选服务详情",
   selectService: "选择一个服务以查看启动配置及关联的进程和端口。",
   serviceKind: "服务类型",
@@ -823,6 +837,7 @@ const simplifiedChinese: Messages = {
   program: "程序",
   arguments: "参数",
   plistPath: "Property List",
+  unitFile: "Unit File",
   label: "Label",
   lastExitStatus: "上次退出状态",
   relatedProcesses: "关联进程",
@@ -835,7 +850,7 @@ const simplifiedChinese: Messages = {
   serviceLoadedExplanation: "{name}已由服务管理器加载，但目前没有运行PID。",
   serviceStoppedExplanation: "{name}已经配置，但当前未加载或运行。",
   serviceFailedExplanation: "{name}上次退出状态不为0，需要检查。",
-  serviceDisabledExplanation: "{name}已经配置，但在launchd中被禁用。",
+  serviceDisabledExplanation: "{name}已经配置，但在其服务管理器中被禁用。",
   serviceUnknownExplanation:
     "HostLens发现了{name}，但当前证据不足以判断其状态。",
   startupAutomaticExplanation: "配置证据表明该服务会自动启动。",
@@ -870,6 +885,12 @@ const simplifiedChinese: Messages = {
   whatHostLensKnows: "HostLens知道什么",
   defaultGateway: "默认网关",
   dnsServers: "DNS服务器",
+  firewall: "防火墙",
+  firewalld_running: "firewalld正在运行",
+  firewalld_stopped: "firewalld已停止",
+  firewalld_unavailable: "firewalld不可用",
+  firewalld_unknown: "firewalld状态未知",
+  activeFirewallZones: "活动区域",
   noInterfacesObserved: "没有观察到活动网络接口地址。",
   noPotentialListeners: "没有观察到可能从网络访问的监听端口。",
   noBackgroundServices: "没有观察到第三方后台服务。",

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   inferLinuxVpnConnections,
+  parseFirewalldObservation,
   parseIpAddressJson,
   parseIpRouteJson,
   parseResolvConf,
@@ -80,5 +81,15 @@ describe("Linux network parsers", () => {
     );
     assert.deepEqual(resolver?.nameservers, ["192.168.10.1", "1.1.1.1"]);
     assert.deepEqual(resolver?.searchDomains, ["corp.example", "local"]);
+  });
+
+  it("records firewalld state and active zones without inferring policy", () => {
+    const firewall = parseFirewalldObservation(
+      "running\n",
+      "public\n  interfaces: ens192\ntrusted\n  interfaces: wg0\n",
+      collectedAt,
+    );
+    assert.equal(firewall.status, "running");
+    assert.deepEqual(firewall.activeZones, ["public", "trusted"]);
   });
 });
