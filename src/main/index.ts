@@ -6,6 +6,7 @@ import {
   ipcMain,
   Menu,
   nativeImage,
+  Notification,
   screen,
   Tray,
 } from "electron";
@@ -16,6 +17,7 @@ import { createServiceScanner } from "./services/index.ts";
 import { createNetworkScanner } from "./network/index.ts";
 import { createRuntimeScanner } from "./runtimes/index.ts";
 import { SessionMonitor } from "./session-monitor.ts";
+import { HistoryStore } from "./history/history-store.ts";
 
 const PANEL_WIDTH = 540;
 const PANEL_HEIGHT = 720;
@@ -24,6 +26,8 @@ let mainWindow: BrowserWindow | null = null;
 let panelWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isQuitting = false;
+let sessionMonitor: SessionMonitor | null = null;
+let historyStore: HistoryStore | null = null;
 
 app.setName("HostLens Ports");
 
@@ -31,13 +35,6 @@ const scanner = createPortScanner();
 const serviceScanner = createServiceScanner();
 const networkScanner = createNetworkScanner();
 const runtimeScanner = createRuntimeScanner();
-const sessionMonitor = new SessionMonitor(
-  scanner,
-  serviceScanner,
-  networkScanner,
-  runtimeScanner,
-);
-
 function createTrayIcon(): Electron.NativeImage {
   if (process.platform === "darwin") {
     const systemIcon = nativeImage
@@ -333,7 +330,25 @@ function configureApplicationMenu(): void {
 }
 
 function registerIpc(): void {
-  ipcMain.handle("ports:list", () => sessionMonitor.scan());
+  ipcMain.handle("ports:list", async () => {
+    if (!sessionMonitor) throw new Error("HostLens is still starting.");
+    const state = await sessionMonitor.scan();
+    showPendingAlerts(state);
+    return state;
+  });
+  ipcMain.handle("history:update", (_event, update: unknown) => {
+    if (!sessionMonitor) throw new Error("HostLens is still starting.");
+    if (!update || typeof update !== "object") {
+      throw new TypeError("History update must be an object.");
+    }
+    return sessionMonitor.updateHistory(
+      update as Parameters<SessionMonitor["updateHistory"]>[0],
+    );
+  });
+  ipcMain.handle("history:clear", () => {
+    if (!sessionMonitor) throw new Error("HostLens is still starting.");
+    return sessionMonitor.clearHistory();
+  });
   ipcMain.handle("clipboard:write", (_event, text: unknown) => {
     if (typeof text !== "string") {
       throw new TypeError("Clipboard content must be text.");
@@ -367,6 +382,29 @@ function registerIpc(): void {
   ipcMain.handle("app:quit", () => app.quit());
 }
 
+function showPendingAlerts(
+  state: Awaited<ReturnType<SessionMonitor["scan"]>>,
+): void {
+  if (!Notification.isSupported()) return;
+  const events = new Map(
+    state.history.events.map((event) => [event.id, event]),
+  );
+  for (const candidate of state.history.pendingAlerts) {
+    const event = events.get(candidate.eventId);
+    if (!event) continue;
+    const notification = new Notification({
+      title:
+        candidate.ruleId === "new-network-port"
+          ? "New network-facing port"
+          : "Watched resource changed",
+      body: `${event.label} · ${event.kind}`,
+      silent: false,
+    });
+    notification.on("click", showMainWindow);
+    notification.show();
+  }
+}
+
 app.whenReady().then(() => {
   if (process.platform === "darwin") {
     app.setActivationPolicy("regular");
@@ -386,6 +424,17 @@ app.whenReady().then(() => {
   }
 
   configureApplicationMenu();
+  historyStore = new HistoryStore(
+    join(app.getPath("userData"), "history-v1.sqlite"),
+  );
+  sessionMonitor = new SessionMonitor(
+    scanner,
+    serviceScanner,
+    networkScanner,
+    runtimeScanner,
+    undefined,
+    historyStore,
+  );
   registerIpc();
   tray = new Tray(createTrayIcon());
   tray.setToolTip("HostLens Ports");
@@ -400,4 +449,6 @@ app.on("activate", showMainWindow);
 
 app.on("before-quit", () => {
   isQuitting = true;
+  historyStore?.close();
+  historyStore = null;
 });

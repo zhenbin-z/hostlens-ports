@@ -130,10 +130,15 @@ export interface HostLensState {
   network: import("./network.ts").NetworkSnapshot;
   runtimes: import("./runtimes.ts").RuntimeSnapshot;
   changes: SessionChanges;
+  history: import("./history.ts").HistoryState;
 }
 
 export interface HostLensApi {
   listPorts(): Promise<HostLensState>;
+  updateHistory(
+    update: import("./history.ts").HistoryUpdate,
+  ): Promise<import("./history.ts").HistoryState>;
+  clearHistory(): Promise<import("./history.ts").HistoryState>;
   copyText(text: string): Promise<void>;
   exportText(suggestedName: string, text: string): Promise<boolean>;
   openMainWindow(): Promise<void>;
