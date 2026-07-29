@@ -11,6 +11,7 @@
 - Final implementation screenshots:
   - Simplified Chinese: `/var/folders/qt/p1_jr91x7pd4mlq6nm825v700000gn/T/com.openai.sky.CUAService/Electron Screenshot 2026-07-29 at 1.05.17 PM.jpeg`
   - Japanese with Python filtering: `/var/folders/qt/p1_jr91x7pd4mlq6nm825v700000gn/T/com.openai.sky.CUAService/Electron Screenshot 2026-07-29 at 1.06.09 PM.jpeg`
+  - Japanese with exact Python 3.9.6 runtime filtering: `/var/folders/qt/p1_jr91x7pd4mlq6nm825v700000gn/T/com.openai.sky.CUAService/Electron Screenshot 2026-07-29 at 1.23.43 PM.jpeg`
 - Combined comparison evidence:
   - `/private/tmp/hostlens-language-before-after.png`
   - `/private/tmp/hostlens-nav-before-after.png`
@@ -32,11 +33,19 @@
 - English, Japanese, and Simplified Chinese language selection.
 - Full-window navigation in Japanese and Simplified Chinese.
 - Runtime filter order: Runtime → Manager → Sort.
+- Runtime selector hierarchy:
+  - All runtimes.
+  - All versions of a runtime family.
+  - Each observed runtime installation, identified by version and source.
 - Python selection:
   - Package count changed from 34 to 12.
   - Result list contained only Python packages.
   - Manager selection exposed only observed Python managers.
 - Python `pip` selection.
+- Python 3.9.6 system-runtime selection:
+  - Package count narrowed from 12 Python packages to 7 packages from that installation.
+  - Every visible package reported Python 3.9.6.
+  - Manager options were derived from packages belonging to that installation.
 - Switching from Python/pip to Node.js:
   - Manager reset to “All package managers”.
   - Result count changed to 22.
@@ -64,6 +73,9 @@
 - [P1] Runtime filters had the wrong dependency order and contradictory options.
   - Fix: reordered controls to Runtime → Manager → Sort, derived managers from the selected runtime, and reset an incompatible manager when the runtime changes.
   - Post-fix evidence: Python shows 12 pip packages with no npm entries; switching to Node.js resets Manager and shows 22 Node.js packages with no pip entries.
+- [P1] Runtime filtering stopped at the Node.js/Python family level despite the inventory identifying individual installations.
+  - Fix: added grouped family and version/source options backed by each runtime installation ID.
+  - Post-fix evidence: selecting `Python 3.9.6 · system` narrows the list to the 7 packages associated with that exact runtime.
 
 ## Focused-region comparison
 

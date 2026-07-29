@@ -6,12 +6,14 @@ import type {
 } from "../../shared/runtimes.ts";
 import {
   availablePackageManagers,
+  packageMatchesRuntimeFilter,
   packageRuntimeKind,
 } from "./runtime-filter-model.ts";
 
 function observedPackage(
   manager: PackageManagerKind,
   name = `${manager}-package`,
+  runtimeId?: string,
 ): GlobalPackage {
   return {
     id: `${manager}:${name}`,
@@ -19,6 +21,7 @@ function observedPackage(
     version: "1.0.0",
     manager,
     managerExecutable: `/usr/local/bin/${manager}`,
+    runtimeId,
     executables: [],
     observationStatus: "complete",
     unavailableFields: [],
@@ -45,7 +48,7 @@ describe("runtime package filters", () => {
   });
 
   it("shows only Node.js package managers for Node.js", () => {
-    assert.deepEqual(availablePackageManagers(packages, "node"), [
+    assert.deepEqual(availablePackageManagers(packages, "kind:node"), [
       "npm",
       "yarn",
       "pnpm",
@@ -53,7 +56,7 @@ describe("runtime package filters", () => {
   });
 
   it("shows only Python package managers for Python", () => {
-    assert.deepEqual(availablePackageManagers(packages, "python"), [
+    assert.deepEqual(availablePackageManagers(packages, "kind:python"), [
       "pip",
       "pipx",
     ]);
@@ -66,6 +69,28 @@ describe("runtime package filters", () => {
         "all",
       ),
       ["npm", "pipx"],
+    );
+  });
+
+  it("filters managers and packages to one runtime installation", () => {
+    const versionedPackages = [
+      observedPackage("npm", "codex-node-22", "node-22"),
+      observedPackage("npm", "codex-node-25", "node-25"),
+      observedPackage("yarn", "yarn-node-22", "node-22"),
+      observedPackage("pip", "openpyxl-python-313", "python-313"),
+    ];
+
+    assert.deepEqual(
+      availablePackageManagers(versionedPackages, "runtime:node-22"),
+      ["npm", "yarn"],
+    );
+    assert.deepEqual(
+      versionedPackages
+        .filter((pkg) =>
+          packageMatchesRuntimeFilter(pkg, "runtime:node-22"),
+        )
+        .map(({ name }) => name),
+      ["codex-node-22", "yarn-node-22"],
     );
   });
 });
