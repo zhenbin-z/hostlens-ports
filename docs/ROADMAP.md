@@ -174,7 +174,7 @@ Completion evidence recorded on July 27, 2026:
 - process termination; and
 - automatic remediation.
 
-## In development: 0.3.0 — Services & Startup Inspector
+## Released: 0.3.0 — Services & Startup Inspector
 
 Version 0.3 should answer:
 
@@ -266,7 +266,7 @@ Completion evidence recorded on the `develop/0.3.0` branch on July 28, 2026:
 - MCP, LLM, or chat features; and
 - multi-host management.
 
-## Planned: 0.4.0 — macOS Host Overview & Network Context
+## Released: 0.4.0 — macOS Host Overview & Network Context
 
 Version 0.4 should answer:
 
@@ -287,6 +287,31 @@ Version 0.4 should answer:
 - keep all collection local, read-only, and free of active LAN scanning; and
 - verify collectors, relationships, performance, and all three languages on a
   real Mac.
+
+Completion evidence recorded on July 29, 2026:
+
+- 58 automated tests pass, including sanitized interface, route, DNS, VPN, and
+  socket-relation fixtures plus optional-collector isolation;
+- the production Electron build passes TypeScript validation;
+- a real Mac Host Overview correctly displayed the primary network, active
+  interfaces, default gateway, DNS, observable VPN context, background
+  services, and potentially reachable listeners;
+- English, Japanese, and Simplified Chinese UI and cross-view navigation were
+  checked in the live Electron application;
+- wildcard listeners are related only to active interfaces with network-scope
+  addresses, avoiding link-local virtual-interface noise; and
+- the 20-scan network benchmark recorded a p95 of 12.13 ms with evidence on
+  every socket relation. See [Scanner Benchmarks](BENCHMARKS.md).
+
+### Explicitly out of scope for 0.4
+
+- active LAN, firewall, or internet reachability testing;
+- packet capture or network traffic inspection;
+- network or VPN configuration changes;
+- persistent network history;
+- Linux network parity;
+- MCP, LLM, or chat features; and
+- multi-host management.
 
 ## Planned: 0.5.0 — Runtimes & Global Packages Inspector
 

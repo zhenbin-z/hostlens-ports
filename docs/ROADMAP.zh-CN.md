@@ -157,7 +157,7 @@ Technical Evidence 可以引用同一个 Object。
 - 结束进程；
 - 自动修复。
 
-## 开发中：0.3.0 — Services & Startup Inspector
+## 已发布：0.3.0 — Services & Startup Inspector
 
 0.3需要回答：
 
@@ -239,7 +239,7 @@ Technical Evidence 可以引用同一个 Object。
 - MCP、LLM或Chat；
 - Multi-host Management。
 
-## 计划：0.4.0 — macOS Host Overview & Network Context
+## 已发布：0.4.0 — macOS Host Overview & Network Context
 
 0.4需要回答：
 
@@ -258,6 +258,29 @@ Technical Evidence 可以引用同一个 Object。
 - 提供面向个人用户的说明，以及可展开的Developer / IT Evidence；
 - 保持本地、只读，不进行Active LAN Scan；
 - 在真实Mac上验证Collector、Relationship、性能和三语UI。
+
+2026年7月29日记录的完成证据：
+
+- 58项自动化测试全部通过，包括Interface、Route、DNS、VPN、
+  Socket Relationship脱敏Fixture以及Optional Collector隔离；
+- Production Electron Build与TypeScript检查通过；
+- 真实Mac的Host Overview正确显示Primary Network、活动Interface、
+  Default Gateway、DNS、可观察的VPN Context、后台服务和可能可达的Listener；
+- 英文、日文、简体中文UI以及View间导航已在真实Electron App中确认；
+- Wildcard Listener只关联拥有Network-scope Address的活动Interface，避免
+  Link-local虚拟网卡噪音；
+- 20次Network Benchmark中所有Socket Relation均带有Evidence，p95为
+  12.13 ms。详见[扫描器基准测试](BENCHMARKS.zh-CN.md)。
+
+### 0.4明确不做
+
+- 主动测试LAN、Firewall或Internet Reachability；
+- Packet Capture或Network Traffic Inspection；
+- 修改Network或VPN配置；
+- 持久化Network History；
+- Linux Network功能对等；
+- MCP、LLM或Chat；
+- Multi-host Management。
 
 ## 计划：0.5.0 — Runtimes & Global Packages Inspector
 

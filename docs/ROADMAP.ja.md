@@ -160,7 +160,7 @@ Fieldが存在するだけでは完了とみなしません。
 - Process終了
 - 自動修復
 
-## 開発中：0.3.0 — Services & Startup Inspector
+## リリース済み：0.3.0 — Services & Startup Inspector
 
 0.3が回答する問い：
 
@@ -244,7 +244,7 @@ Fieldが存在するだけでは完了とみなしません。
 - MCP、LLM、Chat
 - Multi-host Management
 
-## 計画：0.4.0 — macOS Host Overview & Network Context
+## リリース済み：0.4.0 — macOS Host Overview & Network Context
 
 0.4は次の問いに答えます。
 
@@ -264,6 +264,30 @@ Fieldが存在するだけでは完了とみなしません。
 - Personal向け説明と展開可能なDeveloper / IT Evidence
 - Active LAN Scanなし、LocalかつRead-onlyを維持
 - 実MacでCollector、Relationship、Performance、3言語UIを検証
+
+2026年7月29日に記録したCompletion Evidence：
+
+- Interface、Route、DNS、VPN、Socket RelationshipのSanitized Fixtureと
+  Optional Collector Isolationを含む58件のAutomated Testが成功
+- Production Electron BuildとTypeScript Validationが成功
+- 実MacのHost OverviewでPrimary Network、Active Interface、Default Gateway、
+  DNS、観測可能なVPN Context、Background Service、Potentially Reachable
+  Listenerを確認
+- 英語、日本語、簡体字中国語UIとView間Navigationを実Electron Appで確認
+- Wildcard ListenerはNetwork-scope Addressを持つActive Interfaceだけに関連付け、
+  Link-local Virtual InterfaceのNoiseを抑制
+- 20回Network Benchmarkで全Socket RelationにEvidenceがあり、p95 12.13 msを
+  記録。詳細は[Scanner Benchmark](BENCHMARKS.ja.md)
+
+### 0.4 の対象外
+
+- LAN、Firewall、Internet ReachabilityのActive Test
+- Packet Capture / Network Traffic Inspection
+- Network / VPN設定変更
+- Persistent Network History
+- Linux Network Parity
+- MCP、LLM、Chat
+- Multi-host Management
 
 ## 計画：0.5.0 — Runtimes & Global Packages Inspector
 

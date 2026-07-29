@@ -20,19 +20,28 @@ HostLens Ports is a lightweight, open-source desktop utility for inspecting
 TCP listening ports without memorizing `lsof`, `netstat`, or `ss` commands.
 It connects each port to its owning process, command, bind address, and
 network exposure, then presents the result in a searchable interface.
-Version 0.3 also inventories launchd jobs and Homebrew Services, including
-configured services that are currently stopped.
+Version 0.4 adds a Host Overview with network interfaces, addresses, default
+routes, DNS, observable VPN context, background services, and evidence-backed
+socket-to-interface relationships.
 
 The current release is intentionally local and read-only. It has no LLM,
 database, telemetry, account, or cloud service.
 
 ![HostLens Ports application](docs/images/hostlens-ports-app.png)
 
+![HostLens Host Overview](docs/images/hostlens-overview-app.jpg)
+
 ![HostLens Services inspector](docs/images/hostlens-services-app.jpg)
 
 ## Features
 
 - Live TCP listener discovery on macOS
+- Host Overview for current network, services, exposed listeners, and session
+  changes
+- Local collection of interfaces, IPv4/IPv6 addresses, routes, DNS, and
+  observable VPN interfaces
+- Socket-to-interface relationships that distinguish observed bindings from
+  potential reachability
 - Process, PID, parent PID, user, and full command inspection
 - Executable, working-directory, and parent-process-chain evidence
 - Project-aware names for Vite, Next.js, React tooling, Nuxt, webpack, and
@@ -159,6 +168,7 @@ The scanner is behind a platform-neutral interface so Linux can use `ss`,
 src/
 ├── main/
 │   ├── index.ts                 Electron windows, tray, and IPC
+│   ├── network/                 Network collectors and relationships
 │   ├── scanners/                Port scanners and process identity
 │   └── services/                Service collectors and relationships
 ├── preload/
@@ -167,6 +177,7 @@ src/
 │   └── src/                     React interface
 └── shared/
     ├── ports.ts                 Port and host snapshot types
+    ├── network.ts               Network context and relationship types
     └── services.ts              Service and startup types
 ```
 
@@ -178,6 +189,7 @@ yarn typecheck          # Check main, preload, and renderer TypeScript
 yarn test               # Run scanner, identity, session, and privacy tests
 yarn benchmark:scanner  # Run the 20-scan macOS reference benchmark
 yarn benchmark:services # Benchmark ports, services, and relationships
+yarn benchmark:network  # Benchmark macOS network context collection
 yarn build              # Create a production application build
 yarn dist:mac           # Create unsigned local .dmg and .zip artifacts
 ```
@@ -213,8 +225,8 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 - **0.3.0 — Services & Startup Inspector:** inventory launchd and Homebrew
   services, retain stopped configuration, normalize status and startup
   behavior, and connect services to processes and listening ports.
-- **0.4.0 — Host Overview & Network Context:** interfaces, addresses, routes,
-  DNS, VPN context, and socket-to-interface relationships.
+- **0.4.0 — Host Overview & Network Context:** released with interfaces,
+  addresses, routes, DNS, VPN context, and socket-to-interface relationships.
 - **0.5.0 — Runtimes & Global Packages:** Node.js/Python runtimes and
   npm/Yarn/pnpm/pip/pipx global packages related to processes and ports.
 - **0.6.0 — Persistent Changes & Alerts:** local snapshots, typed changes,

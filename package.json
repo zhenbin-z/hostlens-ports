@@ -1,6 +1,6 @@
 {
   "name": "hostlens-ports",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "A lightweight desktop inspector for listening ports, processes, and startup services.",
   "author": "Zhenbin Zhang",
