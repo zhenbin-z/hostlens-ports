@@ -7,6 +7,10 @@ import type {
   ServiceScanner,
   ServiceSnapshot,
 } from "../shared/services.ts";
+import type {
+  NetworkScanner,
+  NetworkSnapshot,
+} from "../shared/network.ts";
 import { compareSnapshots } from "../shared/session-changes.ts";
 import type { PortScanner } from "./scanners/port-scanner.ts";
 
@@ -16,6 +20,7 @@ const DEFAULT_COALESCE_SCAN_MS = 750;
 export class SessionMonitor {
   private readonly scanner: PortScanner;
   private readonly serviceScanner: ServiceScanner;
+  private readonly networkScanner: NetworkScanner;
   private readonly coalesceScanMs: number;
   private readonly startedAt = new Date().toISOString();
   private previousSnapshot: PortSnapshot | undefined;
@@ -27,10 +32,12 @@ export class SessionMonitor {
   public constructor(
     scanner: PortScanner,
     serviceScanner: ServiceScanner,
+    networkScanner: NetworkScanner,
     coalesceScanMs = DEFAULT_COALESCE_SCAN_MS,
   ) {
     this.scanner = scanner;
     this.serviceScanner = serviceScanner;
+    this.networkScanner = networkScanner;
     this.coalesceScanMs = coalesceScanMs;
   }
 
@@ -53,7 +60,10 @@ export class SessionMonitor {
 
   private async performScan(): Promise<HostLensState> {
     const snapshot = await this.scanner.scan();
-    const services = await this.scanServices(snapshot);
+    const [services, network] = await Promise.all([
+      this.scanServices(snapshot),
+      this.scanNetwork(snapshot),
+    ]);
     if (this.previousSnapshot) {
       const nextEvents = compareSnapshots(this.previousSnapshot, snapshot);
       if (nextEvents.length > 0) {
@@ -68,12 +78,39 @@ export class SessionMonitor {
     this.latestState = {
       snapshot,
       services,
+      network,
       changes: {
         startedAt: this.startedAt,
         events: this.events,
       },
     };
     return this.latestState;
+  }
+
+  private async scanNetwork(snapshot: PortSnapshot): Promise<NetworkSnapshot> {
+    try {
+      return await this.networkScanner.scan(snapshot.listeners);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unknown network scan error";
+
+      return {
+        scannedAt: snapshot.scannedAt,
+        platform: snapshot.platform,
+        interfaces: [],
+        routes: [],
+        dnsResolvers: [],
+        vpnConnections: [],
+        socketRelations: [],
+        summary: {
+          dnsServers: [],
+          vpnActive: false,
+        },
+        warnings: [
+          `Network inspection failed without affecting port results: ${message}`,
+        ],
+      };
+    }
   }
 
   private async scanServices(snapshot: PortSnapshot): Promise<ServiceSnapshot> {
