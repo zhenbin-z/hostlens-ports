@@ -203,11 +203,16 @@ function bindPackagesToRuntimes(
   }
 }
 
-export class MacOsRuntimeScanner implements RuntimeScanner {
+export class UnixRuntimeScanner implements RuntimeScanner {
   private readonly runner: RuntimeCommandRunner;
+  private readonly platform: "darwin" | "linux";
   private inventoryCache: RuntimeInventoryCache | undefined;
 
-  public constructor(runner: RuntimeCommandRunner = new DefaultRuntimeCommandRunner()) {
+  public constructor(
+    platform: "darwin" | "linux",
+    runner: RuntimeCommandRunner = new DefaultRuntimeCommandRunner(),
+  ) {
+    this.platform = platform;
     this.runner = runner;
   }
 
@@ -220,7 +225,7 @@ export class MacOsRuntimeScanner implements RuntimeScanner {
 
     return {
       scannedAt: collectedAt,
-      platform: "darwin",
+      platform: this.platform,
       runtimes: inventory.runtimes,
       packages: inventory.packages,
       relationships: relatePackagesToHost(
@@ -295,5 +300,11 @@ export class MacOsRuntimeScanner implements RuntimeScanner {
       warnings,
     };
     return this.inventoryCache;
+  }
+}
+
+export class MacOsRuntimeScanner extends UnixRuntimeScanner {
+  public constructor(runner?: RuntimeCommandRunner) {
+    super("darwin", runner);
   }
 }
