@@ -46,7 +46,9 @@ function startupLabel(startup: StartupBehavior, t: Translator): string {
 }
 
 function managerLabel(manager: ServiceManager, t: Translator): string {
-  return manager === "homebrew" ? t("homebrew") : t("launchd");
+  if (manager === "homebrew") return t("homebrew");
+  if (manager === "systemd") return t("systemd");
+  return t("launchd");
 }
 
 function kindLabel(kind: ServiceKind, t: Translator): string {
@@ -213,6 +215,7 @@ export function ServicesView({
               <option value="all">{t("allManagers")}</option>
               <option value="launchd">{t("launchd")}</option>
               <option value="homebrew">{t("homebrew")}</option>
+              <option value="systemd">{t("systemd")}</option>
             </select>
           </label>
           <label>

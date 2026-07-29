@@ -5,7 +5,7 @@ import type {
   PortListener,
 } from "./ports.ts";
 
-export type ServiceManager = "launchd" | "homebrew";
+export type ServiceManager = "launchd" | "homebrew" | "systemd";
 export type ServiceKind = "user-agent" | "system-agent" | "system-daemon";
 export type ServiceScope = "user" | "system";
 export type ServiceOwnership =
