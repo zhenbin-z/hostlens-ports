@@ -239,48 +239,68 @@ Technical Evidence 可以引用同一个 Object。
 - MCP、LLM或Chat；
 - Multi-host Management。
 
-## 下一步：Unified Host Model 与 macOS Inspector
+## 计划：0.4.0 — macOS Host Overview & Network Context
 
-在0.3验证Service Relationship之后：
+0.4需要回答：
 
-- 正式定义 `Process`、`Socket`、`Project`、`LaunchSource` 与 `Evidence`；
-- 扩展Docker与Startup Item关系；
-- 展示 Network Interface、Route、DNS 和 VPN Context；
-- 增加展示 Background Activity 与 Startup Behavior 的 Personal Overview；
-- 增加展示 Project、Runtime 与 Local Service 的 Developer View；
-- 增加展示 Machine Inventory、Evidence 与 Reviewable Summary 的 IT View；
-- 只有在真实 Collector 和 UI 存在时才加入新的资源类型。
+> **这台Mac连接到了哪些Network，Listening Service可能通过哪些Interface访问？**
 
-## Linux 一等支持
+- 正式定义`Process`、`Service`、`Socket`、`Project`、`LaunchSource`、
+  `NetworkInterface`、`Route`、`DnsConfiguration`、`VpnConnection`与
+  `Evidence`的Relationship；
+- 收集macOS Interface、IPv4 / IPv6地址、Default Route、DNS Configuration与
+  可以观测到的VPN Interface；
+- 将Socket Bind Address关联到具体Interface，但不声称一定能穿过Firewall或从
+  Internet访问；
+- 区分Bound、Potentially Reachable和Actively Tested；
+- 增加展示Current Network、Background Service、Startup Behavior、
+  Network-facing Port与Session Change的Host Overview；
+- 提供面向个人用户的说明，以及可展开的Developer / IT Evidence；
+- 保持本地、只读，不进行Active LAN Scan；
+- 在真实Mac上验证Collector、Relationship、性能和三语UI。
 
-Linux 使用共享 Host 概念，同时保留平台专用 Evidence。
+## 计划：0.5.0 — Runtimes & Global Packages Inspector
 
-推荐顺序：
+0.5把已安装开发工具与当前运行状态关联起来：
 
-1. Process 与 Listening Socket；
-2. systemd Service；
-3. systemd Timer 与 cron；
-4. Startup Source Attribution；
-5. firewalld；
-6. journal Summary；
-7. Docker 与 Podman；
-8. Package 与 Runtime Inventory。
+- 从System、Homebrew、nvm、pyenv等来源检查Node.js / Python Runtime；
+- 检查npm、Yarn、pnpm、pip和pipx Global Package；
+- 显示Package Name、Version、Manager、Runtime、Install Path与Executable；
+- 将Package Executable关联到Process、Service、Project和Listening Port；
+- 权限不足时保留带Evidence的Unknown / Partial Observation；
+- 提供Search、Filter、Summary、Export和英日中三语UI；
+- 不执行Install、Update、Uninstall、Vulnerability Verdict或每个Project的完整
+  Dependency Scan。
 
-第一批目标是 Ubuntu 和 Red Hat Enterprise Linux。Headless 和 Multi-host
-属于独立的后续问题。
+## 计划：0.6.0 — Persistent Changes & Alerts
 
-## Persistent Changes 与 Alerts
+Normalized Identity稳定后：
 
-规范化身份稳定后：
+- 持久化带版本的轻量Local Snapshot；
+- 为Port、Service、Network Context及Runtime / Package Inventory生成类型化
+  `ChangeEvent`；
+- 提供带Retention Control的有限Timeline；
+- 允许Watch或Ignore Resource；
+- 提供基于Evidence的Alert Rule、Cooldown与Desktop Notification；
+- 提供可Review的Current-state和Change Summary；
+- 使用带Migration测试的Local Database，不增加Telemetry。
 
-- 持久化轻量 Snapshot；
-- 生成类型化 `ChangeEvent`；
-- 提供 Timeline；
-- 支持 Alert Rule 与 cooldown；
-- 提供 Desktop Notification；
-- 允许用户标记关注资源。
+Alert应该解释Evidence与变化，而不是制造安全裁决。
 
-Alert 应该解释 Evidence 与变化，而不是制造安全裁决。
+## 计划：0.7.0 — Ubuntu / RHEL First-class Support
+
+Linux使用同一套Host概念，同时保留平台专用Evidence。
+
+- 通过`ss`和`/proc`支持Process及Listening Socket；
+- 支持systemd Service及Startup Behavior；
+- 收集Interface、Route、DNS、VPN Context与firewalld Observation；
+- 在可用时检查Docker / Podman、Runtime与Global Package；
+- 复用Relationship、Persistent Change、Alert、Report和三语UI；
+- 提供`.deb`、`.rpm`和实用的GNOME Desktop Packaging；
+- 通过Fixture和代表性真实环境验证Ubuntu与Red Hat Enterprise Linux；
+- Command、权限或Optional Tool不可用时仍保留Partial Result。
+
+Headless Agent、Multi-host、Service Mutation与无限制Shell属于后续问题。
 
 ## 个人与中小企业体验
 

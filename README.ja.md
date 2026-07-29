@@ -180,9 +180,16 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 - **0.3.0 — Services & Startup Inspector：** launchdとHomebrew Serviceを収集し、
   停止中の設定を保持、StatusとStartup Behaviorを正規化し、ServiceをProcessと
   Listening Portへ関連付け
-- **その後：** Unified Host Model、Linux一等対応、個人・情シス向けExperience、
-  永続ChangesとAlerts、読み取り専用MCP、任意のExplain、Environment
-  Intelligenceを進め、その後にSupervised Operationsを検討
+- **0.4.0 — Host Overview & Network Context：** Interface、Address、Route、
+  DNS、VPN Context、SocketとInterfaceのRelationship
+- **0.5.0 — Runtimes & Global Packages：** Node.js / Python Runtimeと
+  npm / Yarn / pnpm / pip / pipx Global PackageをProcess / Portへ関連付け
+- **0.6.0 — Persistent Changes & Alerts：** Local Snapshot、型付きChange、
+  Timeline、Watch Resource、Cooldown、Desktop Notification
+- **0.7.0 — Ubuntu / RHEL First-class Support：** Linux Collector、systemd、
+  Network、Package、Persistence、Alert、Desktop Packaging
+- **その後：** 読み取り専用MCP、任意のExplain、Environment Intelligence、
+  その後にSupervised Operationsを検討
 
 HostLensはAIがなくても有用であり続けます。将来のAI機能は、明示的に選択された
 最小限の構造化データのみを利用し、無制限のShellにはアクセスしません。

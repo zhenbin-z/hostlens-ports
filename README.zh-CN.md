@@ -175,9 +175,16 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 - **0.3.0 — Services & Startup Inspector：** 检查launchd和Homebrew Service，
   保留停止中的配置，统一Status与Startup Behavior，并将Service关联到Process和
   Listening Port。
-- **之后：** 扩展 Unified Host Model，加入 Linux 一等支持、个人与情信体验、
-  持久化 Changes 与 Alerts、只读 MCP、可选 Explain 和 Environment
-  Intelligence，最后才考虑 Supervised Operations。
+- **0.4.0 — Host Overview & Network Context：** Interface、Address、Route、
+  DNS、VPN Context以及Socket到Interface的Relationship。
+- **0.5.0 — Runtimes & Global Packages：** 将Node.js / Python Runtime与
+  npm / Yarn / pnpm / pip / pipx Global Package关联到Process和Port。
+- **0.6.0 — Persistent Changes & Alerts：** Local Snapshot、类型化Change、
+  Timeline、Watch Resource、Cooldown和Desktop Notification。
+- **0.7.0 — Ubuntu / RHEL First-class Support：** Linux Collector、systemd、
+  Network、Package、Persistence、Alert和Desktop Packaging。
+- **之后：** 只读MCP、可选Explain、Environment Intelligence，最后才考虑
+  Supervised Operations。
 
 HostLens 在没有 AI 时也必须保持实用。未来 AI 功能只能使用用户明确选择的最少
 结构化数据，并且不能获得无限制 Shell。

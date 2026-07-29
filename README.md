@@ -213,10 +213,16 @@ See → Identify → Relate → Remember → Explain → Advise → Operate safe
 - **0.3.0 — Services & Startup Inspector:** inventory launchd and Homebrew
   services, retain stopped configuration, normalize status and startup
   behavior, and connect services to processes and listening ports.
-- **Later:** expand the unified host model, add first-class Linux support,
-  personal and small-business IT experiences, persistent changes and alerts,
-  read-only MCP, optional Explain, environment intelligence, and only then
-  consider supervised operations.
+- **0.4.0 — Host Overview & Network Context:** interfaces, addresses, routes,
+  DNS, VPN context, and socket-to-interface relationships.
+- **0.5.0 — Runtimes & Global Packages:** Node.js/Python runtimes and
+  npm/Yarn/pnpm/pip/pipx global packages related to processes and ports.
+- **0.6.0 — Persistent Changes & Alerts:** local snapshots, typed changes,
+  timeline, watched resources, cooldowns, and desktop notifications.
+- **0.7.0 — Ubuntu / RHEL First-class Support:** Linux collectors, systemd,
+  networking, packages, persistence, alerts, and desktop packaging.
+- **Later:** read-only MCP, optional Explain, environment intelligence, and
+  only then supervised operations.
 
 HostLens will remain useful without AI. Future AI features must operate on
 minimal, explicitly selected structured data and will not receive an

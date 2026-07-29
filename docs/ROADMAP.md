@@ -266,48 +266,78 @@ Completion evidence recorded on the `develop/0.3.0` branch on July 28, 2026:
 - MCP, LLM, or chat features; and
 - multi-host management.
 
-## Next: Unified Host Model and macOS Inspector
+## Planned: 0.4.0 — macOS Host Overview & Network Context
 
-After 0.3 validates service relationships:
+Version 0.4 should answer:
 
-- formalize `Process`, `Socket`, `Project`, `LaunchSource`, and `Evidence`;
-- expand Docker and startup-item relationships;
-- show network interfaces, routes, DNS, and VPN context;
-- add a personal overview for background activity and startup behavior;
-- add a developer view for projects, runtimes, and local services;
-- add an IT view for machine inventory, evidence, and reviewable summaries; and
-- introduce new resource types only with real collectors and UI.
+> **Which networks is this Mac connected to, and through which interfaces can
+> its listening services be reached?**
 
-## Linux first-class support
+- formalize the shared `Process`, `Service`, `Socket`, `Project`,
+  `LaunchSource`, `NetworkInterface`, `Route`, `DnsConfiguration`,
+  `VpnConnection`, and `Evidence` relationships;
+- collect macOS interfaces, IPv4/IPv6 addresses, default routes, DNS
+  configuration, and observable VPN interfaces;
+- relate socket bind addresses to concrete interfaces without claiming
+  firewall or internet reachability;
+- distinguish Bound, Potentially reachable, and Actively tested states;
+- add a Host Overview for current network, background services, startup
+  behavior, network-facing ports, and session changes;
+- provide personal-language summaries and expandable developer/IT evidence;
+- keep all collection local, read-only, and free of active LAN scanning; and
+- verify collectors, relationships, performance, and all three languages on a
+  real Mac.
 
-Linux will use the shared host concepts with platform-specific evidence.
+## Planned: 0.5.0 — Runtimes & Global Packages Inspector
 
-Recommended order:
+Version 0.5 should connect installed developer tooling to what is running:
 
-1. processes and listening sockets;
-2. systemd services;
-3. systemd timers and cron;
-4. startup-source attribution;
-5. firewalld;
-6. journal summaries;
-7. Docker and Podman; and
-8. package and runtime inventory.
+- inventory Node.js and Python runtimes from system, Homebrew, nvm, pyenv, and
+  other observable installations;
+- inventory npm, Yarn, pnpm, pip, and pipx global packages;
+- show package name, version, manager, runtime, installation path, and exposed
+  executables;
+- relate package executables to running processes, services, projects, and
+  listening ports;
+- preserve unknown and permission-limited observations with evidence;
+- provide search, filters, summaries, export, and English/Japanese/Chinese UI;
+  and
+- remain read-only: no install, update, uninstall, vulnerability verdict, or
+  full per-project dependency scan.
 
-Initial work should target Ubuntu and Red Hat Enterprise Linux. Headless and
-multi-host operation are separate later concerns.
-
-## Persistent changes and alerts
+## Planned: 0.6.0 — Persistent Changes & Alerts
 
 Once normalized identities are stable:
 
-- persist lightweight snapshots;
-- create typed `ChangeEvent` records;
-- provide a timeline;
-- support alert rules and cooldowns;
-- provide desktop notifications; and
-- let users mark resources they care about.
+- persist lightweight, versioned local snapshots;
+- create typed `ChangeEvent` records for ports, services, network context, and
+  runtime/package inventory;
+- provide a bounded timeline with retention controls;
+- let users watch or ignore resources;
+- support evidence-backed alert rules, cooldowns, and desktop notifications;
+- provide reviewable current-state and change summaries; and
+- keep the database local with tested migrations and no telemetry.
 
 Alerts should explain evidence and change, not manufacture security verdicts.
+
+## Planned: 0.7.0 — Ubuntu / RHEL First-class Support
+
+Linux should use the same host concepts with platform-specific evidence.
+
+- support processes and listening sockets through `ss` and `/proc`;
+- support systemd services and startup behavior;
+- collect interfaces, routes, DNS, VPN context, and firewalld observations;
+- inventory Docker/Podman, runtimes, and global packages where available;
+- reuse relationships, persistent changes, alerts, reports, and the
+  trilingual UI;
+- provide `.deb`, `.rpm`, and practical GNOME desktop packaging;
+- validate Ubuntu and Red Hat Enterprise Linux behavior with fixtures and
+  representative real environments; and
+- preserve partial results when commands, permissions, or optional tools are
+  unavailable.
+
+Headless agents, multi-host management, service mutation, and unrestricted
+shell access remain later concerns.
 
 ## Personal and small-business experiences
 

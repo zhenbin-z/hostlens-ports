@@ -244,48 +244,69 @@ Fieldが存在するだけでは完了とみなしません。
 - MCP、LLM、Chat
 - Multi-host Management
 
-## 次：Unified Host Model と macOS Inspector
+## 計画：0.4.0 — macOS Host Overview & Network Context
 
-0.3でService Relationshipを検証した後：
+0.4は次の問いに答えます。
 
-- `Process`、`Socket`、`Project`、`LaunchSource`、`Evidence` を正式化
-- Docker / Startup Item Relationshipを拡張
-- Network Interface、Route、DNS、VPN Context
-- Background ActivityとStartup Behaviorを示すPersonal Overview
-- Project、Runtime、Local Serviceを示すDeveloper View
-- Machine Inventory、Evidence、Reviewable Summaryを示すIT View
-- 実際のCollectorとUIがある場合のみResource Typeを追加
+> **このMacはどのNetworkへ接続し、Listening ServiceはどのInterfaceから到達
+> し得るか？**
 
-## Linux 一等対応
+- `Process`、`Service`、`Socket`、`Project`、`LaunchSource`、
+  `NetworkInterface`、`Route`、`DnsConfiguration`、`VpnConnection`、
+  `Evidence` のRelationshipを正式化
+- macOSのInterface、IPv4 / IPv6 Address、Default Route、DNS Configuration、
+  観測可能なVPN Interfaceを収集
+- FirewallやInternet Reachabilityを断定せず、Socket Bind Addressを具体的な
+  Interfaceへ関連付け
+- Bound、Potentially Reachable、Actively Testedを区別
+- Current Network、Background Service、Startup Behavior、Network-facing Port、
+  Session Changeを示すHost Overview
+- Personal向け説明と展開可能なDeveloper / IT Evidence
+- Active LAN Scanなし、LocalかつRead-onlyを維持
+- 実MacでCollector、Relationship、Performance、3言語UIを検証
 
-Linux は共通Host概念とPlatform固有Evidenceを利用します。
+## 計画：0.5.0 — Runtimes & Global Packages Inspector
 
-推奨順序：
+0.5はInstalled Developer ToolingとRunning Stateを関連付けます。
 
-1. Process と Listening Socket
-2. systemd Service
-3. systemd Timer と cron
-4. Startup Source Attribution
-5. firewalld
-6. journal Summary
-7. Docker / Podman
-8. Package / Runtime Inventory
+- System、Homebrew、nvm、pyenvなどからNode.js / Python RuntimeをInventory
+- npm、Yarn、pnpm、pip、pipxのGlobal PackageをInventory
+- Package Name、Version、Manager、Runtime、Install Path、Executableを表示
+- Package ExecutableをProcess、Service、Project、Listening Portへ関連付け
+- Unknown / Permission-limited ObservationをEvidence付きで保持
+- Search、Filter、Summary、Export、英語 / 日本語 / 簡体字中国語UI
+- Install、Update、Uninstall、Vulnerability Verdict、Project全Dependency Scanは
+  行わない
 
-最初は Ubuntu と Red Hat Enterprise Linux を対象にします。Headless と
-Multi-host は別の後期課題です。
+## 計画：0.6.0 — Persistent Changes & Alerts
 
-## Persistent Changes と Alerts
+Normalized Identityが安定した後：
 
-Identityが安定した後：
+- Version付きの軽量Local Snapshotを永続化
+- Port、Service、Network Context、Runtime / Package Inventory向けの型付き
+  `ChangeEvent`
+- Retention Control付きの限定Timeline
+- ResourceのWatch / Ignore
+- Evidence付きAlert Rule、Cooldown、Desktop Notification
+- Review可能なCurrent-state / Change Summary
+- Tested Migrationを持つLocal Database、Telemetryなし
 
-- 軽量Snapshotを永続化
-- 型付き `ChangeEvent`
-- Timeline
-- Alert Rule / cooldown
-- Desktop Notification
-- ユーザーが注目するResource
+AlertはSecurity Verdictを作るのではなく、Evidenceと変化を説明します。
 
-Alert は Security Verdict を作るのではなく、Evidence と変化を説明します。
+## 計画：0.7.0 — Ubuntu / RHEL First-class Support
+
+Linuxは同じHost概念とPlatform固有Evidenceを利用します。
+
+- `ss`と`/proc`によるProcess / Listening Socket
+- systemd ServiceとStartup Behavior
+- Interface、Route、DNS、VPN Context、firewalld Observation
+- 利用可能なDocker / Podman、Runtime、Global Package Inventory
+- Relationship、Persistent Change、Alert、Report、3言語UIを再利用
+- `.deb`、`.rpm`、実用的なGNOME Desktop Packaging
+- Fixtureと代表的な実環境でUbuntu / Red Hat Enterprise Linuxを検証
+- Command、権限、Optional Toolが利用できない場合もPartial Resultを保持
+
+Headless Agent、Multi-host、Service Mutation、無制限Shellは後期課題です。
 
 ## 個人・中小企業向けExperience
 
